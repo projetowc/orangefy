@@ -92,8 +92,8 @@ const allMissions = [
   },
   {
     id: 6,
-    title: "Atingir 10 vendas — Meta Final!",
-    description: "O objetivo definitivo. 10 vendas provam que você é um vendedor de verdade.",
+    title: "Atingir 10 vendas — e continue crescendo!",
+    description: "Atingir 10 vendas é só o começo. A partir daqui você escala e diversifica produtos.",
     xp: 1000,
     reward: "Badge Lendário + acesso ao Nível Avançado",
     completed: false,
@@ -138,7 +138,7 @@ export default function MissoesPage() {
 
   return (
     <>
-      <Header title="Missões" subtitle="Sua jornada gamificada para as primeiras 10 vendas" />
+      <Header title="Missões" subtitle="Sua jornada gamificada para o sucesso nas vendas" />
 
       <div className="p-6 space-y-6">
         {/* PROGRESS BAR */}

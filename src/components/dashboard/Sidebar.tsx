@@ -10,6 +10,7 @@ import {
   ChevronRight, X, Menu
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useUser, getInitials, getFirstName } from "@/context/UserContext";
 
 const navItems = [
   { href: "/dashboard", icon: LayoutDashboard, label: "Dashboard" },
@@ -25,14 +26,26 @@ const navItems = [
 
 function SidebarContent({ onClose }: { onClose?: () => void }) {
   const pathname = usePathname();
+  const { profile, user, signOut } = useUser();
+
+  const name = profile?.name || user?.email?.split("@")[0] || "Usuário";
+  const initials = getInitials(name);
+  const xp = profile?.xp ?? 0;
+  const level = profile?.level ?? 1;
+  const xpToNext = level * 1000;
+  const xpPercent = Math.min(Math.round((xp / xpToNext) * 100), 100);
+
+  const levelLabels: Record<number, string> = {
+    1: "Iniciante", 2: "Aprendiz", 3: "Intermediário",
+    4: "Avançado", 5: "Especialista", 6: "Mestre",
+  };
 
   return (
     <div className="flex flex-col h-full">
-      {/* Logo */}
       <div className="flex items-center justify-between p-6 border-b border-surface-200">
         <Link href="/dashboard" className="flex items-center gap-2.5">
           <div className="w-9 h-9 rounded-xl bg-gradient-brand flex items-center justify-center shadow-brand">
-            <ShoppingBag className="w-4.5 h-4.5 text-white w-[18px] h-[18px]" />
+            <ShoppingBag className="w-[18px] h-[18px] text-white" />
           </div>
           <span className="text-xl font-black text-dark">
             Orange<span className="text-brand">fy</span>
@@ -45,27 +58,25 @@ function SidebarContent({ onClose }: { onClose?: () => void }) {
         )}
       </div>
 
-      {/* User XP Card */}
       <div className="m-4 p-4 bg-gradient-hero rounded-2xl border border-surface-200">
         <div className="flex items-center gap-3 mb-3">
           <div className="w-10 h-10 rounded-full bg-gradient-brand flex items-center justify-center text-white font-bold text-sm">
-            W
+            {initials}
           </div>
           <div>
-            <div className="font-semibold text-dark text-sm">Wesley S.</div>
-            <div className="text-xs text-dark-muted">Nível 3 · Iniciante</div>
+            <div className="font-semibold text-dark text-sm">{getFirstName(name)}</div>
+            <div className="text-xs text-dark-muted">Nível {level} · {levelLabels[level] ?? "Vendedor"}</div>
           </div>
         </div>
         <div className="mb-1 flex items-center justify-between text-xs">
-          <span className="text-dark-muted font-medium">840 / 1000 XP</span>
-          <span className="text-brand font-semibold">84%</span>
+          <span className="text-dark-muted font-medium">{xp} / {xpToNext} XP</span>
+          <span className="text-brand font-semibold">{xpPercent}%</span>
         </div>
         <div className="w-full h-2 bg-surface-200 rounded-full overflow-hidden">
-          <div className="h-full bg-gradient-brand rounded-full" style={{ width: "84%" }} />
+          <div className="h-full bg-gradient-brand rounded-full transition-all duration-500" style={{ width: `${xpPercent}%` }} />
         </div>
       </div>
 
-      {/* Nav */}
       <nav className="flex-1 px-3 py-2 space-y-1 overflow-y-auto scrollbar-hide">
         {navItems.map((item) => {
           const isActive = pathname === item.href;
@@ -74,10 +85,7 @@ function SidebarContent({ onClose }: { onClose?: () => void }) {
               key={item.href}
               href={item.href}
               onClick={onClose}
-              className={cn(
-                "sidebar-item",
-                isActive && "active"
-              )}
+              className={cn("sidebar-item", isActive && "active")}
             >
               <item.icon className="w-5 h-5 flex-shrink-0" />
               <span className="flex-1">{item.label}</span>
@@ -92,9 +100,11 @@ function SidebarContent({ onClose }: { onClose?: () => void }) {
         })}
       </nav>
 
-      {/* Bottom */}
       <div className="p-4 border-t border-surface-200">
-        <button className="sidebar-item w-full text-danger hover:bg-red-50 hover:text-danger">
+        <button
+          onClick={signOut}
+          className="sidebar-item w-full text-danger hover:bg-red-50 hover:text-danger"
+        >
           <LogOut className="w-5 h-5" />
           <span>Sair</span>
         </button>
@@ -108,7 +118,6 @@ export default function Sidebar() {
 
   return (
     <>
-      {/* Mobile Toggle */}
       <button
         onClick={() => setMobileOpen(true)}
         className="lg:hidden fixed top-4 left-4 z-50 w-10 h-10 bg-white rounded-xl shadow-card border border-surface-200 flex items-center justify-center"
@@ -116,12 +125,10 @@ export default function Sidebar() {
         <Menu className="w-5 h-5 text-dark" />
       </button>
 
-      {/* Desktop Sidebar */}
       <aside className="hidden lg:flex w-72 bg-white border-r border-surface-200 flex-col h-screen sticky top-0">
         <SidebarContent />
       </aside>
 
-      {/* Mobile Overlay */}
       <AnimatePresence>
         {mobileOpen && (
           <>

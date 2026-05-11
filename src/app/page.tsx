@@ -190,8 +190,8 @@ export default function LandingPage() {
                 <div className="flex items-center gap-3">
                   <div className="w-8 h-8 rounded-full bg-gradient-brand flex items-center justify-center text-white text-xs font-bold">W</div>
                   <div>
-                    <div className="text-sm font-semibold text-dark">Bem-vindo, Wesley</div>
-                    <div className="text-xs text-dark-muted">Nível 3 · 840 XP</div>
+                    <div className="text-sm font-semibold text-dark">Bem-vindo de volta!</div>
+                    <div className="text-xs text-dark-muted">Nível 1 · 0 XP</div>
                   </div>
                 </div>
                 <div className="flex items-center gap-2">
@@ -313,7 +313,7 @@ export default function LandingPage() {
               Como funciona
             </motion.div>
             <motion.h2 variants={fadeUp} className="text-4xl sm:text-5xl font-black text-dark mb-4">
-              Do zero às primeiras <span className="text-gradient">10 vendas</span>
+              Do zero ao <span className="text-gradient">sucesso nas vendas</span>
             </motion.h2>
           </motion.div>
 
@@ -544,7 +544,7 @@ export default function LandingPage() {
                 <span className="text-xl font-bold">Orange<span className="text-brand">fy</span></span>
               </div>
               <p className="text-white/50 text-sm leading-relaxed">
-                A plataforma que leva iniciantes às primeiras 10 vendas na Shopee.
+                A plataforma que transforma iniciantes em vendedores de sucesso na Shopee.
               </p>
             </div>
             <div>

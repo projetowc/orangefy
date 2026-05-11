@@ -14,7 +14,7 @@ const rankings = [
   { pos: 7, name: "Juliana R.", avatar: "JR", xp: 1850, sales: 18, level: 4, badge: null },
   { pos: 8, name: "Marcos O.", avatar: "MO", xp: 1620, sales: 15, level: 3, badge: null },
   { pos: 9, name: "Patricia H.", avatar: "PH", xp: 1400, sales: 14, level: 3, badge: null },
-  { pos: 10, name: "Wesley S.", avatar: "WS", xp: 1240, sales: 12, level: 3, badge: null, isMe: true },
+  { pos: 10, name: "Você", avatar: "EU", xp: 0, sales: 0, level: 1, badge: null, isMe: true },
 ];
 
 const levelColors = ["", "", "", "bg-blue-500", "bg-purple-500", "bg-amber-500", "bg-orange-500", "bg-red-500", "bg-gradient-brand"];

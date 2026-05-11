@@ -1,6 +1,7 @@
 "use client";
 
 import { Bell, Search, Flame } from "lucide-react";
+import { useUser } from "@/context/UserContext";
 
 interface HeaderProps {
   title: string;
@@ -8,6 +9,9 @@ interface HeaderProps {
 }
 
 export default function Header({ title, subtitle }: HeaderProps) {
+  const { profile } = useUser();
+  const streak = profile?.streak_days ?? 0;
+
   return (
     <header className="bg-white border-b border-surface-200 px-6 py-4">
       <div className="flex items-center justify-between">
@@ -23,13 +27,14 @@ export default function Header({ title, subtitle }: HeaderProps) {
               className="bg-transparent text-sm text-dark placeholder-dark-muted outline-none w-full"
             />
           </div>
-          <div className="flex items-center gap-1.5 bg-orange-50 text-brand rounded-xl px-3 py-2 text-sm font-semibold">
-            <Flame className="w-4 h-4" />
-            <span>7 dias</span>
-          </div>
+          {streak > 0 && (
+            <div className="flex items-center gap-1.5 bg-orange-50 text-brand rounded-xl px-3 py-2 text-sm font-semibold">
+              <Flame className="w-4 h-4" />
+              <span>{streak} dias</span>
+            </div>
+          )}
           <button className="relative w-10 h-10 bg-surface-50 border border-surface-200 rounded-xl flex items-center justify-center hover:bg-surface-100 transition-colors">
             <Bell className="w-4 h-4 text-dark-muted" />
-            <span className="absolute top-2 right-2 w-2 h-2 bg-brand rounded-full" />
           </button>
         </div>
       </div>

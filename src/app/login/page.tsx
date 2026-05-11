@@ -3,14 +3,18 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import {
   ShoppingBag, Eye, EyeOff, ArrowRight, Lock, Mail,
   CheckCircle2, AlertCircle, ChevronLeft
 } from "lucide-react";
+import { createClient } from "@/lib/supabase-browser";
 
 type View = "login" | "forgot" | "sent";
 
 export default function LoginPage() {
+  const router = useRouter();
+  const supabase = createClient();
   const [view, setView] = useState<View>("login");
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -23,22 +27,29 @@ export default function LoginPage() {
     e.preventDefault();
     setError("");
     setLoading(true);
-    await new Promise((r) => setTimeout(r, 1000));
-    setError("Credenciais inválidas. Verifique seu e-mail e senha.");
+    const { error } = await supabase.auth.signInWithPassword({ email, password });
+    if (error) {
+      setError("E-mail ou senha inválidos. Verifique suas credenciais.");
+    } else {
+      router.push("/dashboard");
+      router.refresh();
+    }
     setLoading(false);
   }
 
   async function handleForgot(e: React.FormEvent) {
     e.preventDefault();
     setLoading(true);
-    await new Promise((r) => setTimeout(r, 1000));
+    await supabase.auth.resetPasswordForEmail(resetEmail, {
+      redirectTo: `${window.location.origin}/reset-password`,
+    });
     setLoading(false);
     setView("sent");
   }
 
   return (
-    <div className="min-h-screen bg-gradient-hero flex">
-      {/* LEFT PANEL — branding */}
+    <div className="min-h-screen bg-white flex">
+      {/* LEFT PANEL */}
       <div className="hidden lg:flex lg:w-1/2 bg-gradient-brand relative overflow-hidden flex-col justify-between p-12">
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_bottom_left,_rgba(255,255,255,0.1)_0%,_transparent_60%)]" />
 
@@ -50,20 +61,14 @@ export default function LoginPage() {
         </Link>
 
         <div className="relative z-10">
-          <motion.div
-            initial={{ opacity: 0, x: -30 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ delay: 0.2 }}
-          >
+          <motion.div initial={{ opacity: 0, x: -30 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.2 }}>
             <h2 className="text-4xl font-black text-white mb-4 leading-tight">
-              Sua jornada para as primeiras
-              <span className="block text-white/70">10 vendas</span>
-              começa aqui.
+              Sua jornada para o sucesso nas vendas
+              <span className="block text-white/70">começa aqui.</span>
             </h2>
             <p className="text-white/70 text-lg mb-8">
               Entre na plataforma e descubra exatamente o que fazer hoje.
             </p>
-
             <div className="space-y-4">
               {[
                 "Missões diárias guiadas",
@@ -85,10 +90,9 @@ export default function LoginPage() {
         </div>
       </div>
 
-      {/* RIGHT PANEL — form */}
+      {/* RIGHT PANEL */}
       <div className="flex-1 flex items-center justify-center p-6">
         <div className="w-full max-w-md">
-          {/* Mobile logo */}
           <div className="lg:hidden mb-8 text-center">
             <Link href="/" className="inline-flex items-center gap-2">
               <div className="w-10 h-10 rounded-xl bg-gradient-brand flex items-center justify-center">
@@ -111,12 +115,7 @@ export default function LoginPage() {
                   <h1 className="text-3xl font-black text-dark mb-2">Bem-vindo de volta</h1>
                   <p className="text-dark-muted">
                     Ainda não tem acesso?{" "}
-                    <a
-                      href="https://pay.cakto.com.br/454awz8_880943"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-brand font-semibold hover:underline"
-                    >
+                    <a href="https://pay.cakto.com.br/454awz8_880943" target="_blank" rel="noopener noreferrer" className="text-brand font-semibold hover:underline">
                       Assine agora
                     </a>
                   </p>
@@ -124,9 +123,7 @@ export default function LoginPage() {
 
                 <form onSubmit={handleLogin} className="space-y-4">
                   <div>
-                    <label className="block text-sm font-semibold text-dark mb-2">
-                      E-mail
-                    </label>
+                    <label className="block text-sm font-semibold text-dark mb-2">E-mail</label>
                     <div className="relative">
                       <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-dark-muted" />
                       <input
@@ -141,9 +138,7 @@ export default function LoginPage() {
                   </div>
 
                   <div>
-                    <label className="block text-sm font-semibold text-dark mb-2">
-                      Senha
-                    </label>
+                    <label className="block text-sm font-semibold text-dark mb-2">Senha</label>
                     <div className="relative">
                       <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-dark-muted" />
                       <input
@@ -165,11 +160,7 @@ export default function LoginPage() {
                   </div>
 
                   <div className="flex justify-end">
-                    <button
-                      type="button"
-                      onClick={() => setView("forgot")}
-                      className="text-sm text-brand font-medium hover:underline"
-                    >
+                    <button type="button" onClick={() => setView("forgot")} className="text-sm text-brand font-medium hover:underline">
                       Esqueci minha senha
                     </button>
                   </div>
@@ -200,12 +191,6 @@ export default function LoginPage() {
                     )}
                   </button>
                 </form>
-
-                <div className="mt-8 p-4 bg-amber-50 border border-amber-200 rounded-xl">
-                  <p className="text-sm text-amber-700 font-medium">
-                    🔒 O cadastro é exclusivo para assinantes aprovados. Apenas usuários que realizaram a compra têm acesso.
-                  </p>
-                </div>
               </motion.div>
             )}
 
@@ -217,21 +202,14 @@ export default function LoginPage() {
                 exit={{ opacity: 0, y: -20 }}
                 transition={{ duration: 0.3 }}
               >
-                <button
-                  onClick={() => setView("login")}
-                  className="flex items-center gap-2 text-dark-muted hover:text-dark text-sm mb-8 transition-colors"
-                >
+                <button onClick={() => setView("login")} className="flex items-center gap-2 text-dark-muted hover:text-dark text-sm mb-8 transition-colors">
                   <ChevronLeft className="w-4 h-4" />
                   Voltar ao login
                 </button>
-
                 <div className="mb-8">
                   <h1 className="text-3xl font-black text-dark mb-2">Recuperar senha</h1>
-                  <p className="text-dark-muted">
-                    Digite seu e-mail e enviaremos um link de recuperação.
-                  </p>
+                  <p className="text-dark-muted">Digite seu e-mail e enviaremos um link de recuperação.</p>
                 </div>
-
                 <form onSubmit={handleForgot} className="space-y-4">
                   <div>
                     <label className="block text-sm font-semibold text-dark mb-2">E-mail</label>
@@ -247,40 +225,23 @@ export default function LoginPage() {
                       />
                     </div>
                   </div>
-
-                  <button
-                    type="submit"
-                    disabled={loading}
-                    className="btn-brand w-full flex items-center justify-center gap-2 py-4"
-                  >
-                    {loading ? (
-                      <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                    ) : "Enviar link de recuperação"}
+                  <button type="submit" disabled={loading} className="btn-brand w-full flex items-center justify-center gap-2 py-4">
+                    {loading ? <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" /> : "Enviar link de recuperação"}
                   </button>
                 </form>
               </motion.div>
             )}
 
             {view === "sent" && (
-              <motion.div
-                key="sent"
-                initial={{ opacity: 0, scale: 0.9 }}
-                animate={{ opacity: 1, scale: 1 }}
-                exit={{ opacity: 0 }}
-                transition={{ duration: 0.4 }}
-                className="text-center"
-              >
+              <motion.div key="sent" initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0 }} className="text-center">
                 <div className="w-20 h-20 rounded-full bg-green-100 flex items-center justify-center mx-auto mb-6">
                   <CheckCircle2 className="w-10 h-10 text-success" />
                 </div>
                 <h1 className="text-3xl font-black text-dark mb-3">E-mail enviado!</h1>
                 <p className="text-dark-muted mb-8">
-                  Enviamos um link de recuperação para <strong>{resetEmail}</strong>. Verifique sua caixa de entrada.
+                  Enviamos um link para <strong>{resetEmail}</strong>. Verifique sua caixa de entrada.
                 </p>
-                <button
-                  onClick={() => setView("login")}
-                  className="btn-brand w-full flex items-center justify-center gap-2 py-4"
-                >
+                <button onClick={() => setView("login")} className="btn-brand w-full flex items-center justify-center gap-2 py-4">
                   Voltar ao login
                 </button>
               </motion.div>

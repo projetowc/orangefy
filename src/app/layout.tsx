@@ -8,7 +8,7 @@ export const metadata: Metadata = {
   keywords: ["shopee", "vendas online", "dropshipping", "produtos", "ecommerce"],
   openGraph: {
     title: "Orangefy — Venda na Shopee com inteligência",
-    description: "A plataforma que leva iniciantes às primeiras 10 vendas na Shopee.",
+    description: "A plataforma que transforma iniciantes em vendedores de sucesso na Shopee.",
     type: "website",
   },
 };
