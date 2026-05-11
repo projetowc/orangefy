@@ -46,7 +46,10 @@ export async function POST(req: NextRequest) {
       .update({ status: "active", plan: planType })
       .eq("email", customer.email);
   } else {
+    const appUrl = process.env.NEXT_PUBLIC_APP_URL || "https://orangefy-rlhr.vercel.app";
+
     const { error: authError } = await supabase.auth.admin.inviteUserByEmail(customer.email, {
+      redirectTo: `${appUrl}/auth/callback?type=invite`,
       data: {
         name: customer.name || customer.email,
         plan: planType,
