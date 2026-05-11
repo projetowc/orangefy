@@ -1,9 +1,9 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, Suspense } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import {
   ShoppingBag, Eye, EyeOff, ArrowRight, Lock, Mail,
   CheckCircle2, AlertCircle, ChevronLeft
@@ -12,10 +12,18 @@ import { createClient } from "@/lib/supabase-browser";
 
 type View = "login" | "forgot" | "sent";
 
-export default function LoginPage() {
+function LoginForm() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const supabase = createClient();
   const [view, setView] = useState<View>("login");
+  const [linkError, setLinkError] = useState("");
+
+  useEffect(() => {
+    if (searchParams.get("error") === "link_expirado") {
+      setLinkError("Este link expirou ou já foi usado. Solicite um novo abaixo.");
+    }
+  }, [searchParams]);
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
@@ -120,6 +128,17 @@ export default function LoginPage() {
                     </a>
                   </p>
                 </div>
+
+                {linkError && (
+                  <motion.div
+                    initial={{ opacity: 0, y: -8 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className="flex items-center gap-2 bg-amber-50 border border-amber-200 rounded-xl p-3 text-sm text-amber-700 mb-4"
+                  >
+                    <AlertCircle className="w-4 h-4 flex-shrink-0" />
+                    {linkError}
+                  </motion.div>
+                )}
 
                 <form onSubmit={handleLogin} className="space-y-4">
                   <div>
@@ -250,5 +269,17 @@ export default function LoginPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function LoginPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-white flex items-center justify-center">
+        <div className="w-10 h-10 border-4 border-brand/20 border-t-brand rounded-full animate-spin" />
+      </div>
+    }>
+      <LoginForm />
+    </Suspense>
   );
 }
