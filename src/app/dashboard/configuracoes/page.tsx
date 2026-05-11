@@ -126,7 +126,7 @@ export default function ConfiguracoesPage() {
           </div>
 
           <a
-            href="https://pay.cakto.com.br/454awz8_880943"
+            href="https://pay.cakto.com.br/555a875"
             target="_blank"
             rel="noopener noreferrer"
             className="btn-brand w-full text-center flex items-center justify-center gap-2 text-sm"

@@ -437,7 +437,7 @@ export default function LandingPage() {
                 ))}
               </ul>
               <a
-                href="https://pay.cakto.com.br/555a875"
+                href="https://pay.cakto.com.br/454awz8_880943"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="btn-outline w-full text-center block"
@@ -481,7 +481,7 @@ export default function LandingPage() {
                 ))}
               </ul>
               <a
-                href="https://pay.cakto.com.br/454awz8_880943"
+                href="https://pay.cakto.com.br/555a875"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="btn-brand w-full text-center block"
@@ -516,7 +516,7 @@ export default function LandingPage() {
             </motion.p>
             <motion.div variants={fadeUp} className="flex flex-col sm:flex-row gap-4 justify-center">
               <a
-                href="https://pay.cakto.com.br/454awz8_880943"
+                href="https://pay.cakto.com.br/555a875"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="bg-white text-brand font-bold rounded-xl px-8 py-4 hover:bg-surface-50 transition-colors flex items-center justify-center gap-2"
