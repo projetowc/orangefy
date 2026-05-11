@@ -1,8 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getServiceSupabase } from "@/lib/supabase";
 
-// Rota apenas para ambiente de desenvolvimento e testes internos
-// Protegida pelo ADMIN_SECRET — nunca exposta ao público
 export async function POST(req: NextRequest) {
   const adminSecret = req.headers.get("x-admin-secret");
 
@@ -19,31 +17,37 @@ export async function POST(req: NextRequest) {
   const supabase = getServiceSupabase();
   const appUrl = process.env.NEXT_PUBLIC_APP_URL || "https://orangefy-rlhr.vercel.app";
 
-  // Verifica se já existe
-  const { data: existing } = await supabase
-    .from("users")
-    .select("id")
-    .eq("email", email)
-    .single();
-
-  if (existing) {
-    return NextResponse.json({ message: "Usuário já existe", existing: true });
-  }
-
-  // Envia convite (mesmo fluxo do webhook da Cakto)
-  const { error } = await supabase.auth.admin.inviteUserByEmail(email, {
+  // Tenta convidar — se já existe, gera link de redefinição de senha
+  const { error: inviteError } = await supabase.auth.admin.inviteUserByEmail(email, {
     redirectTo: `${appUrl}/auth/callback`,
-    data: {
-      name: name || email,
-      plan: plan || "monthly",
-      status: "active",
-    },
+    data: { name: name || email, plan: plan || "monthly", status: "active" },
   });
 
-  if (error) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+  if (inviteError) {
+    // Usuário já cadastrado — gera link de acesso/recuperação de senha
+    if (inviteError.message.includes("already been registered") || inviteError.code === "email_exists") {
+      const { data, error: resetError } = await supabase.auth.admin.generateLink({
+        type: "recovery",
+        email,
+        options: { redirectTo: `${appUrl}/auth/callback` },
+      });
+
+      if (resetError) {
+        return NextResponse.json({ error: resetError.message }, { status: 500 });
+      }
+
+      return NextResponse.json({
+        success: true,
+        existing: true,
+        message: `Usuário já existia. Link de acesso enviado para ${email}.`,
+        link: data?.properties?.action_link, // só visível aqui, nunca no front
+      });
+    }
+
+    return NextResponse.json({ error: inviteError.message }, { status: 500 });
   }
 
+  // Cria o perfil na tabela users
   await supabase.from("users").upsert({
     email,
     name: name || email,
