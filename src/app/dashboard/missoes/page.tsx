@@ -100,7 +100,7 @@ type MissionProgress = {
 };
 
 export default function MissoesPage() {
-  const { user } = useUser();
+  const { user, refreshProfile } = useUser();
   const [expanded, setExpanded] = useState<number | null>(null);
   const [progress, setProgress] = useState<MissionProgress[]>([]);
   const [loading, setLoading] = useState(true);
@@ -170,6 +170,7 @@ export default function MissoesPage() {
       return [...prev, { mission_id: mission.id, completed: true, checklist_progress: {} }];
     });
 
+    await refreshProfile();
     setSaving(null);
   }
 

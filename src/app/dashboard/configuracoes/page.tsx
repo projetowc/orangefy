@@ -1,14 +1,13 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import {
   User, Bell, Lock, CreditCard, LogOut, ChevronRight,
-  Check, Shield, Mail
+  Check, Shield, Mail, AlertCircle
 } from "lucide-react";
 import Header from "@/components/dashboard/Header";
 import { useUser, getInitials } from "@/context/UserContext";
-import { createClient } from "@/lib/supabase-browser";
 
 function Toggle({ value, onChange }: { value: boolean; onChange: (v: boolean) => void }) {
   return (
@@ -22,24 +21,44 @@ function Toggle({ value, onChange }: { value: boolean; onChange: (v: boolean) =>
 }
 
 export default function ConfiguracoesPage() {
-  const { profile, user, signOut } = useUser();
-  const supabase = createClient();
+  const { profile, user, signOut, refreshProfile } = useUser();
 
   const name = profile?.name || user?.email?.split("@")[0] || "";
   const email = user?.email || "";
-  const initials = getInitials(name);
+  const initials = getInitials(name || "U");
   const plan = profile?.plan === "annual" ? "Anual" : "Mensal";
 
   const [notifMissions, setNotifMissions] = useState(true);
   const [notifTips, setNotifTips] = useState(false);
   const [notifEmail, setNotifEmail] = useState(true);
   const [saved, setSaved] = useState(false);
-  const [nameValue, setNameValue] = useState(name);
+  const [saveError, setSaveError] = useState("");
+  const [saving, setSaving] = useState(false);
+  const [nameValue, setNameValue] = useState("");
+
+  useEffect(() => {
+    if (name) setNameValue(name);
+  }, [name]);
 
   async function save() {
-    if (user && nameValue !== name) {
-      await supabase.from("users").update({ name: nameValue }).eq("id", user.id);
+    setSaveError("");
+    setSaving(true);
+
+    if (user && nameValue.trim() && nameValue.trim() !== name) {
+      const res = await fetch("/api/profile", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name: nameValue.trim() }),
+      });
+      if (!res.ok) {
+        setSaveError("Erro ao salvar. Tente novamente.");
+        setSaving(false);
+        return;
+      }
+      await refreshProfile();
     }
+
+    setSaving(false);
     setSaved(true);
     setTimeout(() => setSaved(false), 2000);
   }
@@ -57,12 +76,12 @@ export default function ConfiguracoesPage() {
           </div>
 
           <div className="flex items-center gap-4 mb-6">
-            <div className="w-16 h-16 rounded-2xl bg-gradient-brand flex items-center justify-center text-white text-xl font-black shadow-brand">
+            <div className="w-14 h-14 rounded-2xl bg-gradient-brand flex items-center justify-center text-white text-xl font-black shadow-brand flex-shrink-0">
               {initials}
             </div>
-            <div>
-              <div className="font-bold text-dark">{name}</div>
-              <div className="text-sm text-dark-muted">{email}</div>
+            <div className="min-w-0">
+              <div className="font-bold text-dark truncate">{name}</div>
+              <div className="text-sm text-dark-muted truncate">{email}</div>
               <div className="badge-brand mt-1">Plano {plan} · Ativo</div>
             </div>
           </div>
@@ -75,6 +94,7 @@ export default function ConfiguracoesPage() {
                 value={nameValue}
                 onChange={(e) => setNameValue(e.target.value)}
                 className="input-field"
+                placeholder="Seu nome completo"
               />
             </div>
             <div>
@@ -83,6 +103,13 @@ export default function ConfiguracoesPage() {
               <p className="text-xs text-dark-muted mt-1">O e-mail não pode ser alterado.</p>
             </div>
           </div>
+
+          {saveError && (
+            <div className="flex items-center gap-2 mt-3 text-sm text-danger bg-red-50 border border-red-200 rounded-xl p-3">
+              <AlertCircle className="w-4 h-4 flex-shrink-0" />
+              {saveError}
+            </div>
+          )}
         </motion.div>
 
         {/* NOTIFICATIONS */}
@@ -98,7 +125,7 @@ export default function ConfiguracoesPage() {
               { label: "E-mail semanal", desc: "Resumo semanal de performance", value: notifEmail, onChange: setNotifEmail },
             ].map((item) => (
               <div key={item.label} className="flex items-center justify-between py-2">
-                <div>
+                <div className="min-w-0 flex-1 mr-4">
                   <div className="font-medium text-dark text-sm">{item.label}</div>
                   <div className="text-xs text-dark-muted">{item.desc}</div>
                 </div>
@@ -157,12 +184,19 @@ export default function ConfiguracoesPage() {
         </motion.div>
 
         {/* ACTIONS */}
-        <motion.div className="flex flex-col sm:flex-row gap-4" initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.4 }}>
+        <motion.div className="flex flex-col sm:flex-row gap-3" initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.4 }}>
           <button
             onClick={save}
-            className={`btn-brand flex-1 flex items-center justify-center gap-2 ${saved ? "bg-success" : ""}`}
+            disabled={saving}
+            className={`btn-brand flex-1 flex items-center justify-center gap-2 transition-colors ${saved ? "bg-success" : ""} disabled:opacity-70`}
           >
-            {saved ? <><Check className="w-4 h-4" /> Salvo!</> : "Salvar alterações"}
+            {saving ? (
+              <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+            ) : saved ? (
+              <><Check className="w-4 h-4" /> Salvo!</>
+            ) : (
+              "Salvar alterações"
+            )}
           </button>
           <button
             onClick={signOut}

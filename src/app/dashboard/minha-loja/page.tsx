@@ -7,6 +7,7 @@ import {
   Trash2, X, Package, Info
 } from "lucide-react";
 import Header from "@/components/dashboard/Header";
+import { useUser } from "@/context/UserContext";
 import { formatCurrency } from "@/lib/utils";
 import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer
@@ -31,6 +32,7 @@ function groupByDay(sales: Sale[]) {
 }
 
 export default function MinhaLojaPage() {
+  const { refreshProfile } = useUser();
   const [sales, setSales] = useState<Sale[]>([]);
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
@@ -61,6 +63,7 @@ export default function MinhaLojaPage() {
     setShowForm(false);
     setSubmitting(false);
     fetchSales();
+    refreshProfile();
   }
 
   async function handleDelete(id: string) {
@@ -70,6 +73,7 @@ export default function MinhaLojaPage() {
       body: JSON.stringify({ id }),
     });
     setSales((prev) => prev.filter((s) => s.id !== id));
+    refreshProfile();
   }
 
   const totalSales = sales.length;
