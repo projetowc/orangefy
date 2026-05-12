@@ -123,7 +123,7 @@ export default function GeradorPage() {
     <>
       <Header title="Gerador de Anúncios" subtitle="Crie títulos e descrições otimizadas para vender mais" />
 
-      <div className="p-6 space-y-6 max-w-5xl">
+      <div className="p-4 lg:p-6 space-y-4 lg:space-y-6 max-w-5xl">
         <div className="grid lg:grid-cols-5 gap-6">
           {/* FORM */}
           <motion.div

@@ -68,7 +68,7 @@ export default function CalculadoraPage() {
     <>
       <Header title="Calculadora de Lucro" subtitle="Calcule sua margem antes de anunciar" />
 
-      <div className="p-6 space-y-6 max-w-4xl">
+      <div className="p-4 lg:p-6 space-y-4 lg:space-y-6 max-w-4xl">
         <div className="grid lg:grid-cols-2 gap-6">
           {/* INPUTS */}
           <motion.div

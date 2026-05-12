@@ -82,7 +82,7 @@ export default function MinhaLojaPage() {
     <>
       <Header title="Minha Loja" subtitle="Registre suas vendas e acompanhe seu lucro real" />
 
-      <div className="p-6 space-y-6 max-w-4xl">
+      <div className="p-4 lg:p-6 space-y-4 lg:space-y-6 max-w-4xl">
         {/* Aviso sobre integração */}
         <div className="flex items-start gap-3 bg-surface-50 border border-surface-200 rounded-xl p-4 text-sm text-dark-muted">
           <Info className="w-4 h-4 flex-shrink-0 mt-0.5 text-dark-muted" />

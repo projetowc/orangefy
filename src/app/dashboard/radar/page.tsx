@@ -187,7 +187,7 @@ export default function RadarPage() {
     <>
       <Header title="Radar de Produtos" subtitle="Produtos validados com análise de margem e concorrência" />
 
-      <div className="p-6 space-y-5">
+      <div className="p-4 lg:p-6 space-y-4 lg:space-y-5">
         {/* Filtros */}
         <div className="card">
           <div className="flex flex-col sm:flex-row gap-3">

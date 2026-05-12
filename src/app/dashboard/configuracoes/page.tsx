@@ -48,7 +48,7 @@ export default function ConfiguracoesPage() {
     <>
       <Header title="Configurações" subtitle="Gerencie sua conta e preferências" />
 
-      <div className="p-6 space-y-6 max-w-2xl">
+      <div className="p-4 lg:p-6 space-y-4 lg:space-y-6 max-w-2xl">
         {/* PROFILE */}
         <motion.div className="card" initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }}>
           <div className="flex items-center gap-3 mb-5">

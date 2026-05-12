@@ -24,6 +24,7 @@ const navItems = [
   { href: "/dashboard/configuracoes", icon: Settings, label: "Configurações" },
 ];
 
+
 function SidebarContent({ onClose }: { onClose?: () => void }) {
   const pathname = usePathname();
   const { profile, user, signOut } = useUser();
@@ -42,8 +43,8 @@ function SidebarContent({ onClose }: { onClose?: () => void }) {
 
   return (
     <div className="flex flex-col h-full">
-      <div className="flex items-center justify-between p-6 border-b border-surface-200">
-        <Link href="/dashboard" className="flex items-center gap-2.5">
+      <div className="flex items-center justify-between p-5 border-b border-surface-200">
+        <Link href="/dashboard" className="flex items-center gap-2.5" onClick={onClose}>
           <div className="w-9 h-9 rounded-xl bg-gradient-brand flex items-center justify-center shadow-brand">
             <ShoppingBag className="w-[18px] h-[18px] text-white" />
           </div>
@@ -52,19 +53,19 @@ function SidebarContent({ onClose }: { onClose?: () => void }) {
           </span>
         </Link>
         {onClose && (
-          <button onClick={onClose} className="lg:hidden text-dark-muted hover:text-dark">
+          <button onClick={onClose} className="text-dark-muted hover:text-dark p-1">
             <X className="w-5 h-5" />
           </button>
         )}
       </div>
 
-      <div className="m-4 p-4 bg-gradient-hero rounded-2xl border border-surface-200">
-        <div className="flex items-center gap-3 mb-3">
-          <div className="w-10 h-10 rounded-full bg-gradient-brand flex items-center justify-center text-white font-bold text-sm">
+      <div className="m-3 p-3 bg-gradient-hero rounded-2xl border border-surface-200">
+        <div className="flex items-center gap-3 mb-2">
+          <div className="w-9 h-9 rounded-full bg-gradient-brand flex items-center justify-center text-white font-bold text-sm flex-shrink-0">
             {initials}
           </div>
-          <div>
-            <div className="font-semibold text-dark text-sm">{getFirstName(name)}</div>
+          <div className="min-w-0">
+            <div className="font-semibold text-dark text-sm truncate">{getFirstName(name)}</div>
             <div className="text-xs text-dark-muted">Nível {level} · {levelLabels[level] ?? "Vendedor"}</div>
           </div>
         </div>
@@ -72,12 +73,12 @@ function SidebarContent({ onClose }: { onClose?: () => void }) {
           <span className="text-dark-muted font-medium">{xp} / {xpToNext} XP</span>
           <span className="text-brand font-semibold">{xpPercent}%</span>
         </div>
-        <div className="w-full h-2 bg-surface-200 rounded-full overflow-hidden">
+        <div className="w-full h-1.5 bg-surface-200 rounded-full overflow-hidden">
           <div className="h-full bg-gradient-brand rounded-full transition-all duration-500" style={{ width: `${xpPercent}%` }} />
         </div>
       </div>
 
-      <nav className="flex-1 px-3 py-2 space-y-1 overflow-y-auto scrollbar-hide">
+      <nav className="flex-1 px-2 py-1 space-y-0.5 overflow-y-auto scrollbar-hide">
         {navItems.map((item) => {
           const isActive = pathname === item.href;
           return (
@@ -100,7 +101,7 @@ function SidebarContent({ onClose }: { onClose?: () => void }) {
         })}
       </nav>
 
-      <div className="p-4 border-t border-surface-200">
+      <div className="p-3 border-t border-surface-200">
         <button
           onClick={signOut}
           className="sidebar-item w-full text-danger hover:bg-red-50 hover:text-danger"
@@ -113,22 +114,61 @@ function SidebarContent({ onClose }: { onClose?: () => void }) {
   );
 }
 
+function BottomNav({ onMenuOpen }: { onMenuOpen: () => void }) {
+  const pathname = usePathname();
+
+  const items = [
+    { href: "/dashboard", icon: LayoutDashboard, label: "Início" },
+    { href: "/dashboard/missoes", icon: Zap, label: "Missões" },
+    { href: "/dashboard/radar", icon: Target, label: "Radar" },
+    { href: "/dashboard/minha-loja", icon: Store, label: "Loja" },
+  ];
+
+  return (
+    <nav className="lg:hidden fixed bottom-0 left-0 right-0 z-40 bg-white border-t border-surface-200">
+      <div className="flex items-stretch h-16">
+        {items.map((item) => {
+          const isActive = pathname === item.href;
+          return (
+            <Link
+              key={item.href}
+              href={item.href}
+              className={cn(
+                "flex-1 flex flex-col items-center justify-center gap-1 transition-colors",
+                isActive ? "text-brand" : "text-dark-muted"
+              )}
+            >
+              <item.icon className="w-5 h-5" />
+              <span className="text-[10px] font-medium">{item.label}</span>
+            </Link>
+          );
+        })}
+        <button
+          onClick={onMenuOpen}
+          className="flex-1 flex flex-col items-center justify-center gap-1 text-dark-muted"
+        >
+          <Menu className="w-5 h-5" />
+          <span className="text-[10px] font-medium">Menu</span>
+        </button>
+      </div>
+    </nav>
+  );
+}
+
 export default function Sidebar() {
   const [mobileOpen, setMobileOpen] = useState(false);
 
   return (
     <>
-      <button
-        onClick={() => setMobileOpen(true)}
-        className="lg:hidden fixed top-4 left-4 z-50 w-10 h-10 bg-white rounded-xl shadow-card border border-surface-200 flex items-center justify-center"
-      >
-        <Menu className="w-5 h-5 text-dark" />
-      </button>
-
+      {/* Desktop sidebar */}
       <aside className="hidden lg:flex w-72 bg-white border-r border-surface-200 flex-col h-screen sticky top-0">
         <SidebarContent />
       </aside>
 
+      {/* Mobile bottom nav */}
+      <BottomNav onMenuOpen={() => setMobileOpen(true)} />
+
+      {/* Mobile slide-in sidebar */}
       <AnimatePresence>
         {mobileOpen && (
           <>

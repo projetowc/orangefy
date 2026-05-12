@@ -62,7 +62,7 @@ export default function ComunidadePage() {
     <>
       <Header title="Comunidade" subtitle="Conecte-se com outros vendedores Orangefy" />
 
-      <div className="p-6 space-y-6 max-w-2xl">
+      <div className="p-4 lg:p-6 space-y-4 lg:space-y-6 max-w-2xl">
         {/* STATS */}
         <motion.div
           className="grid grid-cols-3 gap-4"

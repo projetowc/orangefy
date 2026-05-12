@@ -24,7 +24,7 @@ export default function RankingPage() {
     <>
       <Header title="Ranking" subtitle="Top vendedores da comunidade Orangefy" />
 
-      <div className="p-6 space-y-6 max-w-3xl">
+      <div className="p-4 lg:p-6 space-y-4 lg:space-y-6 max-w-3xl">
         {/* TOP 3 PODIUM */}
         <motion.div
           className="card bg-gradient-to-b from-amber-50 to-white border-amber-200"

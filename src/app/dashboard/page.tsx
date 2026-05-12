@@ -61,7 +61,7 @@ export default function DashboardPage() {
         subtitle={`${greeting}, ${firstName}! Comece suas missões de hoje.`}
       />
 
-      <div className="p-6 space-y-6">
+      <div className="p-4 lg:p-6 space-y-4 lg:space-y-6">
         {/* STATS */}
         <motion.div
           className="grid grid-cols-2 lg:grid-cols-4 gap-4"
@@ -296,7 +296,7 @@ export default function DashboardPage() {
 
         {/* STREAK / WELCOME BANNER */}
         <motion.div
-          className="bg-gradient-brand rounded-2xl p-6 flex items-center justify-between text-white relative overflow-hidden"
+          className="bg-gradient-brand rounded-2xl p-5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 text-white relative overflow-hidden"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.6 }}
@@ -317,7 +317,7 @@ export default function DashboardPage() {
           </div>
           <Link
             href="/dashboard/missoes"
-            className="relative z-10 bg-white text-brand font-bold text-sm px-5 py-2.5 rounded-xl hover:bg-surface-50 transition-colors flex items-center gap-2 flex-shrink-0"
+            className="relative z-10 bg-white text-brand font-bold text-sm px-5 py-2.5 rounded-xl hover:bg-surface-50 transition-colors flex items-center justify-center gap-2 w-full sm:w-auto flex-shrink-0"
           >
             {streak > 0 ? "Ver missões" : "Começar agora"}
             <ArrowRight className="w-4 h-4" />
