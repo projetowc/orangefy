@@ -44,20 +44,27 @@ export default function ConfiguracoesPage() {
     setSaveError("");
     setSaving(true);
 
-    if (user && nameValue.trim() && nameValue.trim() !== name) {
-      const res = await fetch("/api/profile", {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name: nameValue.trim() }),
-      });
-      if (!res.ok) {
-        setSaveError("Erro ao salvar. Tente novamente.");
-        setSaving(false);
-        return;
-      }
-      await refreshProfile();
+    const trimmedName = nameValue.trim();
+    if (!trimmedName) {
+      setSaveError("O nome não pode ficar vazio.");
+      setSaving(false);
+      return;
     }
 
+    const res = await fetch("/api/profile", {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ name: trimmedName }),
+    });
+
+    if (!res.ok) {
+      const data = await res.json().catch(() => ({}));
+      setSaveError(data.error || "Erro ao salvar. Tente novamente.");
+      setSaving(false);
+      return;
+    }
+
+    await refreshProfile();
     setSaving(false);
     setSaved(true);
     setTimeout(() => setSaved(false), 2000);

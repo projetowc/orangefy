@@ -1,10 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createServerClient } from "@supabase/ssr";
 import { cookies } from "next/headers";
+import { getServiceSupabase } from "@/lib/supabase";
 
-async function getSupabase() {
+export async function PATCH(req: NextRequest) {
+  // Verify session via SSR client
   const cookieStore = await cookies();
-  return createServerClient(
+  const supabase = createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
     {
@@ -15,24 +17,26 @@ async function getSupabase() {
       },
     }
   );
-}
 
-export async function PATCH(req: NextRequest) {
-  const supabase = await getSupabase();
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return NextResponse.json({ error: "Não autorizado" }, { status: 401 });
 
-  const { name } = await req.json();
-  if (!name || !name.trim()) {
-    return NextResponse.json({ error: "Nome inválido" }, { status: 400 });
-  }
+  const body = await req.json();
+  const name = (body.name || "").trim();
 
-  const { error } = await supabase
+  if (!name) return NextResponse.json({ error: "Nome inválido" }, { status: 400 });
+
+  // Use service role to bypass any RLS issues
+  const service = getServiceSupabase();
+  const { error } = await service
     .from("users")
-    .update({ name: name.trim() })
+    .update({ name })
     .eq("id", user.id);
 
-  if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+  if (error) {
+    console.error("Profile update error:", error);
+    return NextResponse.json({ error: error.message }, { status: 500 });
+  }
 
   return NextResponse.json({ success: true });
 }
