@@ -304,6 +304,65 @@ export default function LandingPage() {
         </div>
       </section>
 
+      {/* SOCIAL PROOF SCREENSHOTS */}
+      <section className="py-12 overflow-hidden bg-surface-50 border-y border-surface-200">
+        <div className="max-w-6xl mx-auto px-4 mb-8 text-center">
+          <div className="badge-brand inline-flex mb-3">Resultados reais</div>
+          <h2 className="text-3xl sm:text-4xl font-black text-dark mb-2">
+            Capturas reais da <span className="text-gradient">Shopee</span>
+          </h2>
+          <p className="text-sm text-dark-muted">
+            Screenshots originais de vendedores que usaram a Orangefy. Sem edição, sem filtro.
+          </p>
+        </div>
+
+        {/* Row 1 — left to right */}
+        <div className="overflow-hidden mb-4">
+          <div className="flex gap-4 animate-marquee" style={{ width: "max-content" }}>
+            {[1, 2, 3, 7, 1, 2, 3, 7].map((n, i) => (
+              <div
+                key={i}
+                className="w-44 sm:w-52 flex-shrink-0 rounded-2xl overflow-hidden border border-surface-200 shadow-sm bg-white"
+              >
+                <Image
+                  src={`/resultados/${n}.png`}
+                  alt={`Resultado Shopee ${n}`}
+                  width={300}
+                  height={500}
+                  className="w-full h-auto object-cover"
+                />
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Row 2 — right to left */}
+        <div className="overflow-hidden">
+          <div className="flex gap-4 animate-marquee-reverse" style={{ width: "max-content" }}>
+            {[4, 5, 6, 3, 4, 5, 6, 3].map((n, i) => (
+              <div
+                key={i}
+                className="w-44 sm:w-52 flex-shrink-0 rounded-2xl overflow-hidden border border-surface-200 shadow-sm bg-white"
+              >
+                <Image
+                  src={`/resultados/${n}.png`}
+                  alt={`Resultado Shopee ${n}`}
+                  width={300}
+                  height={500}
+                  className="w-full h-auto object-cover"
+                />
+              </div>
+            ))}
+          </div>
+        </div>
+
+        <div className="text-center mt-8 px-4">
+          <p className="text-xs text-dark-muted">
+            Resultados variam conforme dedicação, nicho e capital investido. Passe o mouse para pausar.
+          </p>
+        </div>
+      </section>
+
       {/* PRICING */}
       <section id="planos" className="py-12 px-4 bg-surface-50">
         <div className="max-w-6xl mx-auto">
