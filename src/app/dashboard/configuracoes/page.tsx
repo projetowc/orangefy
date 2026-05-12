@@ -8,6 +8,7 @@ import {
 } from "lucide-react";
 import Header from "@/components/dashboard/Header";
 import { useUser, getInitials } from "@/context/UserContext";
+import { createClient } from "@/lib/supabase-browser";
 
 function Toggle({ value, onChange }: { value: boolean; onChange: (v: boolean) => void }) {
   return (
@@ -22,6 +23,7 @@ function Toggle({ value, onChange }: { value: boolean; onChange: (v: boolean) =>
 
 export default function ConfiguracoesPage() {
   const { profile, user, signOut, refreshProfile } = useUser();
+  const supabase = createClient();
 
   const name = profile?.name || user?.email?.split("@")[0] || "";
   const email = user?.email || "";
@@ -51,15 +53,19 @@ export default function ConfiguracoesPage() {
       return;
     }
 
-    const res = await fetch("/api/profile", {
-      method: "PATCH",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ name: trimmedName }),
-    });
+    if (!user) {
+      setSaveError("Sessão expirada. Faça login novamente.");
+      setSaving(false);
+      return;
+    }
 
-    if (!res.ok) {
-      const data = await res.json().catch(() => ({}));
-      setSaveError(data.error || "Erro ao salvar. Tente novamente.");
+    const { error } = await supabase
+      .from("users")
+      .update({ name: trimmedName })
+      .eq("id", user.id);
+
+    if (error) {
+      setSaveError("Erro ao salvar: " + error.message);
       setSaving(false);
       return;
     }
