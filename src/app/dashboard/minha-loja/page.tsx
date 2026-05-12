@@ -4,10 +4,11 @@ import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Plus, TrendingUp, ShoppingBag, DollarSign,
-  Trash2, X, Package, Info
+  Trash2, X, Package, Info, AlertCircle
 } from "lucide-react";
 import Header from "@/components/dashboard/Header";
 import { useUser } from "@/context/UserContext";
+import { createClient } from "@/lib/supabase-browser";
 import { formatCurrency } from "@/lib/utils";
 import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer
@@ -33,19 +34,32 @@ function groupByDay(sales: Sale[]) {
 
 export default function MinhaLojaPage() {
   const { refreshProfile } = useUser();
+  const supabase = createClient();
+
   const [sales, setSales] = useState<Sale[]>([]);
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
   const [submitting, setSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState("");
 
   const [product, setProduct] = useState("");
   const [salePrice, setSalePrice] = useState("");
   const [cost, setCost] = useState("");
 
+  async function getToken() {
+    const { data: { session } } = await supabase.auth.getSession();
+    return session?.access_token || "";
+  }
+
   async function fetchSales() {
-    const res = await fetch("/api/sales");
-    const data = await res.json();
-    setSales(data.sales || []);
+    const token = await getToken();
+    const res = await fetch("/api/sales", {
+      headers: { "Authorization": `Bearer ${token}` },
+    });
+    if (res.ok) {
+      const data = await res.json();
+      setSales(data.sales || []);
+    }
     setLoading(false);
   }
 
@@ -53,12 +67,26 @@ export default function MinhaLojaPage() {
 
   async function handleAddSale(e: React.FormEvent) {
     e.preventDefault();
+    setSubmitError("");
     setSubmitting(true);
-    await fetch("/api/sales", {
+
+    const token = await getToken();
+    const res = await fetch("/api/sales", {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${token}`,
+      },
       body: JSON.stringify({ product_name: product, sale_price: salePrice, cost }),
     });
+
+    if (!res.ok) {
+      const data = await res.json().catch(() => ({}));
+      setSubmitError(data.error || "Erro ao registrar venda. Tente novamente.");
+      setSubmitting(false);
+      return;
+    }
+
     setProduct(""); setSalePrice(""); setCost("");
     setShowForm(false);
     setSubmitting(false);
@@ -67,9 +95,13 @@ export default function MinhaLojaPage() {
   }
 
   async function handleDelete(id: string) {
+    const token = await getToken();
     await fetch("/api/sales", {
       method: "DELETE",
-      headers: { "Content-Type": "application/json" },
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${token}`,
+      },
       body: JSON.stringify({ id }),
     });
     setSales((prev) => prev.filter((s) => s.id !== id));
@@ -87,7 +119,6 @@ export default function MinhaLojaPage() {
       <Header title="Minha Loja" subtitle="Registre suas vendas e acompanhe seu lucro real" />
 
       <div className="p-4 lg:p-6 space-y-4 lg:space-y-6 max-w-4xl">
-        {/* Aviso sobre integração */}
         <div className="flex items-start gap-3 bg-surface-50 border border-surface-200 rounded-xl p-4 text-sm text-dark-muted">
           <Info className="w-4 h-4 flex-shrink-0 mt-0.5 text-dark-muted" />
           <p>
@@ -135,7 +166,7 @@ export default function MinhaLojaPage() {
         <div className="flex items-center justify-between">
           <h2 className="font-semibold text-dark">Vendas registradas</h2>
           <button
-            onClick={() => setShowForm(true)}
+            onClick={() => { setShowForm(true); setSubmitError(""); }}
             className="btn-brand flex items-center gap-2 text-sm px-4 py-2.5"
           >
             <Plus className="w-4 h-4" />
@@ -209,6 +240,12 @@ export default function MinhaLojaPage() {
                       <span className={`font-bold ${parseFloat(salePrice) - parseFloat(cost) >= 0 ? "text-success" : "text-danger"}`}>
                         {formatCurrency(parseFloat(salePrice) - parseFloat(cost))}
                       </span>
+                    </div>
+                  )}
+                  {submitError && (
+                    <div className="flex items-center gap-2 text-sm text-danger bg-red-50 border border-red-200 rounded-xl p-3">
+                      <AlertCircle className="w-4 h-4 flex-shrink-0" />
+                      {submitError}
                     </div>
                   )}
                   <button type="submit" disabled={submitting} className="btn-brand w-full flex items-center justify-center gap-2">
