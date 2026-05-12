@@ -423,11 +423,17 @@ export default function LandingPage() {
                 <p className="text-dark-muted text-sm">Economize 35% — melhor custo-benefício.</p>
               </div>
               <div className="mb-5">
-                <div className="text-xs text-dark-muted line-through mb-0.5">R$1.198,80/ano</div>
-                <span className="text-4xl font-black text-dark">R$779</span>
-                <span className="text-xl font-bold text-dark">,22</span>
-                <span className="text-dark-muted text-sm">/ano</span>
-                <div className="badge-brand mt-1.5 inline-flex">35% OFF · Economize R$419,58</div>
+                <div className="text-xs text-dark-muted mb-1">12x de</div>
+                <div className="flex items-end gap-1 mb-1">
+                  <span className="text-4xl font-black text-dark">R$80</span>
+                  <span className="text-xl font-bold text-dark">,49</span>
+                  <span className="text-dark-muted text-sm mb-0.5">/mês</span>
+                </div>
+                <div className="text-xs text-dark-muted mb-1.5">
+                  ou <span className="line-through">R$1.198,80</span>{" "}
+                  <span className="font-semibold text-dark">R$779,22</span> à vista
+                </div>
+                <div className="badge-brand inline-flex">35% OFF · Economize R$419,58</div>
               </div>
               <ul className="space-y-2.5 mb-6">
                 {[...planFeatures, "Suporte prioritário", "Acesso antecipado"].map((f) => (
@@ -476,7 +482,7 @@ export default function LandingPage() {
                 rel="noopener noreferrer"
                 className="bg-white text-brand font-bold rounded-xl px-7 py-3.5 hover:bg-surface-50 transition-colors flex items-center justify-center gap-2"
               >
-                Começar com 35% OFF
+                Começar por R$80,49/mês
                 <ChevronRight className="w-4 h-4" />
               </a>
               <Link href="/login" className="border-2 border-white/40 text-white font-bold rounded-xl px-7 py-3.5 hover:bg-white/10 transition-colors flex items-center justify-center gap-2">
