@@ -44,7 +44,27 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
       .select("*")
       .eq("id", userId)
       .single();
-    if (data) setProfile(data as UserProfile);
+
+    if (data) {
+      setProfile(data as UserProfile);
+      return;
+    }
+
+    // Profile missing — create it via API with service role
+    const { data: { session } } = await supabase.auth.getSession();
+    if (session?.access_token) {
+      await fetch("/api/profile", {
+        method: "POST",
+        headers: { "Authorization": `Bearer ${session.access_token}` },
+      });
+      // Retry fetch after creation
+      const { data: retryData } = await supabase
+        .from("users")
+        .select("*")
+        .eq("id", userId)
+        .single();
+      if (retryData) setProfile(retryData as UserProfile);
+    }
   }
 
   async function refreshProfile() {
