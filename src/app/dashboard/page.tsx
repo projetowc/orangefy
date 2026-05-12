@@ -31,9 +31,9 @@ const missions = [
 ];
 
 const recommendedProducts = [
-  { id: 1, name: "Organizador de gaveta modular", score: 87, tags: ["🔥 Viral", "💰 Alta margem"] },
-  { id: 2, name: "Suporte veicular magnético", score: 81, tags: ["🟢 Fácil", "📦 Fácil envio"] },
-  { id: 3, name: "Kit pincéis maquiagem 12 peças", score: 75, tags: ["📈 Tendência"] },
+  { id: 1, name: "Organizador de gaveta modular", score: 87, tags: ["Viral", "Alta margem"] },
+  { id: 2, name: "Suporte veicular magnético", score: 81, tags: ["🟢 Fácil", "Fácil envio"] },
+  { id: 3, name: "Kit pincéis maquiagem 12 peças", score: 75, tags: ["Tendência"] },
 ];
 
 const stagger = { hidden: {}, show: { transition: { staggerChildren: 0.08 } } };

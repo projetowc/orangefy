@@ -28,11 +28,11 @@ function generateContent(name: string, category: string, benefits: string): Gene
 
   const titulo = `${name} | ${benefitList[0] || "Alta Qualidade"} | ${category} | Frete Grátis`;
 
-  const descricao = `✅ ${name} — O produto que você estava procurando!
+  const descricao = ` ${name} — O produto que você estava procurando!
 
 ${benefitList.map((b) => `✓ ${b}`).join("\n")}
 
-🌟 POR QUE ESCOLHER NOSSO PRODUTO?
+ POR QUE ESCOLHER NOSSO PRODUTO?
 • Alta qualidade garantida
 • Enviamos em até 24h após confirmação do pagamento
 • Embalagem segura e discreta
@@ -45,7 +45,7 @@ Trabalhamos com os melhores Correios e transportadoras parceiras para garantir q
 ⭐ COMPRE COM CONFIANÇA:
 Somos uma loja comprometida com sua satisfação. Avalie nossa loja após receber!
 
-❓ DÚVIDAS?
+ DÚVIDAS?
 Estamos disponíveis no chat da Shopee para responder todas as suas perguntas.`;
 
   const palavrasChave = [
@@ -66,13 +66,13 @@ Estamos disponíveis no chat da Shopee para responder todas as suas perguntas.`;
     "#shopee",
   ];
 
-  const cta = `🛒 COMPRE AGORA e receba em casa com frete grátis! Estoque limitado — aproveite antes que acabe!`;
+  const cta = ` COMPRE AGORA e receba em casa com frete grátis! Estoque limitado — aproveite antes que acabe!`;
 
-  const copy = `⚡ ${name.toUpperCase()} — ${benefitList[0] || "Qualidade Premium"}!
+  const copy = ` ${name.toUpperCase()} — ${benefitList[0] || "Qualidade Premium"}!
 
 ${benefitList.length > 0 ? benefitList.map((b) => `✓ ${b}`).join(" | ") : "Alta qualidade garantida"}
 
-🎯 Perfeito para quem quer qualidade com o melhor custo-benefício.
+ Perfeito para quem quer qualidade com o melhor custo-benefício.
 💥 Promoção por tempo limitado!
 📦 Enviamos hoje mesmo!
 

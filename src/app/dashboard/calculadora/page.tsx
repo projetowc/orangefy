@@ -251,7 +251,7 @@ export default function CalculadoraPage() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.3 }}
         >
-          <h3 className="font-bold text-blue-800 mb-3">💡 Dicas para maximizar sua margem</h3>
+          <h3 className="font-bold text-blue-800 mb-3"> Dicas para maximizar sua margem</h3>
           <ul className="space-y-2 text-sm text-blue-700">
             <li>• Busque fornecedores no AliExpress, 1688 ou mercados locais para reduzir o custo</li>
             <li>• Margem ideal para iniciantes: acima de 35%</li>

@@ -11,7 +11,7 @@ const posts = [
     avatar: "FL",
     level: 8,
     time: "há 2 horas",
-    content: "Pessoal! Fiz minha 47ª venda hoje!! 🎉 O radar de produtos da Orangefy me ajudou a achar esse nicho incrível. Quem quiser saber mais, me manda mensagem!",
+    content: "Pessoal! Fiz minha 47ª venda hoje!!  O radar de produtos da Orangefy me ajudou a achar esse nicho incrível. Quem quiser saber mais, me manda mensagem!",
     likes: 34,
     comments: 12,
     tag: "conquista",
@@ -33,7 +33,7 @@ const posts = [
     avatar: "AP",
     level: 3,
     time: "há 8 horas",
-    content: "Oi pessoal! Iniciante aqui 👋 Acabei de fazer minha PRIMEIRA VENDA!! Segui as missões da Orangefy passo a passo e em 12 dias consegui! Obrigada a todo mundo que deu força!",
+    content: "Oi pessoal! Iniciante aqui  Acabei de fazer minha PRIMEIRA VENDA!! Segui as missões da Orangefy passo a passo e em 12 dias consegui! Obrigada a todo mundo que deu força!",
     likes: 56,
     comments: 19,
     tag: "conquista",
@@ -101,7 +101,7 @@ export default function ComunidadePage() {
                     <span className="font-semibold text-dark text-sm">{post.author}</span>
                     <span className="badge-gray text-xs">Nível {post.level}</span>
                     <span className={`badge ${tagColors[post.tag]} text-xs`}>
-                      {post.tag === "conquista" ? "🎉" : post.tag === "dica" ? "💡" : "❓"} {post.tag}
+                      {post.tag === "conquista" ? "" : post.tag === "dica" ? "" : ""} {post.tag}
                     </span>
                   </div>
                   <div className="text-xs text-dark-muted">{post.time}</div>

@@ -5,9 +5,9 @@ import { Trophy, Flame, TrendingUp, Star, Crown } from "lucide-react";
 import Header from "@/components/dashboard/Header";
 
 const rankings = [
-  { pos: 1, name: "Fernanda L.", avatar: "FL", xp: 4820, sales: 47, level: 8, badge: "👑" },
-  { pos: 2, name: "Ricardo M.", avatar: "RM", xp: 3910, sales: 38, level: 7, badge: "🥈" },
-  { pos: 3, name: "Camila S.", avatar: "CS", xp: 3240, sales: 31, level: 6, badge: "🥉" },
+  { pos: 1, name: "Fernanda L.", avatar: "FL", xp: 4820, sales: 47, level: 8, badge: "" },
+  { pos: 2, name: "Ricardo M.", avatar: "RM", xp: 3910, sales: 38, level: 7, badge: "" },
+  { pos: 3, name: "Camila S.", avatar: "CS", xp: 3240, sales: 31, level: 6, badge: "" },
   { pos: 4, name: "Bruno T.", avatar: "BT", xp: 2870, sales: 28, level: 5, badge: null },
   { pos: 5, name: "Aline P.", avatar: "AP", xp: 2450, sales: 24, level: 5, badge: null },
   { pos: 6, name: "Diego F.", avatar: "DF", xp: 2100, sales: 20, level: 4, badge: null },
@@ -39,7 +39,7 @@ export default function RankingPage() {
           <div className="flex items-end justify-center gap-4">
             {/* 2nd */}
             <div className="text-center flex-1">
-              <div className="text-2xl mb-2">🥈</div>
+              <div className="text-2xl mb-2"></div>
               <div className="w-14 h-14 rounded-full bg-slate-300 flex items-center justify-center text-white font-bold text-sm mx-auto mb-2">
                 {rankings[1].avatar}
               </div>
@@ -51,7 +51,7 @@ export default function RankingPage() {
             </div>
             {/* 1st */}
             <div className="text-center flex-1">
-              <div className="text-3xl mb-2">👑</div>
+              <div className="text-3xl mb-2"></div>
               <div className="w-16 h-16 rounded-full bg-gradient-brand flex items-center justify-center text-white font-bold mx-auto mb-2 shadow-brand">
                 {rankings[0].avatar}
               </div>
@@ -63,7 +63,7 @@ export default function RankingPage() {
             </div>
             {/* 3rd */}
             <div className="text-center flex-1">
-              <div className="text-2xl mb-2">🥉</div>
+              <div className="text-2xl mb-2"></div>
               <div className="w-14 h-14 rounded-full bg-amber-300 flex items-center justify-center text-white font-bold text-sm mx-auto mb-2">
                 {rankings[2].avatar}
               </div>

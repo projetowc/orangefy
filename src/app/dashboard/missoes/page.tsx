@@ -1,313 +1,404 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import {
-  Zap, CheckCircle2, Clock, Lock, ChevronDown, ChevronUp,
-  Star, Trophy, Flame, Target
-} from "lucide-react";
+import { Check, ChevronDown, ChevronUp, Clock, Lock, Star, Target } from "lucide-react";
 import Header from "@/components/dashboard/Header";
+import { useUser } from "@/context/UserContext";
 
-const allMissions = [
+const MISSIONS = [
   {
     id: 1,
     title: "Criar conta na Shopee",
-    description: "O primeiro passo da jornada. Crie sua conta de vendedor na Shopee.",
+    description: "Acesse shopee.com.br, crie sua conta de vendedor e preencha todos os dados da loja.",
     xp: 100,
-    reward: "Desbloqueio do Radar de Produtos",
-    completed: true,
-    category: "setup",
-    difficulty: "easy",
+    reward: "Acesso ao Radar de Produtos",
+    category: "Configuração",
+    difficulty: "Fácil",
     checklist: [
-      { id: "c1", text: "Acessar shopee.com.br e criar conta", done: true },
-      { id: "c2", text: "Verificar e-mail e número de celular", done: true },
-      { id: "c3", text: "Preencher dados da loja", done: true },
+      { id: "c1", text: "Acessar shopee.com.br e criar conta de vendedor" },
+      { id: "c2", text: "Verificar e-mail e número de celular" },
+      { id: "c3", text: "Preencher dados completos da loja" },
     ],
   },
   {
     id: 2,
-    title: "Escolher produto campeão",
-    description: "Use o Radar de Produtos para encontrar um produto validado.",
+    title: "Escolher produto para vender",
+    description: "Use o Radar de Produtos para encontrar um produto com score acima de 70 e margem acima de 35%.",
     xp: 150,
-    reward: "+150 XP e badge Explorador",
-    completed: true,
-    category: "product",
-    difficulty: "easy",
+    reward: "Badge Explorador",
+    category: "Produto",
+    difficulty: "Fácil",
     checklist: [
-      { id: "c4", text: "Acessar o Radar de Produtos", done: true },
-      { id: "c5", text: "Filtrar por 'Fácil iniciante'", done: true },
-      { id: "c6", text: "Escolher produto com score acima de 70", done: true },
+      { id: "c4", text: "Acessar o Radar de Produtos" },
+      { id: "c5", text: "Filtrar por investimento e margem" },
+      { id: "c6", text: "Definir o produto que vai vender" },
     ],
   },
   {
     id: 3,
-    title: "Publicar primeiro anúncio",
-    description: "Crie seu primeiro anúncio usando o Gerador de Anúncios da Orangefy.",
-    xp: 200,
-    reward: "Badge Vendedor Ativo + acesso a estratégias",
-    completed: false,
-    active: true,
-    category: "listing",
-    difficulty: "medium",
-    progress: 1,
-    total: 3,
+    title: "Calcular seu lucro real",
+    description: "Use a Calculadora de Lucro com os dados reais do produto escolhido e valide se a margem compensa.",
+    xp: 100,
+    reward: "Clareza financeira antes de anunciar",
+    category: "Financeiro",
+    difficulty: "Fácil",
     checklist: [
-      { id: "c7", text: "Gerar título otimizado no Gerador de Anúncios", done: true },
-      { id: "c8", text: "Tirar fotos do produto com fundo branco", done: false },
-      { id: "c9", text: "Publicar anúncio na Shopee", done: false },
+      { id: "c7", text: "Pesquisar o custo do produto no fornecedor" },
+      { id: "c8", text: "Inserir custo, frete e embalagem na calculadora" },
+      { id: "c9", text: "Confirmar que a margem está acima de 30%" },
     ],
   },
   {
     id: 4,
-    title: "Fazer primeira venda",
-    description: "Receba sua primeira compra. Pode demorar um pouco — seja persistente!",
-    xp: 500,
-    reward: "Badge Primeiro Sangue + desbloqueio do Ranking",
-    completed: false,
-    active: false,
-    locked: false,
-    category: "sales",
-    difficulty: "medium",
+    title: "Criar e publicar seu anúncio",
+    description: "Use o Gerador de Anúncios para criar título e descrição otimizados e publique na Shopee.",
+    xp: 200,
+    reward: "Badge Vendedor Ativo",
+    category: "Anúncio",
+    difficulty: "Médio",
     checklist: [
-      { id: "c10", text: "Anúncio publicado e ativo", done: false },
-      { id: "c11", text: "Preço competitivo configurado", done: false },
-      { id: "c12", text: "Receber primeira notificação de compra", done: false },
+      { id: "c10", text: "Gerar título otimizado no Gerador de Anúncios" },
+      { id: "c11", text: "Fotografar o produto com fundo branco ou neutro" },
+      { id: "c12", text: "Publicar anúncio completo na Shopee" },
     ],
   },
   {
     id: 5,
-    title: "Atingir 5 vendas",
-    description: "Prove que é consistente. 5 vendas mostram que seu produto funciona.",
-    xp: 750,
-    reward: "Badge Consistência + desconto especial no plano anual",
-    completed: false,
-    locked: true,
-    category: "growth",
-    difficulty: "hard",
+    title: "Registrar sua primeira venda",
+    description: "Quando receber sua primeira compra, registre em Minha Loja para acompanhar seu progresso.",
+    xp: 500,
+    reward: "Badge Primeira Venda + desbloqueio do Ranking",
+    category: "Vendas",
+    difficulty: "Médio",
     checklist: [
-      { id: "c13", text: "Manter anúncio sempre ativo", done: false },
-      { id: "c14", text: "Responder perguntas de clientes", done: false },
-      { id: "c15", text: "Acumular 5 vendas confirmadas", done: false },
+      { id: "c13", text: "Receber notificação de compra na Shopee" },
+      { id: "c14", text: "Registrar a venda em Minha Loja" },
+      { id: "c15", text: "Enviar o produto dentro do prazo" },
     ],
   },
   {
     id: 6,
-    title: "Atingir 10 vendas — e continue crescendo!",
-    description: "Atingir 10 vendas é só o começo. A partir daqui você escala e diversifica produtos.",
-    xp: 1000,
-    reward: "Badge Lendário + acesso ao Nível Avançado",
-    completed: false,
-    locked: true,
-    category: "growth",
-    difficulty: "hard",
+    title: "Atingir 5 vendas",
+    description: "Prove consistência. Com 5 vendas você já tem dados para otimizar seus anúncios.",
+    xp: 750,
+    reward: "Badge Consistência",
+    category: "Crescimento",
+    difficulty: "Médio",
     checklist: [
-      { id: "c16", text: "Ter pelo menos 3 anúncios ativos", done: false },
-      { id: "c17", text: "Manter score acima de 75", done: false },
-      { id: "c18", text: "Atingir 10 vendas confirmadas", done: false },
+      { id: "c16", text: "Manter anúncio ativo e com estoque" },
+      { id: "c17", text: "Responder perguntas de clientes em menos de 2h" },
+      { id: "c18", text: "Registrar 5 vendas confirmadas" },
     ],
   },
 ];
 
-const categoryColors: Record<string, string> = {
-  setup: "bg-blue-100 text-blue-700",
-  product: "bg-purple-100 text-purple-700",
-  listing: "bg-orange-100 text-brand",
-  sales: "bg-green-100 text-success",
-  growth: "bg-amber-100 text-amber-700",
-};
-
-const categoryLabels: Record<string, string> = {
-  setup: "Configuração",
-  product: "Produto",
-  listing: "Anúncio",
-  sales: "Vendas",
-  growth: "Crescimento",
-};
-
-const difficultyLabels: Record<string, string> = {
-  easy: "🟢 Fácil",
-  medium: "🟡 Médio",
-  hard: "🔴 Difícil",
+type MissionProgress = {
+  mission_id: number;
+  completed: boolean;
+  checklist_progress: Record<string, boolean>;
 };
 
 export default function MissoesPage() {
-  const [expanded, setExpanded] = useState<number | null>(3);
+  const { user } = useUser();
+  const [expanded, setExpanded] = useState<number | null>(null);
+  const [progress, setProgress] = useState<MissionProgress[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState<string | null>(null);
 
-  const completedCount = allMissions.filter((m) => m.completed).length;
-  const totalXP = allMissions.filter((m) => m.completed).reduce((a, m) => a + m.xp, 0);
+  useEffect(() => {
+    fetch("/api/missions")
+      .then((r) => r.json())
+      .then((d) => {
+        setProgress(d.missions || []);
+        setLoading(false);
+      });
+  }, []);
+
+  function getMissionProgress(missionId: number): MissionProgress {
+    return (
+      progress.find((p) => p.mission_id === missionId) || {
+        mission_id: missionId,
+        completed: false,
+        checklist_progress: {},
+      }
+    );
+  }
+
+  async function toggleItem(missionId: number, itemId: string, currentValue: boolean) {
+    setSaving(`${missionId}-${itemId}`);
+    const newValue = !currentValue;
+
+    // Atualiza local imediatamente
+    setProgress((prev) => {
+      const existing = prev.find((p) => p.mission_id === missionId);
+      if (existing) {
+        return prev.map((p) =>
+          p.mission_id === missionId
+            ? { ...p, checklist_progress: { ...p.checklist_progress, [itemId]: newValue } }
+            : p
+        );
+      }
+      return [
+        ...prev,
+        { mission_id: missionId, completed: false, checklist_progress: { [itemId]: newValue } },
+      ];
+    });
+
+    await fetch("/api/missions", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ mission_id: missionId, checklist_item_id: itemId, completed: newValue }),
+    });
+
+    setSaving(null);
+  }
+
+  async function completeMission(mission: (typeof MISSIONS)[0]) {
+    setSaving(`complete-${mission.id}`);
+    await fetch("/api/missions", {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ mission_id: mission.id, xp: mission.xp }),
+    });
+
+    setProgress((prev) => {
+      const existing = prev.find((p) => p.mission_id === mission.id);
+      if (existing) {
+        return prev.map((p) => (p.mission_id === mission.id ? { ...p, completed: true } : p));
+      }
+      return [...prev, { mission_id: mission.id, completed: true, checklist_progress: {} }];
+    });
+
+    setSaving(null);
+  }
+
+  const completedCount = MISSIONS.filter((m) => getMissionProgress(m.id).completed).length;
+  const totalXP = MISSIONS.filter((m) => getMissionProgress(m.id).completed).reduce(
+    (acc, m) => acc + m.xp,
+    0
+  );
+
+  // Primeira missão não concluída = ativa
+  const activeMissionId = MISSIONS.find((m) => !getMissionProgress(m.id).completed)?.id;
+
+  if (loading) {
+    return (
+      <>
+        <Header title="Missões" subtitle="Carregando seu progresso..." />
+        <div className="p-6 flex items-center justify-center h-64">
+          <div className="w-8 h-8 border-2 border-brand/20 border-t-brand rounded-full animate-spin" />
+        </div>
+      </>
+    );
+  }
 
   return (
     <>
-      <Header title="Missões" subtitle="Sua jornada gamificada para o sucesso nas vendas" />
+      <Header title="Missões" subtitle="Siga o roteiro para vender na Shopee com consistência" />
 
-      <div className="p-6 space-y-6">
-        {/* PROGRESS BAR */}
-        <motion.div
-          className="card bg-gradient-to-r from-orange-50 to-white border-brand/20"
-          initial={{ opacity: 0, y: 16 }}
-          animate={{ opacity: 1, y: 0 }}
-        >
+      <div className="p-6 space-y-4 max-w-3xl">
+        {/* Progresso geral */}
+        <div className="card">
           <div className="flex flex-col sm:flex-row sm:items-center gap-4">
             <div className="flex-1">
               <div className="flex items-center gap-3 mb-3">
-                <div className="w-10 h-10 rounded-xl bg-gradient-brand flex items-center justify-center">
-                  <Target className="w-5 h-5 text-white" />
+                <div className="w-9 h-9 rounded-lg bg-brand/10 flex items-center justify-center">
+                  <Target className="w-4 h-4 text-brand" />
                 </div>
                 <div>
-                  <h2 className="font-bold text-dark">Progresso da Jornada</h2>
-                  <p className="text-sm text-dark-muted">{completedCount} de {allMissions.length} missões concluídas</p>
+                  <h2 className="font-semibold text-dark">Seu progresso</h2>
+                  <p className="text-xs text-dark-muted">{completedCount} de {MISSIONS.length} missões concluídas</p>
                 </div>
               </div>
-              <div className="w-full h-3 bg-surface-200 rounded-full overflow-hidden">
+              <div className="w-full h-2 bg-surface-200 rounded-full overflow-hidden">
                 <motion.div
-                  className="h-full bg-gradient-brand rounded-full"
+                  className="h-full bg-brand rounded-full"
                   initial={{ width: 0 }}
-                  animate={{ width: `${(completedCount / allMissions.length) * 100}%` }}
-                  transition={{ delay: 0.3, duration: 0.8, ease: "easeOut" }}
+                  animate={{ width: `${(completedCount / MISSIONS.length) * 100}%` }}
+                  transition={{ duration: 0.6, ease: "easeOut" }}
                 />
               </div>
             </div>
-            <div className="flex gap-4 text-center">
-              <div className="bg-white rounded-xl p-3 border border-surface-200 min-w-[80px]">
-                <div className="text-2xl font-black text-brand">{totalXP}</div>
+            <div className="flex gap-3">
+              <div className="bg-surface-50 border border-surface-200 rounded-xl px-4 py-2.5 text-center min-w-[72px]">
+                <div className="text-xl font-black text-brand">{totalXP}</div>
                 <div className="text-xs text-dark-muted">XP ganhos</div>
               </div>
-              <div className="bg-white rounded-xl p-3 border border-surface-200 min-w-[80px]">
-                <div className="text-2xl font-black text-dark">7</div>
-                <div className="text-xs text-dark-muted flex items-center gap-1 justify-center"><Flame className="w-3 h-3 text-brand" />Streak</div>
+              <div className="bg-surface-50 border border-surface-200 rounded-xl px-4 py-2.5 text-center min-w-[72px]">
+                <div className="text-xl font-black text-dark">{completedCount}</div>
+                <div className="text-xs text-dark-muted">Concluídas</div>
               </div>
             </div>
           </div>
-        </motion.div>
+        </div>
 
-        {/* MISSIONS LIST */}
-        <div className="space-y-4">
-          {allMissions.map((mission, i) => {
-            const isExpanded = expanded === mission.id;
-            const completedChecklist = mission.checklist.filter((c) => c.done).length;
+        {/* Lista de missões */}
+        {MISSIONS.map((mission, i) => {
+          const mp = getMissionProgress(mission.id);
+          const isCompleted = mp.completed;
+          const isActive = mission.id === activeMissionId;
+          const isLocked = !isCompleted && !isActive && mission.id !== activeMissionId &&
+            MISSIONS.findIndex((m) => m.id === mission.id) >
+            MISSIONS.findIndex((m) => m.id === activeMissionId!);
+          const isExpanded = expanded === mission.id;
 
-            return (
-              <motion.div
-                key={mission.id}
-                initial={{ opacity: 0, y: 16 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: i * 0.08 }}
-                className={`card border-2 transition-all duration-200 ${
-                  mission.completed
-                    ? "border-green-200 bg-green-50/50 opacity-80"
-                    : mission.active
-                    ? "border-brand/40 shadow-brand/20 shadow-md"
-                    : mission.locked
-                    ? "border-surface-200 opacity-60"
-                    : "border-surface-200"
-                }`}
+          const checkedItems = mission.checklist.filter(
+            (item) => mp.checklist_progress[item.id]
+          ).length;
+          const allChecked = checkedItems === mission.checklist.length;
+
+          return (
+            <motion.div
+              key={mission.id}
+              initial={{ opacity: 0, y: 12 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: i * 0.06 }}
+              className={`card border transition-all duration-200 ${
+                isCompleted
+                  ? "border-surface-200 opacity-60"
+                  : isActive
+                  ? "border-brand/30"
+                  : "border-surface-200"
+              }`}
+            >
+              <button
+                onClick={() => !isLocked && setExpanded(isExpanded ? null : mission.id)}
+                className="w-full text-left"
+                disabled={isLocked}
               >
-                <button
-                  onClick={() => !mission.locked && setExpanded(isExpanded ? null : mission.id)}
-                  className="w-full text-left"
-                  disabled={!!mission.locked}
-                >
-                  <div className="flex items-center gap-4">
-                    {/* Icon */}
-                    <div className={`w-12 h-12 rounded-2xl flex items-center justify-center flex-shrink-0 ${
-                      mission.completed ? "bg-success" :
-                      mission.active ? "bg-gradient-brand shadow-brand" :
-                      mission.locked ? "bg-surface-200" : "bg-surface-100"
-                    }`}>
-                      {mission.completed ? (
-                        <CheckCircle2 className="w-6 h-6 text-white" />
-                      ) : mission.active ? (
-                        <Zap className="w-6 h-6 text-white" />
-                      ) : mission.locked ? (
-                        <Lock className="w-6 h-6 text-dark-muted" />
-                      ) : (
-                        <Clock className="w-6 h-6 text-dark-muted" />
+                <div className="flex items-center gap-4">
+                  {/* Indicador */}
+                  <div className={`w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0 ${
+                    isCompleted
+                      ? "bg-success"
+                      : isActive
+                      ? "bg-brand"
+                      : "bg-surface-100"
+                  }`}>
+                    {isCompleted ? (
+                      <Check className="w-4 h-4 text-white" />
+                    ) : isLocked ? (
+                      <Lock className="w-4 h-4 text-surface-200" />
+                    ) : (
+                      <Clock className="w-4 h-4 text-white" />
+                    )}
+                  </div>
+
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <span className={`font-semibold text-sm ${isCompleted ? "line-through text-dark-muted" : "text-dark"}`}>
+                        {mission.title}
+                      </span>
+                      {isActive && (
+                        <span className="text-xs font-semibold text-brand bg-brand/10 px-2 py-0.5 rounded-full">
+                          Em andamento
+                        </span>
                       )}
                     </div>
-
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-2 flex-wrap mb-1">
-                        <span className={`font-bold text-dark ${mission.completed ? "line-through text-dark-muted" : ""}`}>
-                          {mission.title}
-                        </span>
-                        {mission.active && <span className="badge-brand text-xs">Em andamento</span>}
-                        {mission.locked && <span className="badge-gray text-xs">🔒 Bloqueada</span>}
-                      </div>
-                      <div className="flex items-center gap-3 text-xs text-dark-muted flex-wrap">
-                        <span className={`badge ${categoryColors[mission.category]}`}>
-                          {categoryLabels[mission.category]}
-                        </span>
-                        <span>{difficultyLabels[mission.difficulty]}</span>
-                        <span className="flex items-center gap-1">
-                          <Star className="w-3 h-3 text-amber-400" />
-                          +{mission.xp} XP
-                        </span>
-                      </div>
-                      {mission.progress !== undefined && (
-                        <div className="mt-2 w-full max-w-xs h-1.5 bg-surface-200 rounded-full overflow-hidden">
-                          <div
-                            className="h-full bg-gradient-brand rounded-full"
-                            style={{ width: `${(mission.progress / mission.total!) * 100}%` }}
-                          />
-                        </div>
-                      )}
+                    <div className="flex items-center gap-3 mt-1 text-xs text-dark-muted">
+                      <span>{mission.category}</span>
+                      <span>·</span>
+                      <span>{mission.difficulty}</span>
+                      <span>·</span>
+                      <span className="flex items-center gap-1">
+                        <Star className="w-3 h-3 text-amber-400" />
+                        {mission.xp} XP
+                      </span>
                     </div>
-
-                    {!mission.locked && (
-                      <div className="flex-shrink-0 text-dark-muted">
-                        {isExpanded ? <ChevronUp className="w-5 h-5" /> : <ChevronDown className="w-5 h-5" />}
+                    {!isCompleted && !isLocked && checkedItems > 0 && (
+                      <div className="mt-2 w-36 h-1 bg-surface-200 rounded-full overflow-hidden">
+                        <div
+                          className="h-full bg-brand rounded-full transition-all"
+                          style={{ width: `${(checkedItems / mission.checklist.length) * 100}%` }}
+                        />
                       </div>
                     )}
                   </div>
-                </button>
 
-                <AnimatePresence>
-                  {isExpanded && !mission.locked && (
-                    <motion.div
-                      initial={{ height: 0, opacity: 0 }}
-                      animate={{ height: "auto", opacity: 1 }}
-                      exit={{ height: 0, opacity: 0 }}
-                      transition={{ duration: 0.3 }}
-                      className="overflow-hidden"
-                    >
-                      <div className="pt-4 mt-4 border-t border-surface-200 space-y-4">
-                        <p className="text-dark-muted text-sm">{mission.description}</p>
+                  {!isLocked && (
+                    <div className="text-dark-muted flex-shrink-0">
+                      {isExpanded ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
+                    </div>
+                  )}
+                </div>
+              </button>
 
-                        <div className="bg-amber-50 border border-amber-200 rounded-xl p-3">
-                          <div className="text-xs font-semibold text-amber-700 mb-1 flex items-center gap-1">
-                            <Trophy className="w-3 h-3" /> Recompensa
-                          </div>
-                          <p className="text-sm text-amber-800">{mission.reward}</p>
+              <AnimatePresence>
+                {isExpanded && !isLocked && (
+                  <motion.div
+                    initial={{ height: 0, opacity: 0 }}
+                    animate={{ height: "auto", opacity: 1 }}
+                    exit={{ height: 0, opacity: 0 }}
+                    transition={{ duration: 0.25 }}
+                    className="overflow-hidden"
+                  >
+                    <div className="pt-4 mt-4 border-t border-surface-200 space-y-4">
+                      <p className="text-sm text-dark-muted leading-relaxed">{mission.description}</p>
+
+                      <div className="bg-surface-50 rounded-xl p-3 text-sm">
+                        <span className="font-semibold text-dark text-xs uppercase tracking-wide">Recompensa</span>
+                        <p className="text-dark-muted mt-1">{mission.reward}</p>
+                      </div>
+
+                      <div>
+                        <div className="flex items-center justify-between text-sm font-semibold text-dark mb-3">
+                          <span>Checklist</span>
+                          <span className="text-xs text-dark-muted font-normal">{checkedItems}/{mission.checklist.length}</span>
                         </div>
-
-                        <div>
-                          <div className="flex items-center justify-between text-sm font-semibold text-dark mb-3">
-                            <span>Checklist</span>
-                            <span className="text-dark-muted font-normal">{completedChecklist}/{mission.checklist.length}</span>
-                          </div>
-                          <div className="space-y-2">
-                            {mission.checklist.map((item) => (
-                              <div key={item.id} className={`flex items-center gap-3 p-2.5 rounded-xl ${item.done ? "bg-green-50" : "bg-surface-50"}`}>
-                                <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center flex-shrink-0 ${
-                                  item.done ? "bg-success border-success" : "border-surface-200"
+                        <div className="space-y-2">
+                          {mission.checklist.map((item) => {
+                            const done = mp.checklist_progress[item.id] || false;
+                            const isSaving = saving === `${mission.id}-${item.id}`;
+                            return (
+                              <button
+                                key={item.id}
+                                onClick={() => !isCompleted && toggleItem(mission.id, item.id, done)}
+                                disabled={isCompleted || isSaving}
+                                className={`w-full flex items-center gap-3 p-3 rounded-xl text-left transition-colors ${
+                                  done ? "bg-green-50" : "bg-surface-50 hover:bg-surface-100"
+                                } disabled:cursor-default`}
+                              >
+                                <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center flex-shrink-0 transition-colors ${
+                                  done ? "bg-success border-success" : "border-surface-200"
                                 }`}>
-                                  {item.done && <CheckCircle2 className="w-3 h-3 text-white" />}
+                                  {isSaving ? (
+                                    <div className="w-2 h-2 border border-dark-muted/30 border-t-dark-muted rounded-full animate-spin" />
+                                  ) : done ? (
+                                    <Check className="w-3 h-3 text-white" />
+                                  ) : null}
                                 </div>
-                                <span className={`text-sm ${item.done ? "text-success line-through" : "text-dark"}`}>
+                                <span className={`text-sm ${done ? "line-through text-dark-muted" : "text-dark"}`}>
                                   {item.text}
                                 </span>
-                              </div>
-                            ))}
-                          </div>
+                              </button>
+                            );
+                          })}
                         </div>
                       </div>
-                    </motion.div>
-                  )}
-                </AnimatePresence>
-              </motion.div>
-            );
-          })}
-        </div>
+
+                      {allChecked && !isCompleted && (
+                        <motion.button
+                          initial={{ opacity: 0, y: 8 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          onClick={() => completeMission(mission)}
+                          disabled={saving === `complete-${mission.id}`}
+                          className="btn-brand w-full flex items-center justify-center gap-2"
+                        >
+                          {saving === `complete-${mission.id}` ? (
+                            <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                          ) : (
+                            <><Check className="w-4 h-4" /> Concluir missão e ganhar {mission.xp} XP</>
+                          )}
+                        </motion.button>
+                      )}
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </motion.div>
+          );
+        })}
       </div>
     </>
   );

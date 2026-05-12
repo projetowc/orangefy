@@ -202,10 +202,10 @@ export default function LandingPage() {
               {/* Mock Stats */}
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-6">
                 {[
-                  { label: "Vendas", value: "7", icon: "🛍️", color: "text-brand" },
+                  { label: "Vendas", value: "7", icon: "🛍", color: "text-brand" },
                   { label: "Lucro Est.", value: "R$ 340", icon: "💰", color: "text-success" },
                   { label: "Score", value: "78/100", icon: "⭐", color: "text-amber-500" },
-                  { label: "Missões", value: "3/5", icon: "🎯", color: "text-blue-600" },
+                  { label: "Missões", value: "3/5", icon: "", color: "text-blue-600" },
                 ].map((stat) => (
                   <div key={stat.label} className="bg-surface-50 rounded-2xl p-4 text-center">
                     <div className="text-2xl mb-1">{stat.icon}</div>
@@ -456,7 +456,7 @@ export default function LandingPage() {
             >
               <div className="absolute top-4 right-4">
                 <div className="bg-gradient-brand text-white text-xs font-bold px-3 py-1.5 rounded-full shadow-brand">
-                  ⭐ Mais Popular
+                  Mais Popular
                 </div>
               </div>
               <div className="mb-6">
@@ -572,7 +572,7 @@ export default function LandingPage() {
           </div>
           <div className="border-t border-white/10 pt-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-sm text-white/40">
             <p>© 2024 Orangefy. Todos os direitos reservados.</p>
-            <p>Feito com ❤️ para vendedores brasileiros</p>
+            <p>Feito com  para vendedores brasileiros</p>
           </div>
         </div>
       </footer>
