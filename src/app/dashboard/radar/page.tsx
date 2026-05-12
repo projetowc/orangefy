@@ -3,7 +3,6 @@
 import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Search, TrendingUp, TrendingDown, Minus, Package, ChevronRight, BarChart2, Truck, Filter, Sparkles, X } from "lucide-react";
-import Image from "next/image";
 import Header from "@/components/dashboard/Header";
 
 type Tag = "viral" | "high-margin" | "easy" | "trending" | "easy-shipping";
@@ -21,18 +20,17 @@ interface Product {
   avgPrice: string;
   category: string;
   analysis: string;
-  image?: string;
 }
 
 const staticProducts: Product[] = [
-  { id: 1, name: "Organizador de gaveta modular", score: 87, margin: 62, competition: "Baixa", difficulty: "Fácil", trend: "up", tags: ["viral", "high-margin"], avgPrice: "R$29–R$45", category: "Casa", analysis: "Produto com alta procura e baixa concorrência. Ótimo para iniciantes com pouco capital inicial.", image: "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=600&h=400&fit=crop&auto=format&q=80" },
-  { id: 2, name: "Suporte veicular celular magnético", score: 81, margin: 58, competition: "Média", difficulty: "Fácil", trend: "up", tags: ["easy", "easy-shipping"], avgPrice: "R$15–R$35", category: "Acessórios", analysis: "Item de consumo constante, leve para enviar e com margem atrativa. Ideal para primeiro produto.", image: "https://images.unsplash.com/photo-1512820828613-b6c4a50dbf21?w=600&h=400&fit=crop&auto=format&q=80" },
-  { id: 3, name: "Kit pincéis maquiagem 12 peças", score: 75, margin: 48, competition: "Média", difficulty: "Fácil", trend: "up", tags: ["trending", "high-margin"], avgPrice: "R$25–R$60", category: "Beleza", analysis: "Tendência crescente. Ticket médio bom. Diferenciação por fotos de qualidade faz grande diferença.", image: "https://images.unsplash.com/photo-1522335789203-aabd1fc54bc9?w=600&h=400&fit=crop&auto=format&q=80" },
-  { id: 4, name: "Lâmpada LED inteligente RGB", score: 72, margin: 44, competition: "Alta", difficulty: "Médio", trend: "stable", tags: ["trending"], avgPrice: "R$35–R$80", category: "Eletrônicos", analysis: "Concorrência moderada. Foque em diferenciação por descrição e imagens de qualidade.", image: "https://images.unsplash.com/photo-1565814329452-e9e3c2c59fc5?w=600&h=400&fit=crop&auto=format&q=80" },
-  { id: 5, name: "Capa silicone colorida (iPhone/Samsung)", score: 68, margin: 52, competition: "Alta", difficulty: "Médio", trend: "stable", tags: ["easy-shipping", "high-margin"], avgPrice: "R$12–R$25", category: "Acessórios", analysis: "Volume alto, mas saturado. Diferencie por variedade de modelos e cores exclusivas.", image: "https://images.unsplash.com/photo-1601784551446-20c9e07cdbdb?w=600&h=400&fit=crop&auto=format&q=80" },
-  { id: 6, name: "Almofada pescoço viagem ergonômica", score: 79, margin: 60, competition: "Baixa", difficulty: "Fácil", trend: "up", tags: ["easy", "high-margin", "easy-shipping"], avgPrice: "R$20–R$45", category: "Viagem", analysis: "Produto evergreen com picos em feriados e férias. Envio simples por ser leve e flexível.", image: "https://images.unsplash.com/photo-1436491865332-7a61a109cc05?w=600&h=400&fit=crop&auto=format&q=80" },
-  { id: 7, name: "Fita LED decorativa 5m", score: 83, margin: 65, competition: "Baixa", difficulty: "Fácil", trend: "up", tags: ["viral", "high-margin", "trending"], avgPrice: "R$25–R$55", category: "Casa", analysis: "Alta procura nas redes. Margem excelente e produto compacto. Boa foto de ambiente vende sozinha.", image: "https://images.unsplash.com/photo-1600166898405-da9535204843?w=600&h=400&fit=crop&auto=format&q=80" },
-  { id: 8, name: "Porta-retrato digital 7 polegadas", score: 70, margin: 42, competition: "Média", difficulty: "Médio", trend: "up", tags: ["trending"], avgPrice: "R$60–R$120", category: "Casa", analysis: "Produto de presente. Pico de vendas em datas comemorativas. Ticket médio maior que a média.", image: "https://images.unsplash.com/photo-1611532736597-de2d4265fba3?w=600&h=400&fit=crop&auto=format&q=80" },
+  { id: 1, name: "Organizador de gaveta modular", score: 87, margin: 62, competition: "Baixa", difficulty: "Fácil", trend: "up", tags: ["viral", "high-margin"], avgPrice: "R$29–R$45", category: "Casa", analysis: "Produto com alta procura e baixa concorrência. Ótimo para iniciantes com pouco capital inicial." },
+  { id: 2, name: "Suporte veicular celular magnético", score: 81, margin: 58, competition: "Média", difficulty: "Fácil", trend: "up", tags: ["easy", "easy-shipping"], avgPrice: "R$15–R$35", category: "Acessórios", analysis: "Item de consumo constante, leve para enviar e com margem atrativa. Ideal para primeiro produto." },
+  { id: 3, name: "Kit pincéis maquiagem 12 peças", score: 75, margin: 48, competition: "Média", difficulty: "Fácil", trend: "up", tags: ["trending", "high-margin"], avgPrice: "R$25–R$60", category: "Beleza", analysis: "Tendência crescente. Ticket médio bom. Diferenciação por fotos de qualidade faz grande diferença." },
+  { id: 4, name: "Lâmpada LED inteligente RGB", score: 72, margin: 44, competition: "Alta", difficulty: "Médio", trend: "stable", tags: ["trending"], avgPrice: "R$35–R$80", category: "Eletrônicos", analysis: "Concorrência moderada. Foque em diferenciação por descrição e imagens de qualidade." },
+  { id: 5, name: "Capa silicone colorida (iPhone/Samsung)", score: 68, margin: 52, competition: "Alta", difficulty: "Médio", trend: "stable", tags: ["easy-shipping", "high-margin"], avgPrice: "R$12–R$25", category: "Acessórios", analysis: "Volume alto, mas saturado. Diferencie por variedade de modelos e cores exclusivas." },
+  { id: 6, name: "Almofada pescoço viagem ergonômica", score: 79, margin: 60, competition: "Baixa", difficulty: "Fácil", trend: "up", tags: ["easy", "high-margin", "easy-shipping"], avgPrice: "R$20–R$45", category: "Viagem", analysis: "Produto evergreen com picos em feriados e férias. Envio simples por ser leve e flexível." },
+  { id: 7, name: "Fita LED decorativa 5m", score: 83, margin: 65, competition: "Baixa", difficulty: "Fácil", trend: "up", tags: ["viral", "high-margin", "trending"], avgPrice: "R$25–R$55", category: "Casa", analysis: "Alta procura nas redes. Margem excelente e produto compacto. Boa foto de ambiente vende sozinha." },
+  { id: 8, name: "Porta-retrato digital 7 polegadas", score: 70, margin: 42, competition: "Média", difficulty: "Médio", trend: "up", tags: ["trending"], avgPrice: "R$60–R$120", category: "Casa", analysis: "Produto de presente. Pico de vendas em datas comemorativas. Ticket médio maior que a média." },
 ];
 
 const tagLabels: Record<Tag, string> = {
@@ -61,43 +59,6 @@ function ScoreRing({ score }: { score: number }) {
   );
 }
 
-function ProductImageBanner({ product, aiGenerated }: { product: Product; aiGenerated?: boolean }) {
-  const [imgError, setImgError] = useState(false);
-  const showImage = product.image && !imgError;
-
-  return (
-    <div className="relative -mx-6 -mt-6 h-44 mb-5 overflow-hidden rounded-t-2xl bg-surface-50">
-      {showImage ? (
-        <Image
-          src={product.image!}
-          alt={product.name}
-          fill
-          className="object-cover"
-          onError={() => setImgError(true)}
-          sizes="(max-width: 640px) 100vw, (max-width: 1280px) 50vw, 33vw"
-        />
-      ) : (
-        <div className="w-full h-full bg-gradient-to-br from-surface-100 to-surface-200 flex items-center justify-center">
-          <Package className="w-12 h-12 text-surface-300" />
-        </div>
-      )}
-      {/* Gradient overlay at bottom for readability */}
-      <div className="absolute inset-x-0 bottom-0 h-16 bg-gradient-to-t from-black/30 to-transparent" />
-      {/* Score badge */}
-      <div className="absolute bottom-2 right-3">
-        <ScoreRing score={product.score} />
-      </div>
-      {/* AI badge */}
-      {aiGenerated && (
-        <div className="absolute top-3 left-3 flex items-center gap-1 bg-white/90 backdrop-blur-sm border border-purple-200 rounded-full px-2 py-0.5">
-          <Sparkles className="w-3 h-3 text-purple-500" />
-          <span className="text-xs text-purple-600 font-medium">IA</span>
-        </div>
-      )}
-    </div>
-  );
-}
-
 function ProductCard({ product, index, onClick, aiGenerated }: {
   product: Product;
   index: number;
@@ -111,13 +72,24 @@ function ProductCard({ product, index, onClick, aiGenerated }: {
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: index * 0.05 }}
       onClick={onClick}
-      className="card cursor-pointer hover:shadow-card-hover transition-all duration-200 border border-surface-200 hover:border-dark/10 relative overflow-hidden"
+      className="card cursor-pointer hover:shadow-card-hover transition-all duration-200 border border-surface-200 hover:border-dark/10 relative"
     >
-      <ProductImageBanner product={product} aiGenerated={aiGenerated} />
+      {aiGenerated && (
+        <div className="absolute top-3 right-3 flex items-center gap-1 bg-purple-50 border border-purple-200 rounded-full px-2 py-0.5">
+          <Sparkles className="w-3 h-3 text-purple-500" />
+          <span className="text-xs text-purple-600 font-medium">IA</span>
+        </div>
+      )}
 
-      <div className="mb-3">
-        <h3 className="font-semibold text-dark text-sm leading-snug line-clamp-2">{product.name}</h3>
-        <span className="text-xs text-dark-muted">{product.category}</span>
+      <div className="flex items-start gap-3 mb-4">
+        <div className="w-10 h-10 rounded-lg bg-surface-50 border border-surface-200 flex items-center justify-center flex-shrink-0">
+          <Package className="w-5 h-5 text-dark-muted" />
+        </div>
+        <div className="flex-1 min-w-0 pr-16">
+          <h3 className="font-semibold text-dark text-sm leading-snug line-clamp-2">{product.name}</h3>
+          <span className="text-xs text-dark-muted">{product.category}</span>
+        </div>
+        <ScoreRing score={product.score} />
       </div>
 
       <div className="flex flex-wrap gap-1.5 mb-4">
@@ -335,42 +307,20 @@ export default function RadarPage() {
           >
             <motion.div
               initial={{ scale: 0.95, opacity: 0 }} animate={{ scale: 1, opacity: 1 }}
-              className="bg-white rounded-2xl max-w-md w-full shadow-xl overflow-hidden"
+              className="bg-white rounded-2xl p-6 max-w-md w-full shadow-xl"
               onClick={(e) => e.stopPropagation()}
             >
-              {/* Modal image */}
-              <div className="relative h-48 bg-surface-50">
-                {selected.image ? (
-                  <Image
-                    src={selected.image}
-                    alt={selected.name}
-                    fill
-                    className="object-cover"
-                    sizes="(max-width: 640px) 100vw, 448px"
-                  />
-                ) : (
-                  <div className="w-full h-full bg-gradient-to-br from-surface-100 to-surface-200 flex items-center justify-center">
-                    <Package className="w-14 h-14 text-surface-300" />
-                  </div>
-                )}
-                <div className="absolute inset-x-0 bottom-0 h-20 bg-gradient-to-t from-black/40 to-transparent" />
-                <div className="absolute bottom-3 right-4">
-                  <ScoreRing score={selected.score} />
-                </div>
-                <button
-                  onClick={() => setSelected(null)}
-                  className="absolute top-3 right-3 w-8 h-8 bg-white/90 backdrop-blur-sm rounded-full flex items-center justify-center hover:bg-white transition-colors"
-                >
-                  <X className="w-4 h-4 text-dark" />
-                </button>
-              </div>
-
-              <div className="p-6">
               <div className="flex items-start justify-between mb-4">
-                <div>
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-lg bg-surface-100 flex items-center justify-center">
+                    <Package className="w-5 h-5 text-dark-muted" />
+                  </div>
+                  <div>
                     <h3 className="font-bold text-dark text-sm">{selected.name}</h3>
                     <span className="text-xs text-dark-muted">{selected.category}</span>
+                  </div>
                 </div>
+                <ScoreRing score={selected.score} />
               </div>
 
               <div className="flex flex-wrap gap-1.5 mb-4">
@@ -404,7 +354,6 @@ export default function RadarPage() {
               <button onClick={() => setSelected(null)} className="btn-brand w-full text-sm py-3">
                 Fechar
               </button>
-              </div>
             </motion.div>
           </motion.div>
         )}
