@@ -7,7 +7,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import {
   LayoutDashboard, Zap, Target, Calculator, Megaphone,
   Store, Trophy, Users, Settings, ShoppingBag, LogOut,
-  ChevronRight, X, Menu
+  ChevronRight, X, Menu, Bot
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useUser, getInitials, getFirstName } from "@/context/UserContext";
@@ -16,6 +16,7 @@ const navItems = [
   { href: "/dashboard", icon: LayoutDashboard, label: "Dashboard" },
   { href: "/dashboard/missoes", icon: Zap, label: "Missões", badge: "3" },
   { href: "/dashboard/radar", icon: Target, label: "Radar de Produtos" },
+  { href: "/dashboard/assistente", icon: Bot, label: "Assistente IA", badge: "novo" },
   { href: "/dashboard/calculadora", icon: Calculator, label: "Calculadora" },
   { href: "/dashboard/gerador", icon: Megaphone, label: "Gerador de Anúncios" },
   { href: "/dashboard/minha-loja", icon: Store, label: "Minha Loja" },
