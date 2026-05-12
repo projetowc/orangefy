@@ -6,7 +6,7 @@ import Image from "next/image";
 import {
   Zap, Target, Calculator, Megaphone, BarChart3, TrendingUp,
   Star, CheckCircle2, ArrowRight, ShoppingBag, Shield,
-  ChevronRight, Rocket, Clock, Users, Award, AlertCircle
+  ChevronRight, Clock, Users, Award, AlertCircle
 } from "lucide-react";
 
 const fadeUp = {
@@ -71,11 +71,6 @@ export default function LandingPage() {
 
             {/* Left: Copy */}
             <motion.div initial="hidden" animate="show" variants={stagger}>
-              <motion.div variants={fadeUp} className="inline-flex items-center gap-2 bg-brand/10 text-brand rounded-full px-3 py-1.5 text-xs font-semibold mb-4">
-                <Rocket className="w-3.5 h-3.5" />
-                Plataforma #1 para iniciantes na Shopee
-              </motion.div>
-
               <motion.h1 variants={fadeUp} className="text-4xl sm:text-5xl lg:text-6xl font-black text-dark leading-[1.1] mb-4">
                 Aprenda a vender na{" "}
                 <span className="text-gradient">Shopee</span>{" "}
