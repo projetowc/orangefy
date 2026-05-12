@@ -6,38 +6,60 @@ import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import {
   ShoppingBag, Eye, EyeOff, ArrowRight, Lock, Mail,
-  CheckCircle2, AlertCircle, ChevronLeft, Sparkles
+  CheckCircle2, AlertCircle, ChevronLeft, UserPlus, LogIn
 } from "lucide-react";
 import { createClient } from "@/lib/supabase-browser";
 
-type View = "login" | "first-access" | "forgot" | "sent";
+type Tab = "login" | "register";
+type View = "form" | "forgot" | "sent";
 
 function LoginForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const supabase = createClient();
-  const [view, setView] = useState<View>("login");
-  const [linkError, setLinkError] = useState("");
+
+  const [tab, setTab] = useState<Tab>("login");
+  const [view, setView] = useState<View>("form");
   const [showPassword, setShowPassword] = useState(false);
+  const [showConfirm, setShowConfirm] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [accessEmail, setAccessEmail] = useState("");
+
+  // Login fields
+  const [loginEmail, setLoginEmail] = useState("");
+  const [loginPassword, setLoginPassword] = useState("");
+
+  // Register fields
+  const [regEmail, setRegEmail] = useState("");
+  const [regPassword, setRegPassword] = useState("");
+  const [regConfirm, setRegConfirm] = useState("");
+
+  // Forgot
+  const [forgotEmail, setForgotEmail] = useState("");
 
   useEffect(() => {
     if (searchParams.get("error") === "link_expirado") {
-      setLinkError("Este link expirou ou já foi usado. Solicite um novo abaixo.");
+      setError("Este link expirou. Faça login ou redefina sua senha.");
     }
   }, [searchParams]);
+
+  // Limpa erro ao trocar de aba
+  function switchTab(t: Tab) {
+    setTab(t);
+    setError("");
+    setView("form");
+  }
 
   async function handleLogin(e: React.FormEvent) {
     e.preventDefault();
     setError("");
     setLoading(true);
-    const { error } = await supabase.auth.signInWithPassword({ email, password });
+    const { error } = await supabase.auth.signInWithPassword({
+      email: loginEmail,
+      password: loginPassword,
+    });
     if (error) {
-      setError("E-mail ou senha inválidos. Verifique suas credenciais.");
+      setError("E-mail ou senha inválidos.");
     } else {
       router.push("/dashboard");
       router.refresh();
@@ -45,20 +67,57 @@ function LoginForm() {
     setLoading(false);
   }
 
-  async function handleFirstAccess(e: React.FormEvent) {
+  async function handleRegister(e: React.FormEvent) {
     e.preventDefault();
+    setError("");
+
+    if (regPassword.length < 6) {
+      setError("A senha deve ter pelo menos 6 caracteres.");
+      return;
+    }
+    if (regPassword !== regConfirm) {
+      setError("As senhas não coincidem.");
+      return;
+    }
+
     setLoading(true);
-    await supabase.auth.resetPasswordForEmail(accessEmail, {
-      redirectTo: `${window.location.origin}/auth/callback`,
+
+    const res = await fetch("/api/auth/register", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email: regEmail, password: regPassword }),
     });
+
+    const data = await res.json();
+
+    if (!data.success) {
+      setError(data.error || "Erro ao criar conta.");
+      setLoading(false);
+      return;
+    }
+
+    // Conta criada — faz login automaticamente
+    const { error: loginError } = await supabase.auth.signInWithPassword({
+      email: regEmail,
+      password: regPassword,
+    });
+
+    if (loginError) {
+      setError("Conta criada! Faça login com suas credenciais.");
+      setTab("login");
+      setLoginEmail(regEmail);
+    } else {
+      router.push("/dashboard");
+      router.refresh();
+    }
+
     setLoading(false);
-    setView("sent");
   }
 
   async function handleForgot(e: React.FormEvent) {
     e.preventDefault();
     setLoading(true);
-    await supabase.auth.resetPasswordForEmail(accessEmail, {
+    await supabase.auth.resetPasswordForEmail(forgotEmail, {
       redirectTo: `${window.location.origin}/auth/callback`,
     });
     setLoading(false);
@@ -99,6 +158,7 @@ function LoginForm() {
       {/* RIGHT PANEL */}
       <div className="flex-1 flex items-center justify-center p-6">
         <div className="w-full max-w-md">
+          {/* Mobile logo */}
           <div className="lg:hidden mb-8 text-center">
             <Link href="/" className="inline-flex items-center gap-2">
               <div className="w-10 h-10 rounded-xl bg-gradient-brand flex items-center justify-center">
@@ -110,151 +170,163 @@ function LoginForm() {
 
           <AnimatePresence mode="wait">
 
-            {/* LOGIN */}
-            {view === "login" && (
-              <motion.div key="login" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -20 }} transition={{ duration: 0.3 }}>
-                <div className="mb-8">
-                  <h1 className="text-3xl font-black text-dark mb-2">Bem-vindo de volta</h1>
-                  <p className="text-dark-muted">
-                    Primeira vez aqui?{" "}
-                    <button onClick={() => setView("first-access")} className="text-brand font-semibold hover:underline">
-                      Configure seu acesso
-                    </button>
-                  </p>
-                </div>
-
-                {linkError && (
-                  <motion.div initial={{ opacity: 0, y: -8 }} animate={{ opacity: 1, y: 0 }} className="flex items-center gap-2 bg-amber-50 border border-amber-200 rounded-xl p-3 text-sm text-amber-700 mb-4">
-                    <AlertCircle className="w-4 h-4 flex-shrink-0" />
-                    {linkError}
-                  </motion.div>
-                )}
-
-                <form onSubmit={handleLogin} className="space-y-4">
-                  <div>
-                    <label className="block text-sm font-semibold text-dark mb-2">E-mail</label>
-                    <div className="relative">
-                      <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-dark-muted" />
-                      <input type="email" className="input-field pl-10" placeholder="seu@email.com" value={email} onChange={(e) => setEmail(e.target.value)} required />
-                    </div>
-                  </div>
-                  <div>
-                    <label className="block text-sm font-semibold text-dark mb-2">Senha</label>
-                    <div className="relative">
-                      <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-dark-muted" />
-                      <input type={showPassword ? "text" : "password"} className="input-field pl-10 pr-12" placeholder="Sua senha" value={password} onChange={(e) => setPassword(e.target.value)} required />
-                      <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-4 top-1/2 -translate-y-1/2 text-dark-muted hover:text-dark">
-                        {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-                      </button>
-                    </div>
-                  </div>
-                  <div className="flex justify-end">
-                    <button type="button" onClick={() => { setView("forgot"); setAccessEmail(email); }} className="text-sm text-brand font-medium hover:underline">
-                      Esqueci minha senha
-                    </button>
-                  </div>
-                  {error && (
-                    <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} className="flex items-center gap-2 bg-red-50 border border-red-200 rounded-xl p-3 text-sm text-danger">
-                      <AlertCircle className="w-4 h-4 flex-shrink-0" />{error}
-                    </motion.div>
-                  )}
-                  <button type="submit" disabled={loading} className="btn-brand w-full flex items-center justify-center gap-2 py-4 disabled:opacity-70">
-                    {loading ? <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" /> : <><span>Entrar na plataforma</span><ArrowRight className="w-5 h-5" /></>}
-                  </button>
-                </form>
-
-                {/* FIRST ACCESS CTA */}
-                <div className="mt-6 p-4 bg-orange-50 border border-brand/20 rounded-2xl">
-                  <div className="flex items-start gap-3">
-                    <Sparkles className="w-5 h-5 text-brand flex-shrink-0 mt-0.5" />
-                    <div>
-                      <p className="text-sm font-semibold text-dark mb-1">Acabou de comprar?</p>
-                      <p className="text-xs text-dark-muted mb-2">Use o e-mail da sua compra para configurar sua senha e acessar a plataforma.</p>
-                      <button onClick={() => setView("first-access")} className="text-xs font-bold text-brand hover:underline">
-                        Configurar meu acesso →
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              </motion.div>
-            )}
-
-            {/* FIRST ACCESS */}
-            {view === "first-access" && (
-              <motion.div key="first-access" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -20 }} transition={{ duration: 0.3 }}>
-                <button onClick={() => setView("login")} className="flex items-center gap-2 text-dark-muted hover:text-dark text-sm mb-8 transition-colors">
-                  <ChevronLeft className="w-4 h-4" /> Voltar ao login
-                </button>
-                <div className="mb-8">
-                  <div className="w-12 h-12 rounded-2xl bg-gradient-brand flex items-center justify-center mb-4 shadow-brand">
-                    <Sparkles className="w-6 h-6 text-white" />
-                  </div>
-                  <h1 className="text-3xl font-black text-dark mb-2">Primeiro acesso</h1>
-                  <p className="text-dark-muted">
-                    Digite o e-mail usado na sua compra. Vamos enviar um link para você criar sua senha e entrar na plataforma.
-                  </p>
-                </div>
-                <form onSubmit={handleFirstAccess} className="space-y-4">
-                  <div>
-                    <label className="block text-sm font-semibold text-dark mb-2">E-mail da compra</label>
-                    <div className="relative">
-                      <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-dark-muted" />
-                      <input type="email" className="input-field pl-10" placeholder="email@usado.na.compra.com" value={accessEmail} onChange={(e) => setAccessEmail(e.target.value)} required autoFocus />
-                    </div>
-                  </div>
-                  <button type="submit" disabled={loading} className="btn-brand w-full flex items-center justify-center gap-2 py-4 disabled:opacity-70">
-                    {loading ? <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" /> : <><Mail className="w-4 h-4" /><span>Enviar link de acesso</span></>}
-                  </button>
-                </form>
-                <div className="mt-4 p-3 bg-blue-50 border border-blue-200 rounded-xl">
-                  <p className="text-xs text-blue-700">
-                    💡 Verifique também a pasta de <strong>spam</strong> caso não encontre o e-mail na caixa de entrada.
-                  </p>
-                </div>
-              </motion.div>
-            )}
-
-            {/* FORGOT PASSWORD */}
+            {/* RECUPERAR SENHA */}
             {view === "forgot" && (
-              <motion.div key="forgot" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -20 }} transition={{ duration: 0.3 }}>
-                <button onClick={() => setView("login")} className="flex items-center gap-2 text-dark-muted hover:text-dark text-sm mb-8 transition-colors">
-                  <ChevronLeft className="w-4 h-4" /> Voltar ao login
+              <motion.div key="forgot" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -20 }}>
+                <button onClick={() => setView("form")} className="flex items-center gap-2 text-dark-muted hover:text-dark text-sm mb-8">
+                  <ChevronLeft className="w-4 h-4" /> Voltar
                 </button>
-                <div className="mb-8">
-                  <h1 className="text-3xl font-black text-dark mb-2">Recuperar senha</h1>
-                  <p className="text-dark-muted">Enviaremos um link para redefinir sua senha.</p>
-                </div>
+                <h1 className="text-3xl font-black text-dark mb-2">Recuperar senha</h1>
+                <p className="text-dark-muted mb-6">Enviaremos um link para redefinir sua senha.</p>
                 <form onSubmit={handleForgot} className="space-y-4">
-                  <div>
-                    <label className="block text-sm font-semibold text-dark mb-2">E-mail</label>
-                    <div className="relative">
-                      <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-dark-muted" />
-                      <input type="email" className="input-field pl-10" placeholder="seu@email.com" value={accessEmail} onChange={(e) => setAccessEmail(e.target.value)} required />
-                    </div>
+                  <div className="relative">
+                    <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-dark-muted" />
+                    <input type="email" className="input-field pl-10" placeholder="seu@email.com" value={forgotEmail} onChange={(e) => setForgotEmail(e.target.value)} required />
                   </div>
-                  <button type="submit" disabled={loading} className="btn-brand w-full flex items-center justify-center gap-2 py-4">
-                    {loading ? <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" /> : "Enviar link de recuperação"}
+                  <button type="submit" disabled={loading} className="btn-brand w-full py-4 flex items-center justify-center gap-2">
+                    {loading ? <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" /> : "Enviar link"}
                   </button>
                 </form>
               </motion.div>
             )}
 
-            {/* SENT */}
+            {/* EMAIL ENVIADO */}
             {view === "sent" && (
               <motion.div key="sent" initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0 }} className="text-center">
                 <div className="w-20 h-20 rounded-full bg-green-100 flex items-center justify-center mx-auto mb-6">
                   <CheckCircle2 className="w-10 h-10 text-success" />
                 </div>
                 <h1 className="text-3xl font-black text-dark mb-3">E-mail enviado!</h1>
-                <p className="text-dark-muted mb-2">
-                  Enviamos um link para <strong>{accessEmail}</strong>.
-                </p>
-                <p className="text-sm text-dark-muted mb-8">
-                  Clique no link do e-mail para criar sua senha e acessar a plataforma. Verifique também a pasta de spam.
-                </p>
-                <button onClick={() => setView("login")} className="btn-brand w-full flex items-center justify-center gap-2 py-4">
-                  Voltar ao login
-                </button>
+                <p className="text-dark-muted mb-8">Verifique sua caixa de entrada e clique no link para redefinir a senha.</p>
+                <button onClick={() => { setView("form"); setTab("login"); }} className="btn-brand w-full py-4">Voltar ao login</button>
+              </motion.div>
+            )}
+
+            {/* TABS: LOGIN / CRIAR CONTA */}
+            {view === "form" && (
+              <motion.div key="form" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -20 }}>
+                {/* TABS */}
+                <div className="flex bg-surface-50 rounded-2xl p-1 mb-8 border border-surface-200">
+                  <button
+                    onClick={() => switchTab("login")}
+                    className={`flex-1 flex items-center justify-center gap-2 py-3 rounded-xl text-sm font-semibold transition-all duration-200 ${
+                      tab === "login"
+                        ? "bg-white text-dark shadow-card"
+                        : "text-dark-muted hover:text-dark"
+                    }`}
+                  >
+                    <LogIn className="w-4 h-4" /> Entrar
+                  </button>
+                  <button
+                    onClick={() => switchTab("register")}
+                    className={`flex-1 flex items-center justify-center gap-2 py-3 rounded-xl text-sm font-semibold transition-all duration-200 ${
+                      tab === "register"
+                        ? "bg-white text-dark shadow-card"
+                        : "text-dark-muted hover:text-dark"
+                    }`}
+                  >
+                    <UserPlus className="w-4 h-4" /> Criar conta
+                  </button>
+                </div>
+
+                <AnimatePresence mode="wait">
+
+                  {/* LOGIN */}
+                  {tab === "login" && (
+                    <motion.div key="login-tab" initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: 10 }} transition={{ duration: 0.2 }}>
+                      <form onSubmit={handleLogin} className="space-y-4">
+                        <div>
+                          <label className="block text-sm font-semibold text-dark mb-2">E-mail</label>
+                          <div className="relative">
+                            <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-dark-muted" />
+                            <input type="email" className="input-field pl-10" placeholder="seu@email.com" value={loginEmail} onChange={(e) => setLoginEmail(e.target.value)} required />
+                          </div>
+                        </div>
+                        <div>
+                          <label className="block text-sm font-semibold text-dark mb-2">Senha</label>
+                          <div className="relative">
+                            <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-dark-muted" />
+                            <input type={showPassword ? "text" : "password"} className="input-field pl-10 pr-12" placeholder="Sua senha" value={loginPassword} onChange={(e) => setLoginPassword(e.target.value)} required />
+                            <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-4 top-1/2 -translate-y-1/2 text-dark-muted hover:text-dark">
+                              {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                            </button>
+                          </div>
+                        </div>
+                        <div className="flex justify-end">
+                          <button type="button" onClick={() => { setView("forgot"); setForgotEmail(loginEmail); }} className="text-sm text-brand font-medium hover:underline">
+                            Esqueci minha senha
+                          </button>
+                        </div>
+                        {error && tab === "login" && (
+                          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex items-center gap-2 bg-red-50 border border-red-200 rounded-xl p-3 text-sm text-danger">
+                            <AlertCircle className="w-4 h-4 flex-shrink-0" /> {error}
+                          </motion.div>
+                        )}
+                        <button type="submit" disabled={loading} className="btn-brand w-full flex items-center justify-center gap-2 py-4 disabled:opacity-70">
+                          {loading ? <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" /> : <><span>Entrar na plataforma</span><ArrowRight className="w-5 h-5" /></>}
+                        </button>
+                      </form>
+                    </motion.div>
+                  )}
+
+                  {/* REGISTER */}
+                  {tab === "register" && (
+                    <motion.div key="register-tab" initial={{ opacity: 0, x: 10 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -10 }} transition={{ duration: 0.2 }}>
+                      <p className="text-sm text-dark-muted mb-5">
+                        Use o <strong>mesmo e-mail</strong> utilizado na sua compra para criar a conta.
+                      </p>
+                      <form onSubmit={handleRegister} className="space-y-4">
+                        <div>
+                          <label className="block text-sm font-semibold text-dark mb-2">E-mail da compra</label>
+                          <div className="relative">
+                            <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-dark-muted" />
+                            <input type="email" className="input-field pl-10" placeholder="email@usado.na.compra.com" value={regEmail} onChange={(e) => setRegEmail(e.target.value)} required />
+                          </div>
+                        </div>
+                        <div>
+                          <label className="block text-sm font-semibold text-dark mb-2">Criar senha</label>
+                          <div className="relative">
+                            <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-dark-muted" />
+                            <input type={showPassword ? "text" : "password"} className="input-field pl-10 pr-12" placeholder="Mínimo 6 caracteres" value={regPassword} onChange={(e) => setRegPassword(e.target.value)} required />
+                            <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-4 top-1/2 -translate-y-1/2 text-dark-muted hover:text-dark">
+                              {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                            </button>
+                          </div>
+                        </div>
+                        <div>
+                          <label className="block text-sm font-semibold text-dark mb-2">Confirmar senha</label>
+                          <div className="relative">
+                            <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-dark-muted" />
+                            <input type={showConfirm ? "text" : "password"} className="input-field pl-10 pr-12" placeholder="Repita a senha" value={regConfirm} onChange={(e) => setRegConfirm(e.target.value)} required />
+                            <button type="button" onClick={() => setShowConfirm(!showConfirm)} className="absolute right-4 top-1/2 -translate-y-1/2 text-dark-muted hover:text-dark">
+                              {showConfirm ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                            </button>
+                          </div>
+                          {regConfirm && regPassword !== regConfirm && (
+                            <p className="text-xs text-danger mt-1">As senhas não coincidem</p>
+                          )}
+                        </div>
+                        {error && tab === "register" && (
+                          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex items-start gap-2 bg-red-50 border border-red-200 rounded-xl p-3 text-sm text-danger">
+                            <AlertCircle className="w-4 h-4 flex-shrink-0 mt-0.5" />
+                            <div>
+                              {error}
+                              {error.includes("adquira") && (
+                                <a href="https://pay.cakto.com.br/454awz8_880943" target="_blank" rel="noopener noreferrer" className="block mt-1 font-bold underline">
+                                  Clique aqui para adquirir o acesso →
+                                </a>
+                              )}
+                            </div>
+                          </motion.div>
+                        )}
+                        <button type="submit" disabled={loading} className="btn-brand w-full flex items-center justify-center gap-2 py-4 disabled:opacity-70">
+                          {loading ? <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" /> : <><UserPlus className="w-5 h-5" /><span>Criar minha conta</span></>}
+                        </button>
+                      </form>
+                    </motion.div>
+                  )}
+
+                </AnimatePresence>
               </motion.div>
             )}
 

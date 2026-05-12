@@ -11,9 +11,9 @@ export async function POST(req: NextRequest) {
   let body: {
     event?: string;
     customer?: { email?: string; name?: string };
-    product?: { id?: string; name?: string };
     plan?: string;
   };
+
   try {
     body = await req.json();
   } catch {
@@ -31,48 +31,15 @@ export async function POST(req: NextRequest) {
   }
 
   const supabase = getServiceSupabase();
-
   const planType = plan?.includes("annual") || plan?.includes("anual") ? "annual" : "monthly";
 
-  const { data: existing } = await supabase
-    .from("users")
-    .select("id")
-    .eq("email", customer.email)
-    .single();
+  // Apenas registra a compra — o cliente cria a senha na plataforma
+  await supabase.from("purchases").upsert({
+    email: customer.email.toLowerCase(),
+    name: customer.name || customer.email,
+    plan: planType,
+    purchased_at: new Date().toISOString(),
+  });
 
-  if (existing) {
-    await supabase
-      .from("users")
-      .update({ status: "active", plan: planType })
-      .eq("email", customer.email);
-  } else {
-    const appUrl = process.env.NEXT_PUBLIC_APP_URL || "https://orangefy-rlhr.vercel.app";
-
-    const { error: authError } = await supabase.auth.admin.inviteUserByEmail(customer.email, {
-      redirectTo: `${appUrl}/auth/callback`,
-      data: {
-        name: customer.name || customer.email,
-        plan: planType,
-        status: "active",
-      },
-    });
-
-    if (authError) {
-      console.error("Supabase invite error:", authError);
-      return NextResponse.json({ error: "Failed to invite user" }, { status: 500 });
-    }
-
-    await supabase.from("users").upsert({
-      email: customer.email,
-      name: customer.name || customer.email,
-      plan: planType,
-      status: "active",
-      xp: 0,
-      level: 1,
-      sales_count: 0,
-      shopee_score: 0,
-    });
-  }
-
-  return NextResponse.json({ success: true, message: "User access granted" });
+  return NextResponse.json({ success: true, message: "Purchase registered" });
 }
