@@ -2,9 +2,16 @@
 
 import { useState, useEffect, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Search, TrendingUp, TrendingDown, Minus, Tag, Lightbulb, Target, Clock, RotateCcw, AlertCircle } from "lucide-react";
+import { Search, TrendingUp, TrendingDown, Minus, Tag, Lightbulb, Target, Clock, RotateCcw, AlertCircle, ShoppingCart } from "lucide-react";
 import Header from "@/components/dashboard/Header";
 import { createClient } from "@/lib/supabase-browser";
+
+interface ProdutoConcorrente {
+  nome: string;
+  precoMedio: number;
+  volumeVendas: "Alto" | "Médio" | "Baixo";
+  diferencial: string;
+}
 
 interface SpyResult {
   produto: string;
@@ -15,6 +22,7 @@ interface SpyResult {
   nichoCorrelato: string;
   palavrasChave: string[];
   insight: string;
+  produtosConcorrentes?: ProdutoConcorrente[];
 }
 
 interface HistoricoItem {
@@ -270,6 +278,49 @@ export default function SpyPage() {
                   </div>
                 </div>
               </div>
+
+              {/* Produtos dos concorrentes */}
+              {result.produtosConcorrentes && result.produtosConcorrentes.length > 0 && (
+                <div className="card">
+                  <div className="flex items-center gap-2 mb-4">
+                    <ShoppingCart className="w-4 h-4 text-brand" />
+                    <span className="text-sm font-semibold text-dark">O que os concorrentes mais vendem</span>
+                  </div>
+                  <div className="space-y-3">
+                    {result.produtosConcorrentes.map((p, i) => {
+                      const volumeColor =
+                        p.volumeVendas === "Alto"
+                          ? "bg-green-100 text-green-700"
+                          : p.volumeVendas === "Médio"
+                          ? "bg-yellow-100 text-yellow-700"
+                          : "bg-surface-100 text-dark-muted";
+                      return (
+                        <div
+                          key={i}
+                          className="flex items-start gap-3 p-3 rounded-xl bg-surface-50 border border-surface-100"
+                        >
+                          <div className="w-7 h-7 rounded-lg bg-brand/10 flex items-center justify-center flex-shrink-0 mt-0.5">
+                            <span className="text-xs font-black text-brand">#{i + 1}</span>
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-start justify-between gap-2 mb-1">
+                              <p className="text-sm font-semibold text-dark leading-snug">{p.nome}</p>
+                              <span className={`text-xs font-bold px-2 py-0.5 rounded-full flex-shrink-0 ${volumeColor}`}>
+                                {p.volumeVendas}
+                              </span>
+                            </div>
+                            <p className="text-xs text-dark-muted leading-relaxed">{p.diferencial}</p>
+                          </div>
+                          <div className="text-right flex-shrink-0">
+                            <div className="text-sm font-bold text-dark">R${p.precoMedio}</div>
+                            <div className="text-xs text-dark-muted">preço médio</div>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
             </motion.div>
           )}
         </AnimatePresence>

@@ -47,13 +47,25 @@ Simule uma análise realista de mercado da Shopee Brasil e retorne SOMENTE um JS
   "scoreOportunidade": 0,
   "nichoCorrelato": "sugestão de nicho com menos concorrência",
   "palavrasChave": ["p1", "p2", "p3", "p4", "p5"],
-  "insight": "1 insight estratégico em português, máx 2 frases"
+  "insight": "1 insight estratégico em português, máx 2 frases",
+  "produtosConcorrentes": [
+    {
+      "nome": "nome exato do produto mais vendido pelos concorrentes",
+      "precoMedio": 0,
+      "volumeVendas": "Alto",
+      "diferencial": "o que faz esse produto se destacar na Shopee"
+    }
+  ]
 }
 
 Regras:
 - demanda e concorrencia: "Alta", "Média" ou "Baixa"
 - scoreOportunidade: 0 a 100 (100 = máxima oportunidade)
 - faixaPreco em reais (R$)
+- produtosConcorrentes: exatamente 4 itens, produtos reais que concorrentes vendem bastante nesse nicho na Shopee Brasil
+- volumeVendas: "Alto", "Médio" ou "Baixo"
+- precoMedio em número (sem R$)
+- diferencial: 1 frase curta explicando o diferencial competitivo
 - Seja realista com o mercado brasileiro
 - Retorne SOMENTE o JSON`,
         },
