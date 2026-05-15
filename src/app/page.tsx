@@ -46,11 +46,15 @@ export default function LandingPage() {
       {/* NAV */}
       <nav className="fixed top-0 left-0 right-0 z-50 bg-white/95 backdrop-blur-md border-b border-surface-200">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 h-14 flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <div className="w-7 h-7 rounded-lg bg-gradient-brand flex items-center justify-center">
-              <ShoppingBag className="w-3.5 h-3.5 text-white" />
-            </div>
-            <span className="text-lg font-bold text-dark">Orange<span className="text-brand">fy</span></span>
+          <div className="flex items-center">
+            <Image
+              src="/orangefy-logo.png"
+              alt="Orangefy"
+              width={140}
+              height={40}
+              className="h-9 w-auto"
+              priority
+            />
           </div>
           <div className="flex items-center gap-2 sm:gap-3">
             <Link href="/login" className="text-dark-muted font-medium hover:text-dark transition-colors text-sm px-3 py-2">
@@ -496,11 +500,14 @@ export default function LandingPage() {
         <div className="max-w-6xl mx-auto">
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-6 mb-8">
             <div className="col-span-2 sm:col-span-1">
-              <div className="flex items-center gap-2 mb-3">
-                <div className="w-7 h-7 rounded-lg bg-gradient-brand flex items-center justify-center">
-                  <ShoppingBag className="w-3.5 h-3.5 text-white" />
-                </div>
-                <span className="text-lg font-bold">Orange<span className="text-brand">fy</span></span>
+              <div className="mb-3">
+                <Image
+                  src="/orangefy-logo.png"
+                  alt="Orangefy"
+                  width={140}
+                  height={40}
+                  className="h-9 w-auto rounded-lg"
+                />
               </div>
               <p className="text-white/50 text-sm leading-relaxed">
                 A plataforma que transforma iniciantes em vendedores de sucesso na Shopee.
