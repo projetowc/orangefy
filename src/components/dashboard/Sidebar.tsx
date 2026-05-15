@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import {
@@ -47,13 +48,15 @@ function SidebarContent({ onClose }: { onClose?: () => void }) {
   return (
     <div className="flex flex-col h-full">
       <div className="flex items-center justify-between p-5 border-b border-surface-200">
-        <Link href="/dashboard" className="flex items-center gap-2.5" onClick={onClose}>
-          <div className="w-9 h-9 rounded-xl bg-gradient-brand flex items-center justify-center shadow-brand">
-            <ShoppingBag className="w-[18px] h-[18px] text-white" />
-          </div>
-          <span className="text-xl font-black text-dark">
-            Orange<span className="text-brand">fy</span>
-          </span>
+        <Link href="/dashboard" onClick={onClose}>
+          <Image
+            src="/orangefy-logo-dark.png"
+            alt="Orangefy"
+            width={160}
+            height={46}
+            className="h-10 w-auto"
+            priority
+          />
         </Link>
         {onClose && (
           <button onClick={onClose} className="text-dark-muted hover:text-dark p-1">
