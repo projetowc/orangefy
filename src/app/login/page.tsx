@@ -130,15 +130,11 @@ function LoginForm() {
       {/* LEFT PANEL */}
       <div className="hidden lg:flex lg:w-1/2 bg-gradient-brand relative overflow-hidden flex-col justify-between p-12">
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_bottom_left,_rgba(255,255,255,0.1)_0%,_transparent_60%)]" />
-        <Link href="/" className="relative z-10 inline-block">
-          <Image
-            src="/orangefy-logo-dark.png"
-            alt="Orangefy"
-            width={160}
-            height={46}
-            className="h-11 w-auto"
-            priority
-          />
+        <Link href="/" className="flex items-center gap-2.5 relative z-10">
+          <div className="w-10 h-10 rounded-xl bg-white/20 flex items-center justify-center">
+            <ShoppingBag className="w-5 h-5 text-white" />
+          </div>
+          <span className="text-2xl font-bold text-white">Orangefy</span>
         </Link>
         <div className="relative z-10">
           <h2 className="text-4xl font-black text-white mb-4 leading-tight">
