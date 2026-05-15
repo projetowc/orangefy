@@ -52,7 +52,7 @@ export default function LandingPage() {
               alt="Orangefy"
               width={160}
               height={46}
-              className="h-10 w-auto"
+              className="h-14 w-auto"
               priority
             />
           </div>
@@ -506,7 +506,7 @@ export default function LandingPage() {
                   alt="Orangefy"
                   width={160}
                   height={46}
-                  className="h-10 w-auto"
+                  className="h-14 w-auto"
                 />
               </div>
               <p className="text-white/50 text-sm leading-relaxed">
