@@ -132,7 +132,7 @@ function LoginForm() {
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_bottom_left,_rgba(255,255,255,0.1)_0%,_transparent_60%)]" />
         <Link href="/" className="relative z-10 inline-block">
           <Image
-            src="/orangefy-logo-white.png"
+            src="/orangefy-logo-dark.png"
             alt="Orangefy"
             width={160}
             height={46}
