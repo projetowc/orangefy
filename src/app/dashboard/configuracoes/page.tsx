@@ -28,7 +28,7 @@ export default function ConfiguracoesPage() {
   const name = profile?.name || user?.email?.split("@")[0] || "";
   const email = user?.email || "";
   const initials = getInitials(name || "U");
-  const plan = profile?.plan === "annual" ? "Anual" : "Mensal";
+  const plan = profile?.plan === "annual" || profile?.plan === "lifetime" ? "Vitalício" : "Mensal";
 
   const [notifMissions, setNotifMissions] = useState(true);
   const [notifTips, setNotifTips] = useState(false);
@@ -161,14 +161,14 @@ export default function ConfiguracoesPage() {
             </div>
             <div className="badge-success">Ativo</div>
           </div>
-          {profile?.plan !== "annual" && (
+          {profile?.plan !== "annual" && profile?.plan !== "lifetime" && (
             <a
-              href="https://pay.cakto.com.br/555a875"
+              href="https://pay.cakto.com.br/j64vxpo"
               target="_blank"
               rel="noopener noreferrer"
               className="btn-brand w-full text-center flex items-center justify-center gap-2 text-sm"
             >
-              Fazer upgrade para Anual (35% OFF)
+              Fazer upgrade para Vitalício — R$249,90
               <ChevronRight className="w-4 h-4" />
             </a>
           )}

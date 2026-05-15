@@ -8,7 +8,7 @@ interface UserProfile {
   id: string;
   email: string;
   name: string;
-  plan: "monthly" | "annual";
+  plan: "monthly" | "annual" | "lifetime";
   xp: number;
   level: number;
   sales_count: number;

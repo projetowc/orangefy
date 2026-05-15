@@ -25,7 +25,7 @@ const benefits = [
 ];
 
 const steps = [
-  { number: "01", title: "Assine o plano", desc: "Escolha mensal ou anual. Acesso liberado na hora." },
+  { number: "01", title: "Assine o plano", desc: "Escolha mensal ou vitalício. Acesso liberado na hora." },
   { number: "02", title: "Crie sua conta", desc: "Entre com o e-mail da compra e defina sua senha." },
   { number: "03", title: "Siga as missões", desc: "O roteiro gamificado mostra exatamente o que fazer." },
   { number: "04", title: "Venda e lucre", desc: "Publique anúncios e receba suas primeiras vendas." },
@@ -135,7 +135,7 @@ export default function LandingPage() {
         <div className="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-center gap-2 sm:gap-6 text-sm text-center">
           <span className="flex items-center gap-2 font-semibold">
             <Clock className="w-4 h-4 text-brand" />
-            Oferta por tempo limitado — 35% OFF no plano anual
+            Oferta por tempo limitado — Plano Vitalício por apenas R$249,90 · Pagamento único
           </span>
           <span className="text-white/50 hidden sm:block">|</span>
           <span className="text-white/70">Uma única venda já cobre meses de assinatura</span>
@@ -405,7 +405,7 @@ export default function LandingPage() {
               </a>
             </motion.div>
 
-            {/* Anual */}
+            {/* Vitalício */}
             <motion.div
               className="card border-2 border-brand relative overflow-hidden shadow-brand"
               initial={{ opacity: 0, y: 16 }}
@@ -419,21 +419,19 @@ export default function LandingPage() {
                 </div>
               </div>
               <div className="mb-4">
-                <h3 className="text-lg font-bold text-dark mb-0.5">Plano Anual</h3>
-                <p className="text-dark-muted text-sm">Economize 35% — melhor custo-benefício.</p>
+                <h3 className="text-lg font-bold text-dark mb-0.5">Plano Vitalício</h3>
+                <p className="text-dark-muted text-sm">Pague uma vez, acesse para sempre.</p>
               </div>
               <div className="mb-5">
-                <div className="text-xs text-dark-muted mb-1">12x de</div>
+                <div className="text-xs text-dark-muted mb-1">Pagamento único de</div>
                 <div className="flex items-end gap-1 mb-1">
-                  <span className="text-4xl font-black text-dark">R$80</span>
-                  <span className="text-xl font-bold text-dark">,49</span>
-                  <span className="text-dark-muted text-sm mb-0.5">/mês</span>
+                  <span className="text-4xl font-black text-dark">R$249</span>
+                  <span className="text-xl font-bold text-dark">,90</span>
                 </div>
                 <div className="text-xs text-dark-muted mb-1.5">
-                  ou <span className="line-through">R$1.198,80</span>{" "}
-                  <span className="font-semibold text-dark">R$779,22</span> à vista
+                  Sem mensalidade, sem renovação
                 </div>
-                <div className="badge-brand inline-flex">35% OFF · Economize R$419,58</div>
+                <div className="badge-brand inline-flex">Acesso vitalício a todas as ferramentas</div>
               </div>
               <ul className="space-y-2.5 mb-6">
                 {[...planFeatures, "Suporte prioritário", "Acesso antecipado"].map((f) => (
@@ -443,12 +441,12 @@ export default function LandingPage() {
                 ))}
               </ul>
               <a
-                href="https://pay.cakto.com.br/555a875"
+                href="https://pay.cakto.com.br/j64vxpo"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="btn-brand w-full text-center block"
               >
-                Assinar Anual — Melhor Valor
+                Garantir Acesso Vitalício
               </a>
             </motion.div>
           </div>
@@ -477,12 +475,12 @@ export default function LandingPage() {
             </motion.p>
             <motion.div variants={fadeUp} className="flex flex-col sm:flex-row gap-3 justify-center">
               <a
-                href="https://pay.cakto.com.br/555a875"
+                href="https://pay.cakto.com.br/j64vxpo"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="bg-white text-brand font-bold rounded-xl px-7 py-3.5 hover:bg-surface-50 transition-colors flex items-center justify-center gap-2"
               >
-                Começar por R$80,49/mês
+                Garantir Acesso Vitalício — R$249,90
                 <ChevronRight className="w-4 h-4" />
               </a>
               <Link href="/login" className="border-2 border-white/40 text-white font-bold rounded-xl px-7 py-3.5 hover:bg-white/10 transition-colors flex items-center justify-center gap-2">
