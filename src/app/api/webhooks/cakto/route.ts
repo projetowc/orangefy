@@ -31,7 +31,12 @@ export async function POST(req: NextRequest) {
   }
 
   const supabase = getServiceSupabase();
-  const planType = plan?.includes("annual") || plan?.includes("anual") ? "annual" : "monthly";
+  const planLower = plan?.toLowerCase() || "";
+  const planType = planLower.includes("vitalicio") || planLower.includes("lifetime") || planLower.includes("vitalício")
+    ? "lifetime"
+    : planLower.includes("annual") || planLower.includes("anual")
+    ? "annual"
+    : "monthly";
 
   // Apenas registra a compra — o cliente cria a senha na plataforma
   await supabase.from("purchases").upsert({
