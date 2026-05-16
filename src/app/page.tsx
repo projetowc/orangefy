@@ -75,7 +75,7 @@ export default function LandingPage() {
 
             {/* Left: Copy */}
             <motion.div initial="hidden" animate="show" variants={stagger}>
-              <motion.h1 variants={fadeUp} className="text-4xl sm:text-5xl lg:text-6xl font-black text-dark leading-[1.1] mb-4">
+              <motion.h1 variants={fadeUp} className="text-3xl sm:text-4xl lg:text-5xl font-black text-dark leading-[1.15] mb-4">
                 Encontre produtos com alta demanda para vender na sua loja e{" "}
                 <span className="text-gradient">lucrar de verdade.</span>
               </motion.h1>
