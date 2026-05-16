@@ -6,7 +6,7 @@ import Image from "next/image";
 import {
   Zap, Target, Calculator, Megaphone, BarChart3, TrendingUp,
   Star, CheckCircle2, ArrowRight, ShoppingBag, Shield,
-  ChevronRight, Clock, Users, Award, AlertCircle
+  ChevronRight, Clock, Users, Award, AlertCircle, Sparkles
 } from "lucide-react";
 
 const fadeUp = {
@@ -145,6 +145,78 @@ export default function LandingPage() {
           <span className="text-white/70">Uma única venda já cobre meses de assinatura</span>
         </div>
       </div>
+
+      {/* PRODUTOS EM DESTAQUE */}
+      <section className="py-12 bg-white overflow-hidden">
+        <div className="max-w-6xl mx-auto px-4 mb-8 text-center">
+          <span className="inline-flex items-center gap-2 bg-brand/10 text-brand text-xs font-bold px-3 py-1.5 rounded-full mb-3">
+            <Sparkles className="w-3.5 h-3.5" />
+            Identificados pela IA Orangefy
+          </span>
+          <h2 className="text-2xl sm:text-3xl font-black text-dark mb-2">
+            Produtos com alto potencial de lucro
+          </h2>
+          <p className="text-dark-muted text-sm max-w-lg mx-auto">
+            Estes são exemplos reais de produtos que a Orangefy já identificou com boa margem e baixa concorrência na Shopee.
+          </p>
+        </div>
+
+        {/* Marquee */}
+        <div className="relative">
+          {/* fade edges */}
+          <div className="absolute left-0 top-0 bottom-0 w-16 bg-gradient-to-r from-white to-transparent z-10 pointer-events-none" />
+          <div className="absolute right-0 top-0 bottom-0 w-16 bg-gradient-to-l from-white to-transparent z-10 pointer-events-none" />
+
+          <div className="flex overflow-hidden">
+            <div className="animate-marquee flex gap-4 flex-shrink-0">
+              {[
+                { img: "/produtos/produto-01.png", name: "Toalhas de Banho Kit", score: 84, tag: "Alta margem" },
+                { img: "/produtos/produto-02.png", name: "Relógio LED Digital", score: 78, tag: "Viral" },
+                { img: "/produtos/produto-03.png", name: "Mini Câmera WiFi", score: 91, tag: "Tendência" },
+                { img: "/produtos/produto-04.png", name: "Luvas Táticas", score: 76, tag: "Fácil envio" },
+                { img: "/produtos/produto-05.png", name: "Umidificador USB", score: 88, tag: "Alta margem" },
+                { img: "/produtos/produto-06.png", name: "Shorts Esportivo", score: 73, tag: "Tendência" },
+                { img: "/produtos/produto-07.png", name: "Mini Aspirador Portátil", score: 85, tag: "Viral" },
+                { img: "/produtos/produto-08.png", name: "Mouse RGB Sem Fio", score: 80, tag: "Fácil envio" },
+                { img: "/produtos/produto-09.png", name: "Relógio Premium Aço", score: 82, tag: "Alta margem" },
+                { img: "/produtos/produto-10.png", name: "Camiseta Dry Fit", score: 77, tag: "Tendência" },
+                { img: "/produtos/produto-11.png", name: "Smartwatch Fitness", score: 89, tag: "Viral" },
+                { img: "/produtos/produto-12.png", name: "Borrifador Azeite", score: 83, tag: "Alta margem" },
+                { img: "/produtos/produto-13.png", name: "Camiseta Feminina", score: 75, tag: "Fácil envio" },
+                { img: "/produtos/produto-14.png", name: "Kit Meias 10 Pares", score: 86, tag: "Alta margem" },
+                { img: "/produtos/produto-15.png", name: "Mochila Executiva", score: 81, tag: "Tendência" },
+                // duplicate for seamless loop
+                { img: "/produtos/produto-01.png", name: "Toalhas de Banho Kit", score: 84, tag: "Alta margem" },
+                { img: "/produtos/produto-02.png", name: "Relógio LED Digital", score: 78, tag: "Viral" },
+                { img: "/produtos/produto-03.png", name: "Mini Câmera WiFi", score: 91, tag: "Tendência" },
+                { img: "/produtos/produto-04.png", name: "Luvas Táticas", score: 76, tag: "Fácil envio" },
+                { img: "/produtos/produto-05.png", name: "Umidificador USB", score: 88, tag: "Alta margem" },
+                { img: "/produtos/produto-06.png", name: "Shorts Esportivo", score: 73, tag: "Tendência" },
+                { img: "/produtos/produto-07.png", name: "Mini Aspirador Portátil", score: 85, tag: "Viral" },
+                { img: "/produtos/produto-08.png", name: "Mouse RGB Sem Fio", score: 80, tag: "Fácil envio" },
+                { img: "/produtos/produto-09.png", name: "Relógio Premium Aço", score: 82, tag: "Alta margem" },
+                { img: "/produtos/produto-10.png", name: "Camiseta Dry Fit", score: 77, tag: "Tendência" },
+                { img: "/produtos/produto-11.png", name: "Smartwatch Fitness", score: 89, tag: "Viral" },
+                { img: "/produtos/produto-12.png", name: "Borrifador Azeite", score: 83, tag: "Alta margem" },
+                { img: "/produtos/produto-13.png", name: "Camiseta Feminina", score: 75, tag: "Fácil envio" },
+                { img: "/produtos/produto-14.png", name: "Kit Meias 10 Pares", score: 86, tag: "Alta margem" },
+                { img: "/produtos/produto-15.png", name: "Mochila Executiva", score: 81, tag: "Tendência" },
+              ].map((p, i) => (
+                <div key={i} className="flex-shrink-0 w-44 bg-white border border-surface-200 rounded-2xl p-3 shadow-sm hover:shadow-card-hover transition-shadow">
+                  <div className="w-full h-36 rounded-xl bg-surface-50 overflow-hidden mb-3 flex items-center justify-center">
+                    <Image src={p.img} alt={p.name} width={160} height={144} className="w-full h-full object-contain p-2" />
+                  </div>
+                  <p className="text-xs font-semibold text-dark leading-snug line-clamp-2 mb-2">{p.name}</p>
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs text-dark-muted bg-surface-100 px-2 py-0.5 rounded-full">{p.tag}</span>
+                    <span className="text-xs font-black text-brand">{p.score}</span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </section>
 
       {/* SOCIAL PROOF */}
       <section className="py-8 bg-surface-50 border-b border-surface-200">
