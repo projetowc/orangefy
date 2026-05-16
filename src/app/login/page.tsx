@@ -167,7 +167,7 @@ function LoginForm() {
                 alt="Orangefy"
                 width={160}
                 height={46}
-                className="h-11 w-auto mx-auto"
+                className="h-8 sm:h-11 w-auto mx-auto"
                 priority
               />
             </Link>

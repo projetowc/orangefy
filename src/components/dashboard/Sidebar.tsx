@@ -54,7 +54,7 @@ function SidebarContent({ onClose }: { onClose?: () => void }) {
             alt="Orangefy"
             width={160}
             height={46}
-            className="h-10 w-auto"
+            className="h-8 lg:h-10 w-auto"
             priority
           />
         </Link>
