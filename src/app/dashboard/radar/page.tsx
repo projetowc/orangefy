@@ -1,8 +1,8 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Search, TrendingUp, TrendingDown, Minus, Package, ChevronRight, BarChart2, Truck, Filter, Sparkles, X } from "lucide-react";
+import { Search, TrendingUp, TrendingDown, Minus, Package, ChevronRight, BarChart2, Truck, Filter, Sparkles, X, RefreshCw } from "lucide-react";
 import Header from "@/components/dashboard/Header";
 
 type Tag = "viral" | "high-margin" | "easy" | "trending" | "easy-shipping";
@@ -22,17 +22,6 @@ interface Product {
   analysis: string;
 }
 
-const staticProducts: Product[] = [
-  { id: 1, name: "Organizador de gaveta modular", score: 87, margin: 62, competition: "Baixa", difficulty: "Fácil", trend: "up", tags: ["viral", "high-margin"], avgPrice: "R$29–R$45", category: "Casa", analysis: "Produto com alta procura e baixa concorrência. Ótimo para iniciantes com pouco capital inicial." },
-  { id: 2, name: "Suporte veicular celular magnético", score: 81, margin: 58, competition: "Média", difficulty: "Fácil", trend: "up", tags: ["easy", "easy-shipping"], avgPrice: "R$15–R$35", category: "Acessórios", analysis: "Item de consumo constante, leve para enviar e com margem atrativa. Ideal para primeiro produto." },
-  { id: 3, name: "Kit pincéis maquiagem 12 peças", score: 75, margin: 48, competition: "Média", difficulty: "Fácil", trend: "up", tags: ["trending", "high-margin"], avgPrice: "R$25–R$60", category: "Beleza", analysis: "Tendência crescente. Ticket médio bom. Diferenciação por fotos de qualidade faz grande diferença." },
-  { id: 4, name: "Lâmpada LED inteligente RGB", score: 72, margin: 44, competition: "Alta", difficulty: "Médio", trend: "stable", tags: ["trending"], avgPrice: "R$35–R$80", category: "Eletrônicos", analysis: "Concorrência moderada. Foque em diferenciação por descrição e imagens de qualidade." },
-  { id: 5, name: "Capa silicone colorida (iPhone/Samsung)", score: 68, margin: 52, competition: "Alta", difficulty: "Médio", trend: "stable", tags: ["easy-shipping", "high-margin"], avgPrice: "R$12–R$25", category: "Acessórios", analysis: "Volume alto, mas saturado. Diferencie por variedade de modelos e cores exclusivas." },
-  { id: 6, name: "Almofada pescoço viagem ergonômica", score: 79, margin: 60, competition: "Baixa", difficulty: "Fácil", trend: "up", tags: ["easy", "high-margin", "easy-shipping"], avgPrice: "R$20–R$45", category: "Viagem", analysis: "Produto evergreen com picos em feriados e férias. Envio simples por ser leve e flexível." },
-  { id: 7, name: "Fita LED decorativa 5m", score: 83, margin: 65, competition: "Baixa", difficulty: "Fácil", trend: "up", tags: ["viral", "high-margin", "trending"], avgPrice: "R$25–R$55", category: "Casa", analysis: "Alta procura nas redes. Margem excelente e produto compacto. Boa foto de ambiente vende sozinha." },
-  { id: 8, name: "Porta-retrato digital 7 polegadas", score: 70, margin: 42, competition: "Média", difficulty: "Médio", trend: "up", tags: ["trending"], avgPrice: "R$60–R$120", category: "Casa", analysis: "Produto de presente. Pico de vendas em datas comemorativas. Ticket médio maior que a média." },
-];
-
 const tagLabels: Record<Tag, string> = {
   viral: "Viral",
   "high-margin": "Alta margem",
@@ -40,6 +29,9 @@ const tagLabels: Record<Tag, string> = {
   trending: "Tendência",
   "easy-shipping": "Fácil envio",
 };
+
+const CACHE_KEY = "radar_products_cache";
+const CACHE_TTL = 30 * 60 * 1000; // 30 min
 
 function ScoreRing({ score }: { score: number }) {
   const radius = 22;
@@ -54,6 +46,32 @@ function ScoreRing({ score }: { score: number }) {
       </svg>
       <div className="absolute inset-0 flex items-center justify-center">
         <span className="text-sm font-black" style={{ color }}>{score}</span>
+      </div>
+    </div>
+  );
+}
+
+function CardSkeleton() {
+  return (
+    <div className="card animate-pulse">
+      <div className="flex items-start gap-3 mb-4">
+        <div className="w-10 h-10 rounded-lg bg-surface-100 flex-shrink-0" />
+        <div className="flex-1 space-y-2 pr-16">
+          <div className="h-4 bg-surface-100 rounded w-3/4" />
+          <div className="h-3 bg-surface-100 rounded w-1/3" />
+        </div>
+        <div className="w-14 h-14 rounded-full bg-surface-100 flex-shrink-0" />
+      </div>
+      <div className="flex gap-2 mb-4">
+        <div className="h-5 bg-surface-100 rounded w-16" />
+        <div className="h-5 bg-surface-100 rounded w-20" />
+      </div>
+      <div className="grid grid-cols-3 gap-2 mb-4">
+        {[0, 1, 2].map((i) => <div key={i} className="h-14 bg-surface-100 rounded-lg" />)}
+      </div>
+      <div className="flex items-center justify-between">
+        <div className="h-3 bg-surface-100 rounded w-20" />
+        <div className="h-3 bg-surface-100 rounded w-16" />
       </div>
     </div>
   );
@@ -128,25 +146,65 @@ function ProductCard({ product, index, onClick, aiGenerated }: {
 }
 
 export default function RadarPage() {
+  const [baseProducts, setBaseProducts] = useState<Product[]>([]);
+  const [loadingBase, setLoadingBase] = useState(true);
+  const [baseError, setBaseError] = useState(false);
+
   const [search, setSearch] = useState("");
   const [filterTag, setFilterTag] = useState<Tag | "all">("all");
   const [selected, setSelected] = useState<Product | null>(null);
   const [aiProducts, setAiProducts] = useState<Product[] | null>(null);
-  const [loading, setLoading] = useState(false);
+  const [loadingAi, setLoadingAi] = useState(false);
   const [aiError, setAiError] = useState(false);
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  useEffect(() => {
-    if (debounceRef.current) clearTimeout(debounceRef.current);
+  const fetchBaseProducts = useCallback(async (force = false) => {
+    setLoadingBase(true);
+    setBaseError(false);
 
-    if (search.trim().length < 3) {
-      setAiProducts(null);
-      setAiError(false);
-      return;
+    if (!force) {
+      try {
+        const cached = sessionStorage.getItem(CACHE_KEY);
+        if (cached) {
+          const { products, timestamp } = JSON.parse(cached);
+          if (Date.now() - timestamp < CACHE_TTL) {
+            setBaseProducts(products);
+            setLoadingBase(false);
+            return;
+          }
+        }
+      } catch {
+        // ignore cache errors
+      }
     }
 
+    try {
+      const seed = Date.now().toString();
+      const res = await fetch(`/api/radar/products?seed=${seed}`);
+      if (!res.ok) throw new Error("API error");
+      const data = await res.json();
+      if (data.products && Array.isArray(data.products)) {
+        setBaseProducts(data.products);
+        sessionStorage.setItem(CACHE_KEY, JSON.stringify({ products: data.products, timestamp: Date.now() }));
+      } else {
+        throw new Error("Invalid response");
+      }
+    } catch {
+      setBaseError(true);
+    } finally {
+      setLoadingBase(false);
+    }
+  }, []);
+
+  useEffect(() => { fetchBaseProducts(); }, [fetchBaseProducts]);
+
+  // AI search debounce
+  useEffect(() => {
+    if (debounceRef.current) clearTimeout(debounceRef.current);
+    if (search.trim().length < 3) { setAiProducts(null); setAiError(false); return; }
+
     debounceRef.current = setTimeout(async () => {
-      setLoading(true);
+      setLoadingAi(true);
       setAiError(false);
       try {
         const res = await fetch("/api/radar/search", {
@@ -158,30 +216,25 @@ export default function RadarPage() {
         const data = await res.json();
         if (data.products && Array.isArray(data.products)) {
           setAiProducts(data.products);
-        } else {
-          throw new Error("Invalid response");
-        }
+        } else throw new Error("Invalid response");
       } catch {
         setAiError(true);
         setAiProducts(null);
       } finally {
-        setLoading(false);
+        setLoadingAi(false);
       }
     }, 700);
   }, [search]);
 
   const isAiMode = search.trim().length >= 3;
+  const loading = isAiMode ? loadingAi : loadingBase;
 
-  const staticFiltered = staticProducts.filter((p) => {
-    const matchSearch = p.name.toLowerCase().includes(search.toLowerCase()) ||
-      p.category.toLowerCase().includes(search.toLowerCase());
+  const filteredBase = baseProducts.filter((p) => {
     const matchTag = filterTag === "all" || p.tags.includes(filterTag);
-    return matchSearch && matchTag;
+    return matchTag;
   });
 
-  const displayProducts = isAiMode
-    ? (aiProducts ?? [])
-    : staticFiltered;
+  const displayProducts = isAiMode ? (aiProducts ?? []) : filteredBase;
 
   return (
     <>
@@ -224,6 +277,15 @@ export default function RadarPage() {
                     {tag === "all" ? "Todos" : tagLabels[tag]}
                   </button>
                 ))}
+                <button
+                  onClick={() => fetchBaseProducts(true)}
+                  disabled={loadingBase}
+                  className="ml-auto flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium border border-surface-200 text-dark-muted hover:border-brand hover:text-brand transition-all disabled:opacity-50"
+                  title="Buscar novos produtos"
+                >
+                  <RefreshCw className={`w-3.5 h-3.5 ${loadingBase ? "animate-spin" : ""}`} />
+                  Atualizar
+                </button>
               </div>
             )}
           </div>
@@ -236,13 +298,11 @@ export default function RadarPage() {
           )}
         </div>
 
-        {/* Loading state */}
+        {/* Loading IA search */}
         <AnimatePresence>
-          {loading && (
+          {loadingAi && (
             <motion.div
-              initial={{ opacity: 0, y: 8 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0 }}
+              initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}
               className="card flex items-center justify-center gap-3 py-12"
             >
               <div className="w-5 h-5 border-2 border-purple-200 border-t-purple-600 rounded-full animate-spin" />
@@ -251,21 +311,36 @@ export default function RadarPage() {
           )}
         </AnimatePresence>
 
-        {/* Error state */}
-        {aiError && !loading && (
+        {/* Error AI */}
+        {aiError && !loadingAi && (
           <div className="card border-red-100 bg-red-50 text-center py-8">
             <p className="text-sm text-danger font-medium">Erro ao buscar produtos. Tente novamente.</p>
             <button
               onClick={() => { const q = search; setSearch(""); setTimeout(() => setSearch(q), 50); }}
               className="text-xs text-brand mt-2 hover:underline"
-            >
+            >Tentar novamente</button>
+          </div>
+        )}
+
+        {/* Error base */}
+        {baseError && !loadingBase && !isAiMode && (
+          <div className="card border-red-100 bg-red-50 text-center py-8">
+            <p className="text-sm text-danger font-medium">Erro ao carregar produtos. Tente novamente.</p>
+            <button onClick={() => fetchBaseProducts(true)} className="text-xs text-brand mt-2 hover:underline">
               Tentar novamente
             </button>
           </div>
         )}
 
+        {/* Skeleton loading base */}
+        {loadingBase && !isAiMode && (
+          <div className="grid sm:grid-cols-2 xl:grid-cols-3 gap-4">
+            {[...Array(6)].map((_, i) => <CardSkeleton key={i} />)}
+          </div>
+        )}
+
         {/* Grid */}
-        {!loading && !aiError && (
+        {!loading && !aiError && !baseError && (
           <>
             {displayProducts.length === 0 && isAiMode && (
               <div className="card text-center py-10">
@@ -276,12 +351,13 @@ export default function RadarPage() {
 
             {displayProducts.length > 0 && (
               <>
-                {isAiMode && aiProducts && (
-                  <div className="flex items-center gap-2 text-xs text-dark-muted">
-                    <Sparkles className="w-3 h-3 text-purple-500" />
-                    <span>{aiProducts.length} produtos gerados pela IA</span>
-                  </div>
-                )}
+                <div className="flex items-center gap-2 text-xs text-dark-muted">
+                  {isAiMode ? (
+                    <><Sparkles className="w-3 h-3 text-purple-500" /><span>{displayProducts.length} produtos gerados pela IA</span></>
+                  ) : (
+                    <><Sparkles className="w-3 h-3 text-brand" /><span>{displayProducts.length} produtos selecionados pela IA agora</span></>
+                  )}
+                </div>
                 <div className="grid sm:grid-cols-2 xl:grid-cols-3 gap-4">
                   {displayProducts.map((product, i) => (
                     <ProductCard
@@ -298,7 +374,7 @@ export default function RadarPage() {
           </>
         )}
 
-        {/* Modal de análise */}
+        {/* Modal */}
         {selected && (
           <motion.div
             initial={{ opacity: 0 }} animate={{ opacity: 1 }}
