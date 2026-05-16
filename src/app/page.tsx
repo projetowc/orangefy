@@ -76,13 +76,13 @@ export default function LandingPage() {
             {/* Left: Copy */}
             <motion.div initial="hidden" animate="show" variants={stagger}>
               <motion.h1 variants={fadeUp} className="text-4xl sm:text-5xl lg:text-6xl font-black text-dark leading-[1.1] mb-4">
-                Aprenda a vender na{" "}
-                <span className="text-gradient">Shopee</span>{" "}
-                e lucre de verdade.
+                Descubra os produtos{" "}
+                <span className="text-gradient">certos para vender</span>{" "}
+                antes da concorrência.
               </motion.h1>
 
               <motion.p variants={fadeUp} className="text-lg text-dark-muted leading-relaxed mb-6 max-w-xl">
-                A Orangefy entrega um sistema completo — radar de produtos com IA, missões diárias e calculadora de lucro — para você fazer sua primeira venda sem achismo.
+                A Orangefy usa IA para encontrar produtos com alta margem e baixa concorrência na Shopee — para você anunciar com confiança e lucrar desde o primeiro produto.
               </motion.p>
 
               <motion.div variants={fadeUp} className="flex flex-col sm:flex-row gap-3 mb-6">
