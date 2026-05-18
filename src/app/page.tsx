@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import { motion } from "framer-motion";
 import Link from "next/link";
 import Image from "next/image";
@@ -8,6 +9,33 @@ import {
   Star, CheckCircle2, ArrowRight, ShoppingBag, Shield,
   ChevronRight, Clock, Users, Award, AlertCircle, Sparkles
 } from "lucide-react";
+
+async function goToCheckout(plan: "monthly" | "lifetime") {
+  try {
+    const res = await fetch("/api/checkout", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ plan }),
+    });
+    const data = await res.json();
+    if (data.url) window.location.href = data.url;
+  } catch {
+    alert("Erro ao iniciar pagamento. Tente novamente.");
+  }
+}
+
+function CheckoutButton({ plan, className, children }: { plan: "monthly" | "lifetime"; className?: string; children: React.ReactNode }) {
+  const [loading, setLoading] = useState(false);
+  return (
+    <button
+      onClick={async () => { setLoading(true); await goToCheckout(plan); setLoading(false); }}
+      disabled={loading}
+      className={`${className} disabled:opacity-70 disabled:cursor-not-allowed`}
+    >
+      {loading ? "Aguarde..." : children}
+    </button>
+  );
+}
 
 const fadeUp = {
   hidden: { opacity: 0, y: 20 },
@@ -470,14 +498,9 @@ export default function LandingPage() {
                   </li>
                 ))}
               </ul>
-              <a
-                href="https://pay.cakto.com.br/454awz8_880943"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="btn-outline w-full text-center block"
-              >
+              <CheckoutButton plan="monthly" className="btn-outline w-full text-center">
                 Assinar Mensal
-              </a>
+              </CheckoutButton>
             </motion.div>
 
             {/* Vitalício */}
@@ -515,14 +538,9 @@ export default function LandingPage() {
                   </li>
                 ))}
               </ul>
-              <a
-                href="https://pay.cakto.com.br/j64vxpo"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="btn-brand w-full text-center block"
-              >
+              <CheckoutButton plan="lifetime" className="btn-brand w-full text-center">
                 Garantir Acesso Vitalício
-              </a>
+              </CheckoutButton>
             </motion.div>
           </div>
 
@@ -549,15 +567,10 @@ export default function LandingPage() {
               Pare de aprender na teoria. A Orangefy coloca você para vender com método, ferramentas e suporte.
             </motion.p>
             <motion.div variants={fadeUp} className="flex flex-col sm:flex-row gap-3 justify-center">
-              <a
-                href="https://pay.cakto.com.br/j64vxpo"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="bg-white text-brand font-bold rounded-xl px-7 py-3.5 hover:bg-surface-50 transition-colors flex items-center justify-center gap-2"
-              >
+              <CheckoutButton plan="lifetime" className="bg-white text-brand font-bold rounded-xl px-7 py-3.5 hover:bg-surface-50 transition-colors flex items-center justify-center gap-2">
                 Garantir Acesso Vitalício — R$249,90
                 <ChevronRight className="w-4 h-4" />
-              </a>
+              </CheckoutButton>
               <Link href="/login" className="border-2 border-white/40 text-white font-bold rounded-xl px-7 py-3.5 hover:bg-white/10 transition-colors flex items-center justify-center gap-2">
                 Já tenho conta
               </Link>

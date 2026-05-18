@@ -162,15 +162,17 @@ export default function ConfiguracoesPage() {
             <div className="badge-success">Ativo</div>
           </div>
           {profile?.plan !== "annual" && profile?.plan !== "lifetime" && (
-            <a
-              href="https://pay.cakto.com.br/j64vxpo"
-              target="_blank"
-              rel="noopener noreferrer"
+            <button
+              onClick={async () => {
+                const res = await fetch("/api/checkout", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ plan: "lifetime" }) });
+                const data = await res.json();
+                if (data.url) window.location.href = data.url;
+              }}
               className="btn-brand w-full text-center flex items-center justify-center gap-2 text-sm"
             >
               Fazer upgrade para Vitalício — R$249,90
               <ChevronRight className="w-4 h-4" />
-            </a>
+            </button>
           )}
         </motion.div>
 
