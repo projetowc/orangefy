@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef, useCallback } from "react";
+import { useState, useEffect, useRef, useCallback, useReducer } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Search, TrendingUp, TrendingDown, Minus, Package, ChevronRight, BarChart2, Truck, Filter, Sparkles, X, RefreshCw, ExternalLink } from "lucide-react";
 import Image from "next/image";
@@ -86,6 +86,9 @@ function ProductCard({ product, index, onClick, aiGenerated }: {
   onClick: () => void;
   aiGenerated?: boolean;
 }) {
+  const [imgError, setImgError] = useState(false);
+  const showImage = product.image && !imgError;
+
   return (
     <motion.div
       key={product.id}
@@ -93,28 +96,50 @@ function ProductCard({ product, index, onClick, aiGenerated }: {
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: index * 0.05 }}
       onClick={onClick}
-      className="card cursor-pointer hover:shadow-card-hover transition-all duration-200 border border-surface-200 hover:border-dark/10 relative"
+      className="card cursor-pointer hover:shadow-card-hover transition-all duration-200 border border-surface-200 hover:border-dark/10 relative overflow-hidden"
     >
-      {aiGenerated && (
-        <div className="absolute top-3 right-3 flex items-center gap-1 bg-purple-50 border border-purple-200 rounded-full px-2 py-0.5">
-          <Sparkles className="w-3 h-3 text-purple-500" />
-          <span className="text-xs text-purple-600 font-medium">IA</span>
+      {/* Imagem do produto */}
+      <div className="relative -mx-6 -mt-6 mb-4 h-48 bg-surface-50 overflow-hidden rounded-t-2xl">
+        {showImage ? (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img
+            src={product.image}
+            alt={product.name}
+            className="w-full h-full object-contain p-2"
+            onError={() => setImgError(true)}
+          />
+        ) : (
+          <div className="w-full h-full flex items-center justify-center">
+            <Package className="w-12 h-12 text-surface-200" />
+          </div>
+        )}
+        {/* Score badge sobre a imagem */}
+        <div className="absolute bottom-2 right-2 bg-white rounded-full shadow-sm p-0.5">
+          <ScoreRing score={product.score} />
         </div>
-      )}
+        {aiGenerated && (
+          <div className="absolute top-2 left-2 flex items-center gap-1 bg-purple-50/90 backdrop-blur-sm border border-purple-200 rounded-full px-2 py-0.5">
+            <Sparkles className="w-3 h-3 text-purple-500" />
+            <span className="text-xs text-purple-600 font-medium">IA</span>
+          </div>
+        )}
+        {product.aliexpressUrl && (
+          <a
+            href={product.aliexpressUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            onClick={(e) => e.stopPropagation()}
+            className="absolute top-2 right-2 bg-white/90 backdrop-blur-sm rounded-full p-1.5 text-dark-muted hover:text-brand transition-colors shadow-sm"
+            title="Ver no AliExpress"
+          >
+            <ExternalLink className="w-3.5 h-3.5" />
+          </a>
+        )}
+      </div>
 
-      <div className="flex items-start gap-3 mb-4">
-        <div className="w-14 h-14 rounded-xl bg-surface-50 border border-surface-200 flex items-center justify-center flex-shrink-0 overflow-hidden">
-          {product.image ? (
-            <Image src={product.image} alt={product.name} width={56} height={56} className="w-full h-full object-cover" unoptimized />
-          ) : (
-            <Package className="w-5 h-5 text-dark-muted" />
-          )}
-        </div>
-        <div className="flex-1 min-w-0 pr-16">
-          <h3 className="font-semibold text-dark text-sm leading-snug line-clamp-2">{product.name}</h3>
-          <span className="text-xs text-dark-muted">{product.category}</span>
-        </div>
-        <ScoreRing score={product.score} />
+      <div className="mb-3">
+        <h3 className="font-semibold text-dark text-sm leading-snug line-clamp-2">{product.name}</h3>
+        <span className="text-xs text-dark-muted">{product.category}</span>
       </div>
 
       <div className="flex flex-wrap gap-1.5 mb-4">
