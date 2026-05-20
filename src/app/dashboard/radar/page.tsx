@@ -2,7 +2,8 @@
 
 import { useState, useEffect, useRef, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Search, TrendingUp, TrendingDown, Minus, Package, ChevronRight, BarChart2, Truck, Filter, Sparkles, X, RefreshCw } from "lucide-react";
+import { Search, TrendingUp, TrendingDown, Minus, Package, ChevronRight, BarChart2, Truck, Filter, Sparkles, X, RefreshCw, ExternalLink } from "lucide-react";
+import Image from "next/image";
 import Header from "@/components/dashboard/Header";
 
 type Tag = "viral" | "high-margin" | "easy" | "trending" | "easy-shipping";
@@ -20,6 +21,8 @@ interface Product {
   avgPrice: string;
   category: string;
   analysis: string;
+  image?: string;
+  aliexpressUrl?: string;
 }
 
 const tagLabels: Record<Tag, string> = {
@@ -100,8 +103,12 @@ function ProductCard({ product, index, onClick, aiGenerated }: {
       )}
 
       <div className="flex items-start gap-3 mb-4">
-        <div className="w-10 h-10 rounded-lg bg-surface-50 border border-surface-200 flex items-center justify-center flex-shrink-0">
-          <Package className="w-5 h-5 text-dark-muted" />
+        <div className="w-14 h-14 rounded-xl bg-surface-50 border border-surface-200 flex items-center justify-center flex-shrink-0 overflow-hidden">
+          {product.image ? (
+            <Image src={product.image} alt={product.name} width={56} height={56} className="w-full h-full object-cover" unoptimized />
+          ) : (
+            <Package className="w-5 h-5 text-dark-muted" />
+          )}
         </div>
         <div className="flex-1 min-w-0 pr-16">
           <h3 className="font-semibold text-dark text-sm leading-snug line-clamp-2">{product.name}</h3>
@@ -137,9 +144,23 @@ function ProductCard({ product, index, onClick, aiGenerated }: {
 
       <div className="flex items-center justify-between">
         <span className="text-xs text-dark-muted">{product.avgPrice}</span>
-        <button className="text-brand text-xs font-semibold flex items-center gap-1">
-          Analisar <ChevronRight className="w-3 h-3" />
-        </button>
+        <div className="flex items-center gap-2">
+          {product.aliexpressUrl && (
+            <a
+              href={product.aliexpressUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              onClick={(e) => e.stopPropagation()}
+              className="text-dark-muted hover:text-brand transition-colors"
+              title="Ver no AliExpress"
+            >
+              <ExternalLink className="w-3.5 h-3.5" />
+            </a>
+          )}
+          <button className="text-brand text-xs font-semibold flex items-center gap-1">
+            Analisar <ChevronRight className="w-3 h-3" />
+          </button>
+        </div>
       </div>
     </motion.div>
   );
