@@ -26,6 +26,8 @@ async function searchAliExpress(keywords: string) {
     page_size: "8",
     page_no: "1",
     tracking_id: "orangefy",
+    device_id: "orangefy_web",
+    device_type: "2",
     fields: "product_id,product_title,product_main_image_url,target_sale_price,evaluate_rate,hot_product_commission_rate,promotion_link,product_detail_url",
   };
   params.sign = generateSign(params, appSecret);

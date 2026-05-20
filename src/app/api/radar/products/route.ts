@@ -79,6 +79,8 @@ export async function GET(req: NextRequest) {
         page_no: "1",
         category_ids: CATEGORY_IDS[catIndex],
         tracking_id: "orangefy",
+        device_id: "orangefy_web",
+        device_type: "2",
       });
 
       const result = data?.aliexpress_affiliate_hotproduct_query_response?.resp_result?.result;

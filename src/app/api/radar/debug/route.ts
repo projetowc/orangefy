@@ -23,6 +23,8 @@ export async function GET() {
     page_size: "2",
     page_no: "1",
     tracking_id: "orangefy",
+    device_id: "orangefy_web",
+    device_type: "2",
   };
   params.sign = generateSign(params, appSecret);
 
