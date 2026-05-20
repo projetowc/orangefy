@@ -16,15 +16,13 @@ export async function GET() {
 
   const params: Record<string, string> = {
     app_key: appKey,
-    method: "aliexpress.affiliate.product.smartmatch",
+    method: "aliexpress.affiliate.hotproduct.query",
     sign_method: "md5",
     timestamp,
-    keywords: "camiseta masculina",
     page_size: "2",
     page_no: "1",
     tracking_id: "orangefy",
-    device_id: "orangefy_web",
-    device_type: "2",
+    fields: "product_id,product_title,product_main_image_url,target_sale_price,evaluate_rate,hot_product_commission_rate,promotion_link",
   };
   params.sign = generateSign(params, appSecret);
 
