@@ -18,9 +18,13 @@ async function goToCheckout(plan: "monthly" | "lifetime" | "quarterly") {
       body: JSON.stringify({ plan }),
     });
     const data = await res.json();
-    if (data.url) window.location.href = data.url;
-  } catch {
-    alert("Erro ao iniciar pagamento. Tente novamente.");
+    if (data.url) {
+      window.location.href = data.url;
+    } else {
+      alert(`Erro ao iniciar pagamento: ${data.error || "Tente novamente."}`);
+    }
+  } catch (e) {
+    alert(`Erro de conexão: ${e}`);
   }
 }
 

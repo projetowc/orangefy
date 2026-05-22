@@ -19,7 +19,7 @@ export async function POST(req: NextRequest) {
     const appUrl = process.env.NEXT_PUBLIC_APP_URL || "https://orangefy-shop.vercel.app";
 
     const session = await stripe.checkout.sessions.create({
-      mode: plan === "monthly" ? "subscription" : "payment",
+      mode: "subscription",
       line_items: [{ price: PRICES[plan as keyof typeof PRICES], quantity: 1 }],
       success_url: `${appUrl}/checkout/sucesso?session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${appUrl}/#planos`,
