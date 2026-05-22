@@ -117,12 +117,6 @@ function ProductCard({ product, index, onClick, aiGenerated }: {
         <div className="absolute bottom-2 right-2 bg-white rounded-full shadow-sm p-0.5">
           <ScoreRing score={product.score} />
         </div>
-        {aiGenerated && (
-          <div className="absolute top-2 left-2 flex items-center gap-1 bg-purple-50/90 backdrop-blur-sm border border-purple-200 rounded-full px-2 py-0.5">
-            <Sparkles className="w-3 h-3 text-purple-500" />
-            <span className="text-xs text-purple-600 font-medium">IA</span>
-          </div>
-        )}
         {product.aliexpressUrl && (
           <a
             href={product.aliexpressUrl}
