@@ -4,8 +4,8 @@ import Stripe from "stripe";
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
 
 const PRICES = {
-  monthly:  process.env.STRIPE_PRICE_MONTHLY!,
-  lifetime: process.env.STRIPE_PRICE_LIFETIME!,
+  monthly:   process.env.STRIPE_PRICE_MONTHLY!,
+  quarterly: process.env.STRIPE_PRICE_QUARTERLY!,
 };
 
 export async function POST(req: NextRequest) {
@@ -16,11 +16,10 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Plano inválido" }, { status: 400 });
     }
 
-    const isLifetime = plan === "lifetime";
     const appUrl = process.env.NEXT_PUBLIC_APP_URL || "https://orangefy-shop.vercel.app";
 
     const session = await stripe.checkout.sessions.create({
-      mode: isLifetime ? "payment" : "subscription",
+      mode: "payment",
       line_items: [{ price: PRICES[plan as keyof typeof PRICES], quantity: 1 }],
       success_url: `${appUrl}/checkout/sucesso?session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${appUrl}/#planos`,

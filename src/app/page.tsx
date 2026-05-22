@@ -10,7 +10,7 @@ import {
   ChevronRight, Clock, Users, Award, AlertCircle, Sparkles
 } from "lucide-react";
 
-async function goToCheckout(plan: "monthly" | "lifetime") {
+async function goToCheckout(plan: "monthly" | "lifetime" | "quarterly") {
   try {
     const res = await fetch("/api/checkout", {
       method: "POST",
@@ -24,7 +24,7 @@ async function goToCheckout(plan: "monthly" | "lifetime") {
   }
 }
 
-function CheckoutButton({ plan, className, children }: { plan: "monthly" | "lifetime"; className?: string; children: React.ReactNode }) {
+function CheckoutButton({ plan, className, children }: { plan: "monthly" | "lifetime" | "quarterly"; className?: string; children: React.ReactNode }) {
   const [loading, setLoading] = useState(false);
   return (
     <button
@@ -166,7 +166,7 @@ export default function LandingPage() {
         <div className="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-center gap-2 sm:gap-6 text-sm text-center">
           <span className="flex items-center gap-2 font-semibold">
             <Clock className="w-4 h-4 text-brand" />
-            Oferta por tempo limitado — Plano Vitalício por apenas R$249,90 · Pagamento único
+            Oferta por tempo limitado — Plano Trimestral por apenas R$249,90 · R$83,30/mês
           </span>
           <span className="text-white/50 hidden sm:block">|</span>
           <span className="text-white/70">Uma única venda já cobre meses de assinatura</span>
@@ -503,7 +503,7 @@ export default function LandingPage() {
               </CheckoutButton>
             </motion.div>
 
-            {/* Vitalício */}
+            {/* Trimestral */}
             <motion.div
               className="card border-2 border-brand relative overflow-hidden shadow-brand"
               initial={{ opacity: 0, y: 16 }}
@@ -517,8 +517,8 @@ export default function LandingPage() {
                 </div>
               </div>
               <div className="mb-4">
-                <h3 className="text-lg font-bold text-dark mb-0.5">Plano Vitalício</h3>
-                <p className="text-dark-muted text-sm">Pague uma vez, acesse para sempre.</p>
+                <h3 className="text-lg font-bold text-dark mb-0.5">Plano Trimestral</h3>
+                <p className="text-dark-muted text-sm">3 meses de acesso completo à plataforma.</p>
               </div>
               <div className="mb-5">
                 <div className="text-xs text-dark-muted mb-1">Pagamento único de</div>
@@ -527,9 +527,9 @@ export default function LandingPage() {
                   <span className="text-xl font-bold text-dark">,90</span>
                 </div>
                 <div className="text-xs text-dark-muted mb-1.5">
-                  Sem mensalidade, sem renovação
+                  R$83,30/mês · Economize vs mensal
                 </div>
-                <div className="badge-brand inline-flex">Acesso vitalício a todas as ferramentas</div>
+                <div className="badge-brand inline-flex">3 meses de acesso a todas as ferramentas</div>
               </div>
               <ul className="space-y-2.5 mb-6">
                 {[...planFeatures, "Suporte prioritário", "Acesso antecipado"].map((f) => (
@@ -538,8 +538,8 @@ export default function LandingPage() {
                   </li>
                 ))}
               </ul>
-              <CheckoutButton plan="lifetime" className="btn-brand w-full text-center">
-                Garantir Acesso Vitalício
+              <CheckoutButton plan="quarterly" className="btn-brand w-full text-center">
+                Garantir Plano Trimestral
               </CheckoutButton>
             </motion.div>
           </div>
@@ -567,8 +567,8 @@ export default function LandingPage() {
               Pare de aprender na teoria. A Orangefy coloca você para vender com método, ferramentas e suporte.
             </motion.p>
             <motion.div variants={fadeUp} className="flex flex-col sm:flex-row gap-3 justify-center">
-              <CheckoutButton plan="lifetime" className="bg-white text-brand font-bold rounded-xl px-7 py-3.5 hover:bg-surface-50 transition-colors flex items-center justify-center gap-2">
-                Garantir Acesso Vitalício — R$249,90
+              <CheckoutButton plan="quarterly" className="bg-white text-brand font-bold rounded-xl px-7 py-3.5 hover:bg-surface-50 transition-colors flex items-center justify-center gap-2">
+                Garantir Plano Trimestral — R$249,90
                 <ChevronRight className="w-4 h-4" />
               </CheckoutButton>
               <Link href="/login" className="border-2 border-white/40 text-white font-bold rounded-xl px-7 py-3.5 hover:bg-white/10 transition-colors flex items-center justify-center gap-2">
