@@ -28,8 +28,13 @@ async function fetchProductImage(keyword: string): Promise<string> {
     const url = "https://api-sg.aliexpress.com/sync?" + new URLSearchParams(params).toString();
     const res = await fetch(url, { signal: AbortSignal.timeout(6000) });
     const data = await res.json();
-    return data?.aliexpress_affiliate_product_query_response?.resp_result?.result?.products?.product?.[0]?.product_main_image_url ?? "";
-  } catch {
+    const resp = data?.aliexpress_affiliate_product_query_response?.resp_result;
+    if (resp?.resp_code !== 200) {
+      console.error(`AliExpress error for "${shortKeyword}":`, resp?.resp_msg, resp?.resp_code);
+    }
+    return resp?.result?.products?.product?.[0]?.product_main_image_url ?? "";
+  } catch (err) {
+    console.error(`AliExpress fetch error for "${shortKeyword}":`, err);
     return "";
   }
 }
