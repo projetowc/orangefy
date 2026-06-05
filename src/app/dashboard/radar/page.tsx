@@ -194,7 +194,8 @@ export default function RadarPage() {
         const cached = sessionStorage.getItem(CACHE_KEY);
         if (cached) {
           const { products, timestamp } = JSON.parse(cached);
-          if (Date.now() - timestamp < CACHE_TTL) {
+          const hasImages = products?.[0] && "image" in products[0];
+          if (hasImages && Date.now() - timestamp < CACHE_TTL) {
             setBaseProducts(products);
             setLoadingBase(false);
             return;

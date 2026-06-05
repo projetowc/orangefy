@@ -29,16 +29,19 @@ function signAliExpressParams(params: Record<string, string>, secret: string): s
 async function fetchProductImage(keyword: string): Promise<string> {
   const appSecret = process.env.ALIEXPRESS_APP_SECRET;
   if (!appSecret) return "";
+  // Use first 3 words to get broader, more reliable image results
+  const shortKeyword = keyword.split(" ").slice(0, 3).join(" ");
   try {
     const params: Record<string, string> = {
       app_key: "534762",
       timestamp: Date.now().toString(),
       sign_method: "sha256",
       method: "aliexpress.affiliate.product.query",
-      keywords: keyword,
+      keywords: shortKeyword,
       page_no: "1",
       page_size: "1",
       fields: "product_main_image_url",
+      tracking_id: "orangefy",
     };
     params.sign = signAliExpressParams(params, appSecret);
     const url = "https://api-sg.aliexpress.com/sync?" + new URLSearchParams(params).toString();
