@@ -23,7 +23,6 @@ async function fetchProductImage(keyword: string): Promise<string> {
       page_no: "1",
       page_size: "1",
       fields: "product_main_image_url",
-      tracking_id: "orangefy",
     };
     params.sign = signAliExpressParams(params, appSecret);
     const url = "https://api-sg.aliexpress.com/sync?" + new URLSearchParams(params).toString();
