@@ -86,6 +86,9 @@ function ProductCard({ product, index, onClick, aiGenerated }: {
   onClick: () => void;
   aiGenerated?: boolean;
 }) {
+  const [imgError, setImgError] = useState(false);
+  const showImage = !!product.image && !imgError;
+
   return (
     <motion.div
       key={product.id}
@@ -93,12 +96,26 @@ function ProductCard({ product, index, onClick, aiGenerated }: {
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: index * 0.05 }}
       onClick={onClick}
-      className="card cursor-pointer hover:shadow-card-hover transition-all duration-200 border border-surface-200 hover:border-dark/10 relative"
+      className={`card cursor-pointer hover:shadow-card-hover transition-all duration-200 border border-surface-200 hover:border-dark/10 relative${showImage ? " overflow-hidden" : ""}`}
     >
-      <div className="flex items-start gap-3 mb-4">
-        <div className="w-10 h-10 rounded-lg bg-surface-50 border border-surface-200 flex items-center justify-center flex-shrink-0">
-          <Package className="w-5 h-5 text-dark-muted" />
+      {showImage && (
+        <div className="-mx-6 -mt-6 mb-4 h-44 bg-surface-50">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src={product.image}
+            alt={product.name}
+            className="w-full h-full object-cover"
+            onError={() => setImgError(true)}
+          />
         </div>
+      )}
+
+      <div className="flex items-start gap-3 mb-4">
+        {!showImage && (
+          <div className="w-10 h-10 rounded-lg bg-surface-50 border border-surface-200 flex items-center justify-center flex-shrink-0">
+            <Package className="w-5 h-5 text-dark-muted" />
+          </div>
+        )}
         <div className="flex-1 min-w-0 pr-16">
           <h3 className="font-semibold text-dark text-sm leading-snug line-clamp-2">{product.name}</h3>
           <span className="text-xs text-dark-muted">{product.category}</span>
@@ -393,9 +410,16 @@ export default function RadarPage() {
           >
             <motion.div
               initial={{ scale: 0.95, opacity: 0 }} animate={{ scale: 1, opacity: 1 }}
-              className="bg-white rounded-2xl p-6 max-w-md w-full shadow-xl"
+              className="bg-white rounded-2xl max-w-md w-full shadow-xl overflow-hidden"
               onClick={(e) => e.stopPropagation()}
             >
+              {selected.image && (
+                <div className="h-48 bg-surface-50">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img src={selected.image} alt={selected.name} className="w-full h-full object-cover" />
+                </div>
+              )}
+              <div className="p-6">
               <div className="flex items-start justify-between mb-4">
                 <div className="flex items-center gap-3">
                   <div className="w-10 h-10 rounded-lg bg-surface-100 flex items-center justify-center">
@@ -440,6 +464,7 @@ export default function RadarPage() {
               <button onClick={() => setSelected(null)} className="btn-brand w-full text-sm py-3">
                 Fechar
               </button>
+              </div>
             </motion.div>
           </motion.div>
         )}

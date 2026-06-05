@@ -1,7 +1,37 @@
 import { NextRequest, NextResponse } from "next/server";
 import Anthropic from "@anthropic-ai/sdk";
+import crypto from "crypto";
 
 const client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
+
+function signAliExpressParams(params: Record<string, string>, secret: string): string {
+  const sorted = Object.keys(params).sort().map(k => `${k}${params[k]}`).join("");
+  return crypto.createHmac("sha256", secret).update(sorted).digest("hex").toUpperCase();
+}
+
+async function fetchProductImage(keyword: string): Promise<string> {
+  const appSecret = process.env.ALIEXPRESS_APP_SECRET;
+  if (!appSecret) return "";
+  try {
+    const params: Record<string, string> = {
+      app_key: "534762",
+      timestamp: Date.now().toString(),
+      sign_method: "sha256",
+      method: "aliexpress.affiliate.product.query",
+      keywords: keyword,
+      page_no: "1",
+      page_size: "1",
+      fields: "product_main_image_url",
+    };
+    params.sign = signAliExpressParams(params, appSecret);
+    const url = "https://api-sg.aliexpress.com/sync?" + new URLSearchParams(params).toString();
+    const res = await fetch(url, { signal: AbortSignal.timeout(6000) });
+    const data = await res.json();
+    return data?.aliexpress_affiliate_product_query_response?.resp_result?.result?.products?.product?.[0]?.product_main_image_url ?? "";
+  } catch {
+    return "";
+  }
+}
 
 const SYSTEM_PROMPT = `Você é um especialista em vendas no Shopee Brasil e análise de mercado de e-commerce. Retorne SOMENTE JSON válido, sem markdown, sem texto extra.`;
 
@@ -72,7 +102,16 @@ REGRAS IMPORTANTES:
       }
     }
 
-    return NextResponse.json(parsed);
+    const productsWithImages = await Promise.all(
+      (parsed.products as Array<{ aliexpressUrl?: string; name: string } & Record<string, unknown>>).map(async (p) => {
+        const urlMatch = p.aliexpressUrl?.match(/SearchText=([^&]+)/);
+        const keyword = urlMatch ? decodeURIComponent(urlMatch[1].replace(/\+/g, " ")) : p.name;
+        const image = await fetchProductImage(keyword);
+        return { ...p, image };
+      })
+    );
+
+    return NextResponse.json({ products: productsWithImages });
   } catch (error) {
     console.error("Radar search error:", error);
     return NextResponse.json({ error: "Erro ao buscar produtos" }, { status: 500 });
