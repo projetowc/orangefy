@@ -1,14 +1,13 @@
 import { NextRequest, NextResponse } from "next/server";
 import Stripe from "stripe";
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
-
 const PRICES = {
   monthly:   process.env.STRIPE_PRICE_MONTHLY!,
   quarterly: process.env.STRIPE_PRICE_QUARTERLY!,
 };
 
 export async function POST(req: NextRequest) {
+  const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
   try {
     const { plan } = await req.json();
 
