@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { motion } from "framer-motion";
 import Link from "next/link";
 import Image from "next/image";
@@ -38,6 +38,42 @@ function CheckoutButton({ plan, className, children }: { plan: "monthly" | "quar
     >
       {loading ? "Aguarde..." : children}
     </button>
+  );
+}
+
+function WistiaEmbed() {
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!document.querySelector('script[data-wistia-player]')) {
+      const s1 = document.createElement("script");
+      s1.src = "https://fast.wistia.com/player.js";
+      s1.async = true;
+      s1.setAttribute("data-wistia-player", "");
+      document.head.appendChild(s1);
+    }
+    if (!document.querySelector('script[data-wistia-embed]')) {
+      const s2 = document.createElement("script");
+      s2.src = "https://fast.wistia.com/embed/4hz6khumkn.js";
+      s2.async = true;
+      s2.type = "module";
+      s2.setAttribute("data-wistia-embed", "4hz6khumkn");
+      document.head.appendChild(s2);
+    }
+    if (containerRef.current && !containerRef.current.querySelector("wistia-player")) {
+      const player = document.createElement("wistia-player");
+      player.setAttribute("media-id", "4hz6khumkn");
+      player.setAttribute("aspect", "1.8461538461538463");
+      player.style.width = "100%";
+      containerRef.current.appendChild(player);
+    }
+  }, []);
+
+  return (
+    <>
+      <style>{`wistia-player[media-id='4hz6khumkn']:not(:defined){background:center/contain no-repeat url('https://fast.wistia.com/embed/medias/4hz6khumkn/swatch');display:block;filter:blur(5px);padding-top:54.17%}`}</style>
+      <div ref={containerRef} />
+    </>
   );
 }
 
@@ -205,12 +241,7 @@ export default function LandingPage() {
             transition={{ duration: 0.5 }}
             className="relative rounded-2xl overflow-hidden shadow-[0_24px_64px_-16px_rgba(238,77,45,0.2)] border border-surface-200"
           >
-            <video
-              src="/demo.mp4"
-              controls
-              playsInline
-              className="w-full block"
-            />
+            <WistiaEmbed />
           </motion.div>
         </div>
       </section>
