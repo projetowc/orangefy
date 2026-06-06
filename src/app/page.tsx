@@ -52,7 +52,7 @@ const benefits = [
   { icon: Zap, title: "Missões Diárias Gamificadas", description: "Um roteiro passo a passo que transforma aprendizado em ação. Sem pular etapas, sem se perder.", color: "bg-amber-50 text-amber-600" },
   { icon: Calculator, title: "Calculadora de Lucro", description: "Calcule margem, ROI e lucro líquido antes de anunciar. Nunca mais venda no prejuízo.", color: "bg-blue-50 text-blue-600" },
   { icon: Megaphone, title: "Gerador de Anúncios com IA", description: "Títulos e descrições otimizadas geradas automaticamente. Anúncios que convertem, sem esforço.", color: "bg-purple-50 text-purple-600" },
-  { icon: BarChart3, title: "Score Shopee 0–100", description: "Pontuação visual de cada produto: margem, concorrência e potencial viral em segundos.", color: "bg-green-50 text-success" },
+  { icon: BarChart3, title: "Score de Oportunidade 0–100", description: "Pontuação visual de cada produto: margem, concorrência e potencial viral em segundos.", color: "bg-green-50 text-success" },
   { icon: TrendingUp, title: "Dashboard Completo", description: "Acompanhe vendas, lucro e evolução de nível. Tudo em um lugar, sempre atualizado.", color: "bg-rose-50 text-rose-600" },
 ];
 
@@ -64,12 +64,12 @@ const steps = [
 ];
 
 const testimonials = [
-  { name: "Ana Paula S.", role: "Iniciante na Shopee", text: "Em 3 semanas segui as missões e fiz minhas primeiras 8 vendas. O radar me mostrou exatamente o produto certo.", avatar: "AP", sales: 8 },
+  { name: "Ana Paula S.", role: "Vendedora online", text: "Em 3 semanas segui as missões e fiz minhas primeiras 8 vendas. O radar me mostrou exatamente o produto certo.", avatar: "AP", sales: 8 },
   { name: "Carlos M.", role: "Revendedor", text: "Achei um nicho com 60% de margem em 20 minutos usando o radar com IA. Nunca teria achado sozinho.", avatar: "CM", sales: 24 },
-  { name: "Juliana R.", role: "Empreendedora", text: "A calculadora de lucro mudou tudo. Antes eu vendia sem saber se estava ganhando dinheiro de verdade.", avatar: "JR", sales: 15 },
+  { name: "Juliana R.", role: "Empreendedora digital", text: "A calculadora de lucro mudou tudo. Antes eu vendia sem saber se estava ganhando dinheiro de verdade.", avatar: "JR", sales: 15 },
 ];
 
-const planFeatures = ["Radar de Produtos com IA", "Missões Diárias Gamificadas", "Calculadora de Lucro", "Gerador de Anúncios com IA", "Score Shopee", "Dashboard Completo"];
+const planFeatures = ["Radar de Produtos com IA", "Missões Diárias Gamificadas", "Calculadora de Lucro", "Gerador de Anúncios com IA", "Score de Oportunidade", "Dashboard Completo"];
 
 export default function LandingPage() {
   return (
@@ -113,7 +113,7 @@ export default function LandingPage() {
               </motion.h1>
 
               <motion.p variants={fadeUp} className="text-lg text-dark-muted leading-relaxed mb-6 max-w-xl">
-                A Orangefy usa IA para encontrar produtos com alta margem e baixa concorrência na Shopee — para você anunciar com confiança e lucrar desde o primeiro produto.
+                A Orangefy usa IA para encontrar produtos com alta margem e baixa concorrência — para você anunciar na Shopee, Mercado Livre, Amazon ou qualquer marketplace com confiança e lucrar desde o primeiro produto.
               </motion.p>
 
               <motion.div variants={fadeUp} className="flex flex-col sm:flex-row gap-3 mb-6">
@@ -188,7 +188,7 @@ export default function LandingPage() {
             Produtos com alto potencial de lucro
           </h2>
           <p className="text-dark-muted text-sm max-w-lg mx-auto">
-            Estes são exemplos reais de produtos que a Orangefy já identificou com boa margem e baixa concorrência na Shopee.
+            Exemplos reais de produtos identificados pela Orangefy com boa margem e baixa concorrência nos maiores marketplaces do Brasil.
           </p>
         </div>
 
@@ -254,7 +254,7 @@ export default function LandingPage() {
         <div className="max-w-6xl mx-auto px-4">
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 sm:gap-8 text-center">
             {[
-              { value: "1.200+", label: "Usuários ativos", icon: Users },
+              { value: "1.200+", label: "Vendedores ativos", icon: Users },
               { value: "8.400+", label: "Vendas geradas", icon: ShoppingBag },
               { value: "R$ 290k+", label: "Em lucro estimado", icon: TrendingUp },
               { value: "4.8 ★", label: "Avaliação média", icon: Award },
@@ -279,7 +279,7 @@ export default function LandingPage() {
           >
             <div className="flex items-start gap-3 mb-4">
               <AlertCircle className="w-5 h-5 text-danger mt-0.5 flex-shrink-0" />
-              <h2 className="text-xl font-black text-dark">Você já tentou vender na Shopee e se perdeu?</h2>
+              <h2 className="text-xl font-black text-dark">Você já tentou vender online e não sabia por onde começar?</h2>
             </div>
             <div className="grid sm:grid-cols-2 gap-3 text-sm text-dark-muted">
               {[
@@ -310,7 +310,7 @@ export default function LandingPage() {
               Ferramentas que <span className="text-gradient">realmente funcionam</span>
             </motion.h2>
             <motion.p variants={fadeUp} className="text-base text-dark-muted max-w-xl mx-auto">
-              Cada recurso foi pensado para acelerar seus resultados e eliminar o achismo.
+              Cada recurso foi pensado para acelerar seus resultados em qualquer marketplace e eliminar o achismo.
             </motion.p>
           </motion.div>
 
@@ -613,7 +613,7 @@ export default function LandingPage() {
               Pronto para fazer sua primeira venda?
             </motion.h2>
             <motion.p variants={fadeUp} className="text-lg text-white/80 mb-7 max-w-xl mx-auto">
-              Pare de aprender na teoria. A Orangefy coloca você para vender com método, ferramentas e suporte.
+              Pare de aprender na teoria. A Orangefy coloca você para vender em qualquer marketplace com método, ferramentas e suporte.
             </motion.p>
             <motion.div variants={fadeUp} className="flex flex-col sm:flex-row gap-3 justify-center">
               <CheckoutButton plan="annual" className="bg-white text-brand font-bold rounded-xl px-7 py-3.5 hover:bg-surface-50 transition-colors flex items-center justify-center gap-2">
@@ -643,7 +643,7 @@ export default function LandingPage() {
                 />
               </div>
               <p className="text-white/50 text-sm leading-relaxed">
-                A plataforma que transforma iniciantes em vendedores de sucesso na Shopee.
+                A plataforma que transforma iniciantes em vendedores de sucesso nos maiores marketplaces do Brasil.
               </p>
             </div>
             <div>
