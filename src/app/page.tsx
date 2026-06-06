@@ -525,12 +525,15 @@ export default function LandingPage() {
                 <p className="text-dark-muted text-sm">3 meses de acesso completo.</p>
               </div>
               <div className="mb-5">
-                <div className="text-xs text-dark-muted line-through mb-0.5">De R$149,70</div>
+                <div className="flex items-center gap-2 mb-1">
+                  <span className="text-sm text-dark-muted line-through">R$149,70</span>
+                  <span className="bg-green-100 text-success text-xs font-bold px-2 py-0.5 rounded-full">-13%</span>
+                </div>
                 <div>
                   <span className="text-4xl font-black text-dark">R$129</span>
                   <span className="text-xl font-bold text-dark">,90</span>
                 </div>
-                <div className="text-xs text-dark-muted mt-1">R$43,30/mês · Economize R$19,80</div>
+                <div className="text-xs text-dark-muted mt-1">R$43,30/mês · Você economiza R$19,80</div>
               </div>
               <ul className="space-y-2 mb-6 flex-1">
                 {planFeatures.map((f) => (
@@ -562,12 +565,15 @@ export default function LandingPage() {
                 <p className="text-dark-muted text-sm">12 meses de acesso completo.</p>
               </div>
               <div className="mb-5">
-                <div className="text-xs text-dark-muted line-through mb-0.5">De R$598,80</div>
+                <div className="flex items-center gap-2 mb-1">
+                  <span className="text-sm text-dark-muted line-through">R$598,80</span>
+                  <span className="bg-green-100 text-success text-xs font-bold px-2 py-0.5 rounded-full">-58%</span>
+                </div>
                 <div>
                   <span className="text-4xl font-black text-dark">R$249</span>
                   <span className="text-xl font-bold text-dark">,90</span>
                 </div>
-                <div className="text-xs text-dark-muted mt-1">R$20,82/mês · Economize R$348,90</div>
+                <div className="text-xs text-dark-muted mt-1">R$20,82/mês · Você economiza R$348,90</div>
               </div>
               <ul className="space-y-2 mb-6 flex-1">
                 {[...planFeatures, "Suporte prioritário", "Acesso antecipado"].map((f) => (
