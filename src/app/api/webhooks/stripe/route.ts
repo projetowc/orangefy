@@ -25,7 +25,7 @@ export async function POST(req: NextRequest) {
     const email = session.customer_details?.email || session.customer_email;
     const name  = session.customer_details?.name || email || "Cliente";
     const planMeta = session.metadata?.plan;
-    const plan = (planMeta === "quarterly" ? "quarterly" : "monthly") as "quarterly" | "monthly";
+    const plan = (planMeta === "quarterly" ? "quarterly" : planMeta === "annual" ? "annual" : "monthly") as "quarterly" | "annual" | "monthly";
 
     if (!email) {
       console.error("No email in session");

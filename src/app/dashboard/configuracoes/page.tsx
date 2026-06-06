@@ -28,7 +28,7 @@ export default function ConfiguracoesPage() {
   const name = profile?.name || user?.email?.split("@")[0] || "";
   const email = user?.email || "";
   const initials = getInitials(name || "U");
-  const plan = profile?.plan === "quarterly" ? "Trimestral" : profile?.plan === "annual" || profile?.plan === "lifetime" ? "Vitalício" : "Mensal";
+  const plan = profile?.plan === "quarterly" ? "Trimestral" : profile?.plan === "annual" ? "Anual" : profile?.plan === "lifetime" ? "Vitalício" : "Mensal";
 
   const [notifMissions, setNotifMissions] = useState(true);
   const [notifTips, setNotifTips] = useState(false);
@@ -162,17 +162,30 @@ export default function ConfiguracoesPage() {
             <div className="badge-success">Ativo</div>
           </div>
           {profile?.plan === "monthly" && (
-            <button
-              onClick={async () => {
-                const res = await fetch("/api/checkout", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ plan: "quarterly" }) });
-                const data = await res.json();
-                if (data.url) window.location.href = data.url;
-              }}
-              className="btn-brand w-full text-center flex items-center justify-center gap-2 text-sm"
-            >
-              Fazer upgrade para Trimestral — R$249,90
-              <ChevronRight className="w-4 h-4" />
-            </button>
+            <div className="flex flex-col sm:flex-row gap-2">
+              <button
+                onClick={async () => {
+                  const res = await fetch("/api/checkout", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ plan: "quarterly" }) });
+                  const data = await res.json();
+                  if (data.url) window.location.href = data.url;
+                }}
+                className="btn-outline flex-1 flex items-center justify-center gap-2 text-sm"
+              >
+                Trimestral — R$129,90
+                <ChevronRight className="w-4 h-4" />
+              </button>
+              <button
+                onClick={async () => {
+                  const res = await fetch("/api/checkout", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ plan: "annual" }) });
+                  const data = await res.json();
+                  if (data.url) window.location.href = data.url;
+                }}
+                className="btn-brand flex-1 flex items-center justify-center gap-2 text-sm"
+              >
+                Anual — R$249,90
+                <ChevronRight className="w-4 h-4" />
+              </button>
+            </div>
           )}
         </motion.div>
 

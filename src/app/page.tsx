@@ -10,7 +10,7 @@ import {
   ChevronRight, Clock, Users, Award, AlertCircle, Sparkles
 } from "lucide-react";
 
-async function goToCheckout(plan: "monthly" | "lifetime" | "quarterly") {
+async function goToCheckout(plan: "monthly" | "quarterly" | "annual") {
   try {
     const res = await fetch("/api/checkout", {
       method: "POST",
@@ -28,7 +28,7 @@ async function goToCheckout(plan: "monthly" | "lifetime" | "quarterly") {
   }
 }
 
-function CheckoutButton({ plan, className, children }: { plan: "monthly" | "lifetime" | "quarterly"; className?: string; children: React.ReactNode }) {
+function CheckoutButton({ plan, className, children }: { plan: "monthly" | "quarterly" | "annual"; className?: string; children: React.ReactNode }) {
   const [loading, setLoading] = useState(false);
   return (
     <button
@@ -57,7 +57,7 @@ const benefits = [
 ];
 
 const steps = [
-  { number: "01", title: "Assine o plano", desc: "Escolha mensal ou vitalício. Acesso liberado na hora." },
+  { number: "01", title: "Assine o plano", desc: "Escolha mensal, trimestral ou anual. Acesso liberado na hora." },
   { number: "02", title: "Crie sua conta", desc: "Entre com o e-mail da compra e defina sua senha." },
   { number: "03", title: "Siga as missões", desc: "O roteiro gamificado mostra exatamente o que fazer." },
   { number: "04", title: "Venda e lucre", desc: "Publique anúncios e receba suas primeiras vendas." },
@@ -170,7 +170,7 @@ export default function LandingPage() {
         <div className="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-center gap-2 sm:gap-6 text-sm text-center">
           <span className="flex items-center gap-2 font-semibold">
             <Clock className="w-4 h-4 text-brand" />
-            Oferta por tempo limitado — Plano Trimestral por apenas R$249,90 · R$83,30/mês
+            Plano Anual por apenas R$249,90 · R$20,82/mês — Melhor custo-benefício
           </span>
           <span className="text-white/50 hidden sm:block">|</span>
           <span className="text-white/70">Uma única venda já cobre meses de assinatura</span>
@@ -478,24 +478,24 @@ export default function LandingPage() {
             </motion.p>
           </motion.div>
 
-          <div className="grid sm:grid-cols-2 gap-5 max-w-3xl mx-auto">
+          <div className="grid sm:grid-cols-3 gap-5 max-w-4xl mx-auto">
             {/* Mensal */}
             <motion.div
-              className="card border-2 border-surface-200 hover:border-brand/30 transition-all"
+              className="card border-2 border-surface-200 hover:border-brand/30 transition-all flex flex-col"
               initial={{ opacity: 0, y: 16 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
             >
               <div className="mb-4">
-                <h3 className="text-lg font-bold text-dark mb-0.5">Plano Mensal</h3>
+                <h3 className="text-lg font-bold text-dark mb-0.5">Mensal</h3>
                 <p className="text-dark-muted text-sm">Comece agora, cancele quando quiser.</p>
               </div>
               <div className="mb-5">
-                <span className="text-4xl font-black text-dark">R$99</span>
+                <span className="text-4xl font-black text-dark">R$49</span>
                 <span className="text-xl font-bold text-dark">,90</span>
                 <span className="text-dark-muted text-sm">/mês</span>
               </div>
-              <ul className="space-y-2.5 mb-6">
+              <ul className="space-y-2 mb-6 flex-1">
                 {planFeatures.map((f) => (
                   <li key={f} className="flex items-center gap-2 text-sm text-dark">
                     <CheckCircle2 className="w-4 h-4 text-success flex-shrink-0" />{f}
@@ -509,7 +509,7 @@ export default function LandingPage() {
 
             {/* Trimestral */}
             <motion.div
-              className="card border-2 border-brand relative overflow-hidden shadow-brand"
+              className="card border-2 border-brand relative overflow-hidden shadow-brand flex flex-col"
               initial={{ opacity: 0, y: 16 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
@@ -521,29 +521,63 @@ export default function LandingPage() {
                 </div>
               </div>
               <div className="mb-4">
-                <h3 className="text-lg font-bold text-dark mb-0.5">Plano Trimestral</h3>
-                <p className="text-dark-muted text-sm">3 meses de acesso completo à plataforma.</p>
+                <h3 className="text-lg font-bold text-dark mb-0.5">Trimestral</h3>
+                <p className="text-dark-muted text-sm">3 meses de acesso completo.</p>
               </div>
               <div className="mb-5">
                 <div className="text-xs text-dark-muted mb-1">Pagamento único de</div>
-                <div className="flex items-end gap-1 mb-1">
-                  <span className="text-4xl font-black text-dark">R$249</span>
+                <div>
+                  <span className="text-4xl font-black text-dark">R$129</span>
                   <span className="text-xl font-bold text-dark">,90</span>
                 </div>
-                <div className="text-xs text-dark-muted mb-1.5">
-                  R$83,30/mês · Economize vs mensal
-                </div>
-                <div className="badge-brand inline-flex">3 meses de acesso a todas as ferramentas</div>
+                <div className="text-xs text-dark-muted mt-1">R$43,30/mês · Economize 13%</div>
               </div>
-              <ul className="space-y-2.5 mb-6">
-                {[...planFeatures, "Suporte prioritário", "Acesso antecipado"].map((f) => (
+              <ul className="space-y-2 mb-6 flex-1">
+                {planFeatures.map((f) => (
                   <li key={f} className="flex items-center gap-2 text-sm text-dark">
                     <CheckCircle2 className="w-4 h-4 text-success flex-shrink-0" />{f}
                   </li>
                 ))}
               </ul>
               <CheckoutButton plan="quarterly" className="btn-brand w-full text-center">
-                Garantir Plano Trimestral
+                Assinar Trimestral
+              </CheckoutButton>
+            </motion.div>
+
+            {/* Anual */}
+            <motion.div
+              className="card border-2 border-surface-200 hover:border-brand/30 transition-all flex flex-col relative"
+              initial={{ opacity: 0, y: 16 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: 0.16 }}
+            >
+              <div className="absolute top-3 right-3">
+                <div className="bg-success text-white text-xs font-bold px-2.5 py-1 rounded-full">
+                  Melhor valor
+                </div>
+              </div>
+              <div className="mb-4">
+                <h3 className="text-lg font-bold text-dark mb-0.5">Anual</h3>
+                <p className="text-dark-muted text-sm">12 meses de acesso completo.</p>
+              </div>
+              <div className="mb-5">
+                <div className="text-xs text-dark-muted mb-1">Pagamento único de</div>
+                <div>
+                  <span className="text-4xl font-black text-dark">R$249</span>
+                  <span className="text-xl font-bold text-dark">,90</span>
+                </div>
+                <div className="text-xs text-dark-muted mt-1">R$20,82/mês · Economize 58%</div>
+              </div>
+              <ul className="space-y-2 mb-6 flex-1">
+                {[...planFeatures, "Suporte prioritário", "Acesso antecipado"].map((f) => (
+                  <li key={f} className="flex items-center gap-2 text-sm text-dark">
+                    <CheckCircle2 className="w-4 h-4 text-success flex-shrink-0" />{f}
+                  </li>
+                ))}
+              </ul>
+              <CheckoutButton plan="annual" className="btn-outline w-full text-center border-success text-success hover:bg-green-50">
+                Assinar Anual
               </CheckoutButton>
             </motion.div>
           </div>
@@ -571,8 +605,8 @@ export default function LandingPage() {
               Pare de aprender na teoria. A Orangefy coloca você para vender com método, ferramentas e suporte.
             </motion.p>
             <motion.div variants={fadeUp} className="flex flex-col sm:flex-row gap-3 justify-center">
-              <CheckoutButton plan="quarterly" className="bg-white text-brand font-bold rounded-xl px-7 py-3.5 hover:bg-surface-50 transition-colors flex items-center justify-center gap-2">
-                Garantir Plano Trimestral — R$249,90
+              <CheckoutButton plan="annual" className="bg-white text-brand font-bold rounded-xl px-7 py-3.5 hover:bg-surface-50 transition-colors flex items-center justify-center gap-2">
+                Garantir Plano Anual — R$249,90
                 <ChevronRight className="w-4 h-4" />
               </CheckoutButton>
               <Link href="/login" className="border-2 border-white/40 text-white font-bold rounded-xl px-7 py-3.5 hover:bg-white/10 transition-colors flex items-center justify-center gap-2">
