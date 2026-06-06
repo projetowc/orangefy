@@ -213,39 +213,6 @@ export default function LandingPage() {
         </div>
       </div>
 
-      {/* VIDEO DEMO */}
-      <section className="py-14 px-4 bg-white">
-        <div className="max-w-4xl mx-auto">
-          <motion.div
-            className="text-center mb-8"
-            initial="hidden"
-            whileInView="show"
-            viewport={{ once: true }}
-            variants={stagger}
-          >
-            <motion.div variants={fadeUp} className="badge-brand inline-flex mb-3">
-              Veja em ação
-            </motion.div>
-            <motion.h2 variants={fadeUp} className="text-3xl sm:text-4xl font-black text-dark mb-3">
-              Conheça a <span className="text-gradient">plataforma completa</span>
-            </motion.h2>
-            <motion.p variants={fadeUp} className="text-base text-dark-muted max-w-xl mx-auto">
-              Veja como encontrar produtos lucrativos, analisar margem e gerar anúncios em minutos.
-            </motion.p>
-          </motion.div>
-
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.5 }}
-            className="relative rounded-2xl overflow-hidden shadow-[0_24px_64px_-16px_rgba(238,77,45,0.2)] border border-surface-200"
-          >
-            <WistiaEmbed />
-          </motion.div>
-        </div>
-      </section>
-
       {/* PRODUTOS EM DESTAQUE */}
       <section className="py-12 bg-white overflow-hidden">
         <div className="max-w-6xl mx-auto px-4 mb-8 text-center">
@@ -428,6 +395,39 @@ export default function LandingPage() {
               </motion.div>
             ))}
           </div>
+        </div>
+      </section>
+
+      {/* VIDEO DEMO */}
+      <section className="py-14 px-4 bg-white">
+        <div className="max-w-4xl mx-auto">
+          <motion.div
+            className="text-center mb-8"
+            initial="hidden"
+            whileInView="show"
+            viewport={{ once: true }}
+            variants={stagger}
+          >
+            <motion.div variants={fadeUp} className="badge-brand inline-flex mb-3">
+              Veja em ação
+            </motion.div>
+            <motion.h2 variants={fadeUp} className="text-3xl sm:text-4xl font-black text-dark mb-3">
+              Conheça a <span className="text-gradient">plataforma completa</span>
+            </motion.h2>
+            <motion.p variants={fadeUp} className="text-base text-dark-muted max-w-xl mx-auto">
+              Veja como encontrar produtos lucrativos, analisar margem e gerar anúncios em minutos.
+            </motion.p>
+          </motion.div>
+
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.5 }}
+            className="relative rounded-2xl overflow-hidden shadow-[0_24px_64px_-16px_rgba(238,77,45,0.2)] border border-surface-200"
+          >
+            <WistiaEmbed />
+          </motion.div>
         </div>
       </section>
 
