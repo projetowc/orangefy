@@ -19,7 +19,7 @@ export async function POST(req: NextRequest) {
     const appUrl = process.env.NEXT_PUBLIC_APP_URL || "https://orangefy-shop.vercel.app";
 
     const session = await stripe.checkout.sessions.create({
-      mode: plan === "monthly" ? "subscription" : "payment",
+      mode: "subscription",
       line_items: [{ price: PRICES[plan as keyof typeof PRICES], quantity: 1 }],
       success_url: `${appUrl}/checkout/sucesso?session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${appUrl}/#planos`,
@@ -31,7 +31,8 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json({ url: session.url });
   } catch (error) {
-    console.error("Checkout error:", error);
-    return NextResponse.json({ error: "Erro ao criar sessão de pagamento" }, { status: 500 });
+    const msg = error instanceof Error ? error.message : String(error);
+    console.error("Checkout error:", msg);
+    return NextResponse.json({ error: "Erro ao criar sessão de pagamento", detail: msg }, { status: 500 });
   }
 }
