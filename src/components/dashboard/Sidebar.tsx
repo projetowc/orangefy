@@ -33,15 +33,10 @@ function SidebarContent({ onClose }: { onClose?: () => void }) {
 
   const name = profile?.name || user?.email?.split("@")[0] || "Usuário";
   const initials = getInitials(name);
-  const xp = profile?.xp ?? 0;
-  const level = profile?.level ?? 1;
-  const xpToNext = level * 1000;
-  const xpPercent = Math.min(Math.round((xp / xpToNext) * 100), 100);
-
-  const levelLabels: Record<number, string> = {
-    1: "Iniciante", 2: "Aprendiz", 3: "Intermediário",
-    4: "Avançado", 5: "Especialista", 6: "Mestre",
-  };
+  const planLabel = profile?.plan === "quarterly" ? "Trimestral"
+    : profile?.plan === "annual" ? "Anual"
+    : profile?.plan === "lifetime" ? "Vitalício"
+    : "Mensal";
 
   return (
     <div className="flex flex-col h-full">
@@ -63,24 +58,23 @@ function SidebarContent({ onClose }: { onClose?: () => void }) {
         )}
       </div>
 
-      <div className="m-3 p-3 bg-gradient-hero rounded-2xl border border-surface-200">
-        <div className="flex items-center gap-3 mb-2">
-          <div className="w-9 h-9 rounded-full bg-gradient-brand flex items-center justify-center text-white font-bold text-sm flex-shrink-0">
-            {initials}
+      <Link href="/dashboard/configuracoes" onClick={onClose} className="m-3 p-3 bg-gradient-hero rounded-2xl border border-surface-200 flex items-center gap-3 hover:border-brand/30 transition-colors">
+        <div className="w-10 h-10 rounded-full bg-gradient-brand flex items-center justify-center text-white font-bold text-sm flex-shrink-0">
+          {initials}
+        </div>
+        <div className="min-w-0 flex-1">
+          <div className="font-semibold text-dark text-sm truncate">{getFirstName(name)}</div>
+          <div className="flex items-center gap-1.5 mt-1">
+            <span className="text-xs font-semibold text-brand bg-orange-50 border border-brand/20 px-2 py-0.5 rounded-full">
+              Plano {planLabel}
+            </span>
+            <span className="flex items-center gap-1 text-xs text-dark-muted">
+              <span className="w-1.5 h-1.5 rounded-full bg-success" />
+              Ativo
+            </span>
           </div>
-          <div className="min-w-0">
-            <div className="font-semibold text-dark text-sm truncate">{getFirstName(name)}</div>
-            <div className="text-xs text-dark-muted">Nível {level} · {levelLabels[level] ?? "Vendedor"}</div>
-          </div>
         </div>
-        <div className="mb-1 flex items-center justify-between text-xs">
-          <span className="text-dark-muted font-medium">{xp} / {xpToNext} XP</span>
-          <span className="text-brand font-semibold">{xpPercent}%</span>
-        </div>
-        <div className="w-full h-1.5 bg-surface-200 rounded-full overflow-hidden">
-          <div className="h-full bg-gradient-brand rounded-full transition-all duration-500" style={{ width: `${xpPercent}%` }} />
-        </div>
-      </div>
+      </Link>
 
       <nav className="flex-1 px-2 py-1 space-y-0.5 overflow-y-auto scrollbar-hide">
         {navItems.map((item) => {
