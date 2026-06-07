@@ -7,7 +7,7 @@ import Image from "next/image";
 import {
   Zap, Target, Calculator, Megaphone, BarChart3, TrendingUp,
   Star, CheckCircle2, ArrowRight, ShoppingBag, Shield,
-  ChevronRight, Clock, Users, Award, AlertCircle, Sparkles
+  ChevronRight, Clock, Users, Award, AlertCircle, Sparkles, Flame
 } from "lucide-react";
 
 async function goToCheckout(plan: "monthly" | "quarterly" | "annual") {
@@ -89,7 +89,7 @@ const benefits = [
   { icon: Calculator, title: "Calculadora de Lucro", description: "Calcule margem, ROI e lucro líquido antes de anunciar. Nunca mais venda no prejuízo.", color: "bg-blue-50 text-blue-600" },
   { icon: Megaphone, title: "Gerador de Anúncios com IA", description: "Títulos e descrições otimizadas geradas automaticamente. Anúncios que convertem, sem esforço.", color: "bg-purple-50 text-purple-600" },
   { icon: BarChart3, title: "Score de Oportunidade 0–100", description: "Pontuação visual de cada produto: margem, concorrência e potencial viral em segundos.", color: "bg-green-50 text-success" },
-  { icon: TrendingUp, title: "Dashboard Completo", description: "Acompanhe vendas, lucro e evolução de nível. Tudo em um lugar, sempre atualizado.", color: "bg-rose-50 text-rose-600" },
+  { icon: Flame, title: "Anúncios Virais com IA", description: "Descubra os anúncios que estão bombando em cada nicho: hooks, roteiros, formatos e públicos prontos para copiar.", color: "bg-rose-50 text-rose-600" },
 ];
 
 const steps = [
@@ -105,7 +105,7 @@ const testimonials = [
   { name: "Juliana R.", role: "Empreendedora digital", text: "A calculadora de lucro mudou tudo. Antes eu vendia sem saber se estava ganhando dinheiro de verdade.", avatar: "JR", sales: 15 },
 ];
 
-const planFeatures = ["Radar de Produtos com IA", "Missões Diárias Gamificadas", "Calculadora de Lucro", "Gerador de Anúncios com IA", "Score de Oportunidade", "Dashboard Completo"];
+const planFeatures = ["Radar de Produtos com IA", "Missões Diárias Gamificadas", "Calculadora de Lucro", "Gerador de Anúncios com IA", "Anúncios Virais (inteligência de concorrência)", "Score de Oportunidade", "Dashboard Completo"];
 
 export default function LandingPage() {
   return (
