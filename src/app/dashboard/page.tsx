@@ -4,24 +4,14 @@ import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import {
   ShoppingBag, TrendingUp, Star, Trophy, ArrowRight,
-  Package, Flame, ChevronRight, Sparkles
+  Package, Flame, ChevronRight, Sparkles, Store
 } from "lucide-react";
 import Link from "next/link";
 import {
-  AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer
+  BarChart, Bar, Cell, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer
 } from "recharts";
 import Header from "@/components/dashboard/Header";
 import { useUser, getFirstName } from "@/context/UserContext";
-
-const salesData = [
-  { day: "Seg", lucro: 0 },
-  { day: "Ter", lucro: 0 },
-  { day: "Qua", lucro: 0 },
-  { day: "Qui", lucro: 0 },
-  { day: "Sex", lucro: 0 },
-  { day: "Sáb", lucro: 0 },
-  { day: "Dom", lucro: 0 },
-];
 
 interface FeaturedProduct {
   id: number;
@@ -31,6 +21,24 @@ interface FeaturedProduct {
   category: string;
   avgPrice: string;
   image?: string;
+}
+
+interface ShopPreview {
+  id: number;
+  nome: string;
+  nicho: string;
+  crescimentoPercentual: number;
+  tendencia: "alta" | "estavel";
+}
+
+function scoreColor(score: number) {
+  if (score >= 80) return "#10B981";
+  if (score >= 60) return "#FF7337";
+  return "#EE4D2D";
+}
+
+function truncateName(name: string, max = 22) {
+  return name.length > max ? `${name.slice(0, max - 1)}…` : name;
 }
 
 const stagger = { hidden: {}, show: { transition: { staggerChildren: 0.08 } } };
@@ -105,6 +113,7 @@ export default function DashboardPage() {
 
   const [products, setProducts] = useState<FeaturedProduct[]>([]);
   const [loadingProducts, setLoadingProducts] = useState(true);
+  const [shops, setShops] = useState<ShopPreview[]>([]);
 
   useEffect(() => {
     let cancelled = false;
@@ -114,7 +123,7 @@ export default function DashboardPage() {
         if (cached) {
           const { products: cachedProducts } = JSON.parse(cached);
           if (Array.isArray(cachedProducts) && cachedProducts.length > 0 && !cancelled) {
-            setProducts(cachedProducts.slice(0, 4));
+            setProducts(cachedProducts.slice(0, 6));
             setLoadingProducts(false);
             return;
           }
@@ -128,7 +137,7 @@ export default function DashboardPage() {
         if (!res.ok) throw new Error("API error");
         const data = await res.json();
         if (!cancelled && data.products && Array.isArray(data.products)) {
-          setProducts(data.products.slice(0, 4));
+          setProducts(data.products.slice(0, 6));
         }
       } catch {
         // silently ignore — section just won't render
@@ -138,6 +147,23 @@ export default function DashboardPage() {
     })();
     return () => { cancelled = true; };
   }, []);
+
+  useEffect(() => {
+    try {
+      const cached = sessionStorage.getItem("lojas_virais_v1");
+      if (cached) {
+        const { shops: cachedShops } = JSON.parse(cached);
+        if (Array.isArray(cachedShops) && cachedShops.length > 0) {
+          setShops(cachedShops.slice(0, 3));
+        }
+      }
+    } catch {
+      // ignore cache errors
+    }
+  }, []);
+
+  const rankedProducts = [...products].sort((a, b) => b.score - a.score).slice(0, 5);
+  const chartData = rankedProducts.map((p) => ({ ...p, shortName: truncateName(p.name) }));
 
   return (
     <>
@@ -202,7 +228,7 @@ export default function DashboardPage() {
         </motion.div>
 
         <div className="grid lg:grid-cols-3 gap-6">
-          {/* CHART */}
+          {/* RANKING DE PRODUTOS */}
           <motion.div
             className="card lg:col-span-2"
             initial={{ opacity: 0, y: 20 }}
@@ -211,91 +237,83 @@ export default function DashboardPage() {
           >
             <div className="flex items-center justify-between mb-6">
               <div>
-                <h2 className="font-bold text-dark">Evolução de Vendas</h2>
-                <p className="text-xs text-dark-muted mt-0.5">Últimos 7 dias</p>
+                <h2 className="font-bold text-dark">Ranking de Produtos</h2>
+                <p className="text-xs text-dark-muted mt-0.5">Score de oportunidade dos produtos mais quentes do Radar agora</p>
               </div>
-              <div className="badge-brand">Esta semana</div>
+              <div className="badge-brand">Top 5</div>
             </div>
-            {sales === 0 ? (
+            {loadingProducts ? (
+              <div className="space-y-3 animate-pulse">
+                {[...Array(5)].map((_, i) => (
+                  <div key={i} className="h-8 bg-surface-100 rounded-lg" style={{ width: `${85 - i * 12}%` }} />
+                ))}
+              </div>
+            ) : chartData.length === 0 ? (
               <div className="flex flex-col items-center justify-center h-40 text-center">
-                <ShoppingBag className="w-10 h-10 text-surface-200 mb-3" />
-                <p className="text-dark-muted text-sm font-medium">Nenhuma venda ainda</p>
-                <p className="text-xs text-dark-muted mt-1">Use o Radar de Produtos para encontrar seu primeiro campeão de vendas</p>
+                <Package className="w-10 h-10 text-surface-200 mb-3" />
+                <p className="text-dark-muted text-sm font-medium">Nenhum produto carregado ainda</p>
+                <p className="text-xs text-dark-muted mt-1">Explore o Radar de Produtos para ver as melhores oportunidades</p>
               </div>
             ) : (
-              <ResponsiveContainer width="100%" height={180}>
-                <AreaChart data={salesData}>
-                  <defs>
-                    <linearGradient id="brandGrad" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="5%" stopColor="#EE4D2D" stopOpacity={0.15} />
-                      <stop offset="95%" stopColor="#EE4D2D" stopOpacity={0} />
-                    </linearGradient>
-                  </defs>
-                  <CartesianGrid strokeDasharray="3 3" stroke="#F0F0F0" />
-                  <XAxis dataKey="day" tick={{ fontSize: 12, fill: "#6B7280" }} axisLine={false} tickLine={false} />
-                  <YAxis hide />
-                  <Tooltip contentStyle={{ borderRadius: "12px", border: "1px solid #E5E7EB" }} />
-                  <Area type="monotone" dataKey="lucro" stroke="#EE4D2D" strokeWidth={2.5} fill="url(#brandGrad)" />
-                </AreaChart>
+              <ResponsiveContainer width="100%" height={240}>
+                <BarChart data={chartData} layout="vertical" margin={{ top: 0, right: 24, left: 0, bottom: 0 }}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="#F0F0F0" horizontal={false} />
+                  <XAxis type="number" domain={[0, 100]} tick={{ fontSize: 12, fill: "#6B7280" }} axisLine={false} tickLine={false} />
+                  <YAxis type="category" dataKey="shortName" width={140} tick={{ fontSize: 12, fill: "#1F2937" }} axisLine={false} tickLine={false} />
+                  <Tooltip
+                    contentStyle={{ borderRadius: "12px", border: "1px solid #E5E7EB" }}
+                    formatter={(value: number) => [`${value} pontos`, "Score"]}
+                  />
+                  <Bar dataKey="score" radius={[0, 8, 8, 0]} barSize={18}>
+                    {chartData.map((entry) => (
+                      <Cell key={entry.id} fill={scoreColor(entry.score)} />
+                    ))}
+                  </Bar>
+                </BarChart>
               </ResponsiveContainer>
             )}
           </motion.div>
 
-          {/* SCORE */}
+          {/* LOJAS EM ALTA */}
           <motion.div
             className="card"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.3 }}
           >
-            <h2 className="font-bold text-dark mb-4">Score da Loja</h2>
-            <div className="flex items-center justify-center mb-4">
-              <div className="relative w-36 h-36">
-                <svg className="w-full h-full" viewBox="0 0 120 120">
-                  <circle cx="60" cy="60" r="50" fill="none" stroke="#F0F0F0" strokeWidth="10" />
-                  <circle
-                    cx="60" cy="60" r="50" fill="none"
-                    stroke={score > 0 ? "url(#scoreGrad)" : "#E5E7EB"}
-                    strokeWidth="10" strokeLinecap="round"
-                    strokeDasharray={`${2 * Math.PI * 50 * (score / 100)} ${2 * Math.PI * 50}`}
-                    className="score-ring"
-                  />
-                  <defs>
-                    <linearGradient id="scoreGrad" x1="0%" y1="0%" x2="100%" y2="0%">
-                      <stop offset="0%" stopColor="#FF7337" />
-                      <stop offset="100%" stopColor="#EE4D2D" />
-                    </linearGradient>
-                  </defs>
-                </svg>
-                <div className="absolute inset-0 flex flex-col items-center justify-center">
-                  <span className="text-4xl font-black text-dark">{score || "—"}</span>
-                  <span className="text-xs text-dark-muted">{score > 0 ? "de 100" : "Cadastre sua loja"}</span>
-                </div>
-              </div>
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="font-bold text-dark flex items-center gap-2">
+                <Store className="w-4 h-4 text-brand" />
+                Lojas em Alta
+              </h2>
+              <Link href="/dashboard/lojas-virais" className="text-brand text-xs font-semibold flex items-center gap-1 hover:gap-1.5 transition-all whitespace-nowrap">
+                Ver todas <ChevronRight className="w-3.5 h-3.5" />
+              </Link>
             </div>
-            {score === 0 ? (
-              <div className="text-center">
-                <p className="text-xs text-dark-muted mb-3">Cadastre sua loja em Minha Loja para ver seu score aqui.</p>
-                <Link href="/dashboard/minha-loja" className="text-brand text-xs font-semibold hover:underline">
-                  Ir para Minha Loja →
+            {shops.length === 0 ? (
+              <div className="text-center py-6">
+                <TrendingUp className="w-8 h-8 text-surface-200 mx-auto mb-3" />
+                <p className="text-dark-muted text-sm font-medium mb-1">Descubra lojas que mais vendem</p>
+                <p className="text-xs text-dark-muted mb-3">Veja produtos campeões e gráficos de vendas mensais de lojas em crescimento.</p>
+                <Link href="/dashboard/lojas-virais" className="btn-brand text-xs px-4 py-2 inline-flex items-center gap-1.5">
+                  Explorar lojas <ArrowRight className="w-3.5 h-3.5" />
                 </Link>
               </div>
             ) : (
               <div className="space-y-3">
-                {[
-                  { label: "Margem", value: 82, color: "#10B981" },
-                  { label: "Concorrência", value: 65, color: "#EE4D2D" },
-                  { label: "Potencial viral", value: 78, color: "#FF7337" },
-                  { label: "Logística", value: 90, color: "#10B981" },
-                ].map((item) => (
-                  <div key={item.label}>
-                    <div className="flex justify-between text-xs mb-1">
-                      <span className="text-dark-muted">{item.label}</span>
-                      <span className="font-semibold text-dark">{item.value}</span>
+                {shops.map((shop) => (
+                  <div key={shop.id} className="flex items-center gap-3 p-2.5 rounded-xl border border-surface-200 hover:border-brand/30 transition-colors">
+                    <div className="w-9 h-9 rounded-full bg-gradient-brand flex items-center justify-center text-white font-bold text-xs flex-shrink-0">
+                      {shop.nome.slice(0, 2).toUpperCase()}
                     </div>
-                    <div className="h-1.5 bg-surface-200 rounded-full overflow-hidden">
-                      <div className="h-full rounded-full" style={{ width: `${item.value}%`, backgroundColor: item.color }} />
+                    <div className="min-w-0 flex-1">
+                      <div className="font-semibold text-dark text-sm truncate">{shop.nome}</div>
+                      <div className="text-xs text-dark-muted truncate">{shop.nicho}</div>
                     </div>
+                    <span className={`flex items-center gap-1 text-xs font-bold flex-shrink-0 ${shop.tendencia === "alta" ? "text-success" : "text-dark-muted"}`}>
+                      <TrendingUp className="w-3.5 h-3.5" />
+                      +{shop.crescimentoPercentual}%
+                    </span>
                   </div>
                 ))}
               </div>
