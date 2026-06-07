@@ -3,10 +3,13 @@
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import {
-  TrendingUp, ArrowRight,
+  TrendingUp, ArrowRight, Target, Star, Percent, Tags,
   Package, Flame, ChevronRight, Sparkles, Store
 } from "lucide-react";
 import Link from "next/link";
+import {
+  AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer
+} from "recharts";
 import Header from "@/components/dashboard/Header";
 import { useUser, getFirstName } from "@/context/UserContext";
 
@@ -33,6 +36,13 @@ function scoreColor(score: number) {
   if (score >= 60) return "#FF7337";
   return "#EE4D2D";
 }
+
+function truncateName(name: string, max = 16) {
+  return name.length > max ? `${name.slice(0, max - 1)}…` : name;
+}
+
+const stagger = { hidden: {}, show: { transition: { staggerChildren: 0.08 } } };
+const fadeUp = { hidden: { opacity: 0, y: 16 }, show: { opacity: 1, y: 0, transition: { duration: 0.4 } } };
 
 function FeaturedProductCard({ product, index }: { product: FeaturedProduct; index: number }) {
   const [imgError, setImgError] = useState(false);
@@ -160,6 +170,51 @@ export default function DashboardPage() {
     }
   }, []);
 
+  const rankedProducts = [...products].sort((a, b) => b.score - a.score);
+  const chartData = rankedProducts.map((p) => ({ name: truncateName(p.name), score: p.score }));
+  const avgScore = products.length ? Math.round(products.reduce((sum, p) => sum + p.score, 0) / products.length) : 0;
+  const avgMargin = products.length ? Math.round(products.reduce((sum, p) => sum + p.margin, 0) / products.length) : 0;
+  const categoryCounts = products.reduce<Record<string, number>>((acc, p) => {
+    acc[p.category] = (acc[p.category] ?? 0) + 1;
+    return acc;
+  }, {});
+  const topCategory = Object.entries(categoryCounts).sort((a, b) => b[1] - a[1])[0]?.[0] ?? "—";
+
+  const stats = [
+    {
+      label: "Produtos no Radar",
+      value: loadingProducts ? "—" : String(products.length),
+      sub: "selecionados pela IA agora",
+      icon: Target,
+      color: "text-brand",
+      bg: "bg-orange-50",
+    },
+    {
+      label: "Score Médio",
+      value: loadingProducts ? "—" : String(avgScore),
+      sub: "de 100 pontos de oportunidade",
+      icon: Star,
+      color: "text-amber-500",
+      bg: "bg-amber-50",
+    },
+    {
+      label: "Margem Média",
+      value: loadingProducts ? "—" : `${avgMargin}%`,
+      sub: "lucro estimado por produto",
+      icon: Percent,
+      color: "text-success",
+      bg: "bg-green-50",
+    },
+    {
+      label: "Categoria em Alta",
+      value: loadingProducts ? "—" : topCategory,
+      sub: "mais frequente nos destaques",
+      icon: Tags,
+      color: "text-purple-600",
+      bg: "bg-purple-50",
+    },
+  ];
+
   return (
     <>
       <Header
@@ -168,6 +223,123 @@ export default function DashboardPage() {
       />
 
       <div className="p-4 lg:p-6 space-y-4 lg:space-y-6">
+        {/* STATS */}
+        <motion.div
+          className="grid grid-cols-2 lg:grid-cols-4 gap-4"
+          initial="hidden"
+          animate="show"
+          variants={stagger}
+        >
+          {stats.map((stat) => (
+            <motion.div key={stat.label} variants={fadeUp} className="card">
+              <div className="flex items-start justify-between mb-3">
+                <div className={`w-10 h-10 rounded-xl ${stat.bg} flex items-center justify-center`}>
+                  <stat.icon className={`w-5 h-5 ${stat.color}`} />
+                </div>
+              </div>
+              <div className="text-2xl font-black text-dark mb-0.5 truncate">{stat.value}</div>
+              <div className="text-xs text-dark-muted font-medium">{stat.label}</div>
+              <div className="text-xs text-dark-muted mt-1">{stat.sub}</div>
+            </motion.div>
+          ))}
+        </motion.div>
+
+        <div className="grid lg:grid-cols-3 gap-6">
+          {/* TENDÊNCIA DE OPORTUNIDADES */}
+          <motion.div
+            className="card lg:col-span-2"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.15 }}
+          >
+            <div className="flex items-center justify-between mb-6">
+              <div>
+                <h2 className="font-bold text-dark">Tendência de Oportunidades</h2>
+                <p className="text-xs text-dark-muted mt-0.5">Score dos produtos em destaque, do mais ao menos promissor</p>
+              </div>
+              <div className="badge-brand">Radar agora</div>
+            </div>
+            {loadingProducts ? (
+              <div className="h-[220px] rounded-xl bg-surface-100 animate-pulse" />
+            ) : chartData.length === 0 ? (
+              <div className="flex flex-col items-center justify-center h-[220px] text-center">
+                <Package className="w-10 h-10 text-surface-200 mb-3" />
+                <p className="text-dark-muted text-sm font-medium">Nenhum produto carregado ainda</p>
+                <p className="text-xs text-dark-muted mt-1">Explore o Radar de Produtos para ver as melhores oportunidades</p>
+              </div>
+            ) : (
+              <ResponsiveContainer width="100%" height={220}>
+                <AreaChart data={chartData} margin={{ top: 8, right: 12, left: -12, bottom: 0 }}>
+                  <defs>
+                    <linearGradient id="scoreTrendGrad" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="5%" stopColor="#EE4D2D" stopOpacity={0.25} />
+                      <stop offset="95%" stopColor="#EE4D2D" stopOpacity={0} />
+                    </linearGradient>
+                  </defs>
+                  <CartesianGrid strokeDasharray="3 3" stroke="#F0F0F0" vertical={false} />
+                  <XAxis dataKey="name" tick={{ fontSize: 11, fill: "#6B7280" }} axisLine={false} tickLine={false} interval={0} angle={-20} textAnchor="end" height={50} />
+                  <YAxis domain={[0, 100]} tick={{ fontSize: 12, fill: "#6B7280" }} axisLine={false} tickLine={false} width={28} />
+                  <Tooltip
+                    contentStyle={{ borderRadius: "12px", border: "1px solid #E5E7EB" }}
+                    formatter={(value: number) => [`${value} pontos`, "Score"]}
+                  />
+                  <Area type="monotone" dataKey="score" stroke="#EE4D2D" strokeWidth={2.5} fill="url(#scoreTrendGrad)" />
+                </AreaChart>
+              </ResponsiveContainer>
+            )}
+          </motion.div>
+
+          {/* LOJAS EM ALTA — RESUMO */}
+          <motion.div
+            className="card"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.25 }}
+          >
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="font-bold text-dark flex items-center gap-2">
+                <Store className="w-4 h-4 text-brand" />
+                Lojas em Alta
+              </h2>
+              <Link href="/dashboard/lojas-virais" className="text-brand text-xs font-semibold flex items-center gap-1 hover:gap-1.5 transition-all whitespace-nowrap">
+                Ver todas <ChevronRight className="w-3.5 h-3.5" />
+              </Link>
+            </div>
+            {shops.length === 0 ? (
+              <div className="text-center py-6">
+                <TrendingUp className="w-8 h-8 text-surface-200 mx-auto mb-3" />
+                <p className="text-dark-muted text-sm font-medium mb-1">Lojas que mais vendem agora</p>
+                <p className="text-xs text-dark-muted mb-3">Produtos campeões, faturamento e gráficos de vendas mensais.</p>
+                <Link href="/dashboard/lojas-virais" className="btn-brand text-xs px-4 py-2 inline-flex items-center gap-1.5">
+                  Explorar lojas <ArrowRight className="w-3.5 h-3.5" />
+                </Link>
+              </div>
+            ) : (
+              <div className="space-y-3">
+                {shops.map((shop) => (
+                  <Link
+                    key={shop.id}
+                    href="/dashboard/lojas-virais"
+                    className="flex items-center gap-3 p-2.5 rounded-xl border border-surface-200 hover:border-brand/30 transition-colors"
+                  >
+                    <div className="w-9 h-9 rounded-full bg-gradient-brand flex items-center justify-center text-white font-bold text-xs flex-shrink-0">
+                      {shop.nome.slice(0, 2).toUpperCase()}
+                    </div>
+                    <div className="min-w-0 flex-1">
+                      <div className="font-semibold text-dark text-sm truncate">{shop.nome}</div>
+                      <div className="text-xs text-dark-muted truncate">{shop.nicho}</div>
+                    </div>
+                    <span className={`flex items-center gap-1 text-xs font-bold flex-shrink-0 ${shop.tendencia === "alta" ? "text-success" : "text-dark-muted"}`}>
+                      <TrendingUp className="w-3.5 h-3.5" />
+                      +{shop.crescimentoPercentual}%
+                    </span>
+                  </Link>
+                ))}
+              </div>
+            )}
+          </motion.div>
+        </div>
+
         {/* PRODUTOS EM DESTAQUE */}
         <motion.div className="card" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}>
           <div className="flex items-center justify-between mb-5">
@@ -187,58 +359,6 @@ export default function DashboardPage() {
               ? [...Array(8)].map((_, i) => <FeaturedProductSkeleton key={i} />)
               : products.map((p, i) => <FeaturedProductCard key={p.id} product={p} index={i} />)}
           </div>
-        </motion.div>
-
-        {/* LOJAS EM ALTA */}
-        <motion.div className="card" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}>
-          <div className="flex items-center justify-between mb-5">
-            <div>
-              <h2 className="font-bold text-dark flex items-center gap-2">
-                <Store className="w-4 h-4 text-brand" />
-                Lojas em Alta
-              </h2>
-              <p className="text-xs text-dark-muted mt-0.5">Lojas que mais vendem agora, com seus produtos campeões</p>
-            </div>
-            <Link href="/dashboard/lojas-virais" className="text-brand text-sm font-semibold flex items-center gap-1 hover:gap-2 transition-all whitespace-nowrap">
-              Ver todas <ChevronRight className="w-4 h-4" />
-            </Link>
-          </div>
-          {shops.length === 0 ? (
-            <div className="flex flex-col items-center justify-center text-center py-8">
-              <TrendingUp className="w-9 h-9 text-surface-200 mb-3" />
-              <p className="text-dark-muted text-sm font-medium mb-1">Descubra as lojas que mais vendem na internet</p>
-              <p className="text-xs text-dark-muted mb-4 max-w-sm">Veja produtos campeões, faturamento estimado e gráficos de vendas mensais de lojas em crescimento acelerado.</p>
-              <Link href="/dashboard/lojas-virais" className="btn-brand text-sm px-4 py-2 inline-flex items-center gap-1.5">
-                Explorar lojas em alta <ArrowRight className="w-4 h-4" />
-              </Link>
-            </div>
-          ) : (
-            <div className="grid sm:grid-cols-3 gap-4">
-              {shops.map((shop, i) => (
-                <Link
-                  key={shop.id}
-                  href="/dashboard/lojas-virais"
-                  className="block p-4 rounded-2xl border border-surface-200 hover:border-brand/30 hover:shadow-card-hover transition-all duration-200"
-                >
-                  <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.06 }}>
-                    <div className="flex items-center gap-3 mb-3">
-                      <div className="w-10 h-10 rounded-full bg-gradient-brand flex items-center justify-center text-white font-bold text-sm flex-shrink-0">
-                        {shop.nome.slice(0, 2).toUpperCase()}
-                      </div>
-                      <div className="min-w-0 flex-1">
-                        <div className="font-semibold text-dark text-sm truncate">{shop.nome}</div>
-                        <div className="text-xs text-dark-muted truncate">{shop.nicho}</div>
-                      </div>
-                    </div>
-                    <span className={`inline-flex items-center gap-1 text-xs font-bold px-2 py-1 rounded-full ${shop.tendencia === "alta" ? "text-success bg-green-50" : "text-dark-muted bg-surface-100"}`}>
-                      <TrendingUp className="w-3.5 h-3.5" />
-                      +{shop.crescimentoPercentual}% no período
-                    </span>
-                  </motion.div>
-                </Link>
-              ))}
-            </div>
-          )}
         </motion.div>
 
         {/* WELCOME / CTA BANNER */}
