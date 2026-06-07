@@ -100,7 +100,7 @@ function AdCard({ ad, index, onClick }: { ad: Ad; index: number; onClick: () => 
       className={`card cursor-pointer hover:shadow-card-hover transition-all duration-200 border border-surface-200 hover:border-brand/30 flex flex-col gap-3${showImage ? " overflow-hidden" : ""}`}
     >
       {showImage && (
-        <div className="-mx-6 -mt-6 h-40 bg-surface-50 relative">
+        <div className="-mx-6 -mt-6 h-48 bg-surface-50 relative">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src={ad.image}

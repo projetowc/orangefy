@@ -99,7 +99,7 @@ function ProductCard({ product, index, onClick, aiGenerated }: {
       className={`card cursor-pointer hover:shadow-card-hover transition-all duration-200 border border-surface-200 hover:border-dark/10 relative${showImage ? " overflow-hidden" : ""}`}
     >
       {showImage && (
-        <div className="-mx-6 -mt-6 mb-4 h-44 bg-surface-50">
+        <div className="-mx-6 -mt-6 mb-4 h-52 bg-surface-50 relative">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src={product.image}
@@ -107,6 +107,12 @@ function ProductCard({ product, index, onClick, aiGenerated }: {
             className="w-full h-full object-cover"
             onError={() => setImgError(true)}
           />
+          <span className="absolute top-3 left-3 bg-white/95 backdrop-blur-sm text-dark text-sm font-black px-2.5 py-1 rounded-lg shadow-sm">
+            {product.avgPrice}
+          </span>
+          <div className="absolute top-3 right-3 bg-white/90 backdrop-blur-sm rounded-full p-0.5 shadow-sm">
+            <ScoreRing score={product.score} />
+          </div>
         </div>
       )}
 
@@ -116,11 +122,19 @@ function ProductCard({ product, index, onClick, aiGenerated }: {
             <Package className="w-5 h-5 text-dark-muted" />
           </div>
         )}
-        <div className="flex-1 min-w-0 pr-16">
+        <div className={`flex-1 min-w-0 ${showImage ? "" : "pr-16"}`}>
           <h3 className="font-semibold text-dark text-sm leading-snug line-clamp-2">{product.name}</h3>
-          <span className="text-xs text-dark-muted">{product.category}</span>
+          <div className="flex items-center gap-1.5 text-xs text-dark-muted mt-0.5">
+            <span>{product.category}</span>
+            {!showImage && (
+              <>
+                <span>·</span>
+                <span className="font-bold text-dark">{product.avgPrice}</span>
+              </>
+            )}
+          </div>
         </div>
-        <ScoreRing score={product.score} />
+        {!showImage && <ScoreRing score={product.score} />}
       </div>
 
       <div className="flex flex-wrap gap-1.5 mb-4">
