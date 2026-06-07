@@ -22,6 +22,7 @@ interface Ad {
   diasRodando: number;
   objetivo: "conversao" | "trafego" | "awareness";
   dica: string;
+  image?: string;
 }
 
 type PlatformFilter = "todos" | "meta" | "tiktok";
@@ -84,6 +85,8 @@ function AdCardSkeleton() {
 }
 
 function AdCard({ ad, index, onClick }: { ad: Ad; index: number; onClick: () => void }) {
+  const [imgError, setImgError] = useState(false);
+  const showImage = !!ad.image && !imgError;
   const perf = performanceConfig[ad.performance];
   const fmt = formatConfig[ad.format];
   const PerfIcon = perf.icon;
@@ -94,8 +97,24 @@ function AdCard({ ad, index, onClick }: { ad: Ad; index: number; onClick: () => 
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: index * 0.05 }}
       onClick={onClick}
-      className="card cursor-pointer hover:shadow-card-hover transition-all duration-200 border border-surface-200 hover:border-brand/30 flex flex-col gap-3"
+      className={`card cursor-pointer hover:shadow-card-hover transition-all duration-200 border border-surface-200 hover:border-brand/30 flex flex-col gap-3${showImage ? " overflow-hidden" : ""}`}
     >
+      {showImage && (
+        <div className="-mx-6 -mt-6 h-40 bg-surface-50 relative">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src={ad.image}
+            alt={ad.headline}
+            className="w-full h-full object-cover"
+            onError={() => setImgError(true)}
+          />
+          <span className={`absolute top-2.5 right-2.5 flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold border ${perf.bg} ${perf.color} backdrop-blur-sm bg-opacity-90`}>
+            <PerfIcon className="w-3 h-3" />
+            {perf.label}
+          </span>
+        </div>
+      )}
+
       {/* Header */}
       <div className="flex items-center justify-between gap-2 flex-wrap">
         <div className="flex items-center gap-2 flex-wrap">
@@ -114,10 +133,12 @@ function AdCard({ ad, index, onClick }: { ad: Ad; index: number; onClick: () => 
             {fmt.label}
           </span>
         </div>
-        <span className={`flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold border ${perf.bg} ${perf.color}`}>
-          <PerfIcon className="w-3 h-3" />
-          {perf.label}
-        </span>
+        {!showImage && (
+          <span className={`flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold border ${perf.bg} ${perf.color}`}>
+            <PerfIcon className="w-3 h-3" />
+            {perf.label}
+          </span>
+        )}
       </div>
 
       {/* Hook */}
@@ -183,6 +204,13 @@ function AdModal({ ad, onClose }: { ad: Ad; onClose: () => void }) {
         className="bg-white rounded-t-3xl sm:rounded-2xl w-full sm:max-w-lg shadow-2xl overflow-hidden max-h-[90vh] overflow-y-auto"
         onClick={(e) => e.stopPropagation()}
       >
+        {ad.image && (
+          <div className="h-52 bg-surface-50">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src={ad.image} alt={ad.headline} className="w-full h-full object-cover" />
+          </div>
+        )}
+
         {/* Modal header */}
         <div className="sticky top-0 bg-white border-b border-surface-100 px-5 py-4 flex items-center justify-between">
           <div className="flex items-center gap-2 flex-wrap">

@@ -145,7 +145,7 @@ function LoginForm() {
             Entre na plataforma e descubra exatamente o que fazer hoje.
           </p>
           <div className="space-y-4">
-            {["Missões diárias guiadas", "Produtos validados e lucrativos", "Calculadora de margem precisa", "Anúncios gerados por IA"].map((item) => (
+            {["Radar de produtos validados", "Spy de concorrentes com IA", "Calculadora de margem precisa", "Anúncios gerados por IA"].map((item) => (
               <div key={item} className="flex items-center gap-3">
                 <CheckCircle2 className="w-5 h-5 text-white/80 flex-shrink-0" />
                 <span className="text-white/80">{item}</span>

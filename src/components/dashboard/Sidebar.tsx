@@ -6,8 +6,8 @@ import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import {
-  LayoutDashboard, Zap, Target, Calculator, Megaphone,
-  Store, Trophy, Users, Settings, ShoppingBag, LogOut,
+  LayoutDashboard, Target, Calculator, Megaphone,
+  Store, Settings, LogOut,
   ChevronRight, X, Menu, Bot, Truck, Eye, Flame
 } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -15,7 +15,6 @@ import { useUser, getInitials, getFirstName } from "@/context/UserContext";
 
 const navItems = [
   { href: "/dashboard", icon: LayoutDashboard, label: "Dashboard" },
-  { href: "/dashboard/missoes", icon: Zap, label: "Missões", badge: "3" },
   { href: "/dashboard/radar", icon: Target, label: "Radar de Produtos" },
   { href: "/dashboard/assistente", icon: Bot, label: "Assistente IA" },
   { href: "/dashboard/fornecedores", icon: Truck, label: "Radar de Fornecedores" },
@@ -24,8 +23,6 @@ const navItems = [
   { href: "/dashboard/calculadora", icon: Calculator, label: "Calculadora" },
   { href: "/dashboard/gerador", icon: Megaphone, label: "Gerador de Anúncios" },
   { href: "/dashboard/minha-loja", icon: Store, label: "Minha Loja" },
-  { href: "/dashboard/ranking", icon: Trophy, label: "Ranking" },
-  { href: "/dashboard/comunidade", icon: Users, label: "Comunidade" },
   { href: "/dashboard/configuracoes", icon: Settings, label: "Configurações" },
 ];
 
@@ -126,8 +123,8 @@ function BottomNav({ onMenuOpen }: { onMenuOpen: () => void }) {
 
   const items = [
     { href: "/dashboard", icon: LayoutDashboard, label: "Início" },
-    { href: "/dashboard/missoes", icon: Zap, label: "Missões" },
     { href: "/dashboard/radar", icon: Target, label: "Radar" },
+    { href: "/dashboard/anuncios-virais", icon: Flame, label: "Anúncios" },
     { href: "/dashboard/minha-loja", icon: Store, label: "Loja" },
   ];
 

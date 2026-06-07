@@ -5,9 +5,9 @@ import { motion } from "framer-motion";
 import Link from "next/link";
 import Image from "next/image";
 import {
-  Zap, Target, Calculator, Megaphone, BarChart3, TrendingUp,
+  Target, Calculator, Megaphone, BarChart3, TrendingUp,
   Star, CheckCircle2, ArrowRight, ShoppingBag, Shield,
-  ChevronRight, Clock, Users, Award, AlertCircle, Sparkles, Flame
+  ChevronRight, Clock, Users, Award, AlertCircle, Sparkles, Flame, Eye
 } from "lucide-react";
 
 async function goToCheckout(plan: "monthly" | "quarterly" | "annual") {
@@ -85,7 +85,7 @@ const stagger = { hidden: {}, show: { transition: { staggerChildren: 0.08 } } };
 
 const benefits = [
   { icon: Target, title: "Radar de Produtos com IA", description: "Descubra produtos virais com alta margem antes da concorrência. A IA analisa o mercado por você.", color: "bg-orange-50 text-brand" },
-  { icon: Zap, title: "Missões Diárias Gamificadas", description: "Um roteiro passo a passo que transforma aprendizado em ação. Sem pular etapas, sem se perder.", color: "bg-amber-50 text-amber-600" },
+  { icon: Eye, title: "Spy de Concorrentes com IA", description: "Espione lojas e produtos da concorrência e descubra exatamente o que está vendendo no seu nicho.", color: "bg-amber-50 text-amber-600" },
   { icon: Calculator, title: "Calculadora de Lucro", description: "Calcule margem, ROI e lucro líquido antes de anunciar. Nunca mais venda no prejuízo.", color: "bg-blue-50 text-blue-600" },
   { icon: Megaphone, title: "Gerador de Anúncios com IA", description: "Títulos e descrições otimizadas geradas automaticamente. Anúncios que convertem, sem esforço.", color: "bg-purple-50 text-purple-600" },
   { icon: BarChart3, title: "Score de Oportunidade 0–100", description: "Pontuação visual de cada produto: margem, concorrência e potencial viral em segundos.", color: "bg-green-50 text-success" },
@@ -95,17 +95,17 @@ const benefits = [
 const steps = [
   { number: "01", title: "Assine o plano", desc: "Escolha mensal, trimestral ou anual. Acesso liberado na hora." },
   { number: "02", title: "Crie sua conta", desc: "Entre com o e-mail da compra e defina sua senha." },
-  { number: "03", title: "Siga as missões", desc: "O roteiro gamificado mostra exatamente o que fazer." },
+  { number: "03", title: "Use as ferramentas de IA", desc: "Radar, Spy de Concorrentes e Anúncios Virais mostram exatamente o que vender e como anunciar." },
   { number: "04", title: "Venda e lucre", desc: "Publique anúncios e receba suas primeiras vendas." },
 ];
 
 const testimonials = [
-  { name: "Ana Paula S.", role: "Vendedora online", text: "Em 3 semanas segui as missões e fiz minhas primeiras 8 vendas. O radar me mostrou exatamente o produto certo.", avatar: "AP", sales: 8 },
+  { name: "Ana Paula S.", role: "Vendedora online", text: "Em 3 semanas usando as ferramentas da Orangefy fiz minhas primeiras 8 vendas. O radar me mostrou exatamente o produto certo.", avatar: "AP", sales: 8 },
   { name: "Carlos M.", role: "Revendedor", text: "Achei um nicho com 60% de margem em 20 minutos usando o radar com IA. Nunca teria achado sozinho.", avatar: "CM", sales: 24 },
   { name: "Juliana R.", role: "Empreendedora digital", text: "A calculadora de lucro mudou tudo. Antes eu vendia sem saber se estava ganhando dinheiro de verdade.", avatar: "JR", sales: 15 },
 ];
 
-const planFeatures = ["Radar de Produtos com IA", "Missões Diárias Gamificadas", "Calculadora de Lucro", "Gerador de Anúncios com IA", "Anúncios Virais (inteligência de concorrência)", "Score de Oportunidade", "Dashboard Completo"];
+const planFeatures = ["Radar de Produtos com IA", "Spy de Concorrentes com IA", "Calculadora de Lucro", "Gerador de Anúncios com IA", "Anúncios Virais (inteligência de concorrência)", "Score de Oportunidade", "Dashboard Completo"];
 
 export default function LandingPage() {
   return (

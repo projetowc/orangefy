@@ -1,9 +1,10 @@
 "use client";
 
+import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import {
   ShoppingBag, TrendingUp, Star, Trophy, ArrowRight,
-  CheckCircle2, Clock, Package, Flame, ChevronRight, Zap
+  Package, Flame, ChevronRight, Sparkles
 } from "lucide-react";
 import Link from "next/link";
 import {
@@ -22,22 +23,70 @@ const salesData = [
   { day: "Dom", lucro: 0 },
 ];
 
-const missions = [
-  { id: 1, title: "Criar conta na Shopee", xp: 100, completed: false, active: true },
-  { id: 2, title: "Escolher produto campeão", xp: 150, completed: false, active: false },
-  { id: 3, title: "Publicar primeiro anúncio", xp: 200, completed: false, active: false },
-  { id: 4, title: "Fazer primeira venda", xp: 500, completed: false, active: false },
-  { id: 5, title: "Atingir 5 vendas", xp: 750, completed: false, active: false },
-];
-
-const recommendedProducts = [
-  { id: 1, name: "Organizador de gaveta modular", score: 87, tags: ["Viral", "Alta margem"] },
-  { id: 2, name: "Suporte veicular magnético", score: 81, tags: ["🟢 Fácil", "Fácil envio"] },
-  { id: 3, name: "Kit pincéis maquiagem 12 peças", score: 75, tags: ["Tendência"] },
-];
+interface FeaturedProduct {
+  id: number;
+  name: string;
+  score: number;
+  margin: number;
+  category: string;
+  avgPrice: string;
+  image?: string;
+}
 
 const stagger = { hidden: {}, show: { transition: { staggerChildren: 0.08 } } };
 const fadeUp = { hidden: { opacity: 0, y: 16 }, show: { opacity: 1, y: 0, transition: { duration: 0.4 } } };
+
+function FeaturedProductCard({ product, index }: { product: FeaturedProduct; index: number }) {
+  const [imgError, setImgError] = useState(false);
+  const showImage = !!product.image && !imgError;
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 12 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ delay: index * 0.06 }}
+      className="rounded-2xl border border-surface-200 overflow-hidden hover:shadow-card-hover transition-all duration-200 hover:border-brand/30 bg-white"
+    >
+      <div className="h-32 bg-surface-50 relative">
+        {showImage ? (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img
+            src={product.image}
+            alt={product.name}
+            className="w-full h-full object-cover"
+            onError={() => setImgError(true)}
+          />
+        ) : (
+          <div className="w-full h-full flex items-center justify-center">
+            <Package className="w-8 h-8 text-surface-300" />
+          </div>
+        )}
+        <span className="absolute top-2 right-2 bg-white/90 backdrop-blur-sm text-brand text-xs font-black px-2 py-1 rounded-lg shadow-sm">
+          {product.score}
+        </span>
+      </div>
+      <div className="p-3">
+        <h3 className="font-semibold text-dark text-sm leading-snug line-clamp-2 mb-1">{product.name}</h3>
+        <div className="flex items-center justify-between text-xs text-dark-muted">
+          <span>{product.category}</span>
+          <span className="text-success font-semibold">{product.margin}% margem</span>
+        </div>
+      </div>
+    </motion.div>
+  );
+}
+
+function FeaturedProductSkeleton() {
+  return (
+    <div className="rounded-2xl border border-surface-200 overflow-hidden animate-pulse">
+      <div className="h-32 bg-surface-100" />
+      <div className="p-3 space-y-2">
+        <div className="h-4 bg-surface-100 rounded w-4/5" />
+        <div className="h-3 bg-surface-100 rounded w-2/3" />
+      </div>
+    </div>
+  );
+}
 
 export default function DashboardPage() {
   const { profile, user } = useUser();
@@ -54,11 +103,47 @@ export default function DashboardPage() {
   const hour = new Date().getHours();
   const greeting = hour < 12 ? "Bom dia" : hour < 18 ? "Boa tarde" : "Boa noite";
 
+  const [products, setProducts] = useState<FeaturedProduct[]>([]);
+  const [loadingProducts, setLoadingProducts] = useState(true);
+
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      try {
+        const cached = sessionStorage.getItem("radar_products_v3");
+        if (cached) {
+          const { products: cachedProducts } = JSON.parse(cached);
+          if (Array.isArray(cachedProducts) && cachedProducts.length > 0 && !cancelled) {
+            setProducts(cachedProducts.slice(0, 4));
+            setLoadingProducts(false);
+            return;
+          }
+        }
+      } catch {
+        // ignore cache errors
+      }
+
+      try {
+        const res = await fetch(`/api/radar/products?seed=${Date.now()}`);
+        if (!res.ok) throw new Error("API error");
+        const data = await res.json();
+        if (!cancelled && data.products && Array.isArray(data.products)) {
+          setProducts(data.products.slice(0, 4));
+        }
+      } catch {
+        // silently ignore — section just won't render
+      } finally {
+        if (!cancelled) setLoadingProducts(false);
+      }
+    })();
+    return () => { cancelled = true; };
+  }, []);
+
   return (
     <>
       <Header
         title="Dashboard"
-        subtitle={`${greeting}, ${firstName}! Comece suas missões de hoje.`}
+        subtitle={`${greeting}, ${firstName}! Aqui está o resumo da sua operação.`}
       />
 
       <div className="p-4 lg:p-6 space-y-4 lg:space-y-6">
@@ -135,7 +220,7 @@ export default function DashboardPage() {
               <div className="flex flex-col items-center justify-center h-40 text-center">
                 <ShoppingBag className="w-10 h-10 text-surface-200 mb-3" />
                 <p className="text-dark-muted text-sm font-medium">Nenhuma venda ainda</p>
-                <p className="text-xs text-dark-muted mt-1">Complete as missões para começar a vender</p>
+                <p className="text-xs text-dark-muted mt-1">Use o Radar de Produtos para encontrar seu primeiro campeão de vendas</p>
               </div>
             ) : (
               <ResponsiveContainer width="100%" height={180}>
@@ -190,9 +275,9 @@ export default function DashboardPage() {
             </div>
             {score === 0 ? (
               <div className="text-center">
-                <p className="text-xs text-dark-muted mb-3">Complete as missões iniciais para ver seu score aqui.</p>
-                <Link href="/dashboard/missoes" className="text-brand text-xs font-semibold hover:underline">
-                  Ver missões →
+                <p className="text-xs text-dark-muted mb-3">Cadastre sua loja em Minha Loja para ver seu score aqui.</p>
+                <Link href="/dashboard/minha-loja" className="text-brand text-xs font-semibold hover:underline">
+                  Ir para Minha Loja →
                 </Link>
               </div>
             ) : (
@@ -218,83 +303,28 @@ export default function DashboardPage() {
           </motion.div>
         </div>
 
-        <div className="grid lg:grid-cols-2 gap-6">
-          {/* MISSIONS */}
-          <motion.div className="card" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.4 }}>
-            <div className="flex items-center justify-between mb-5">
-              <div>
-                <h2 className="font-bold text-dark">Jornada de Missões</h2>
-                <p className="text-xs text-dark-muted mt-0.5">Siga o roteiro para evoluir</p>
-              </div>
-              <Link href="/dashboard/missoes" className="text-brand text-sm font-semibold flex items-center gap-1 hover:gap-2 transition-all">
-                Ver todas <ChevronRight className="w-4 h-4" />
-              </Link>
+        {/* FEATURED PRODUCTS */}
+        <motion.div className="card" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.4 }}>
+          <div className="flex items-center justify-between mb-5">
+            <div>
+              <h2 className="font-bold text-dark flex items-center gap-2">
+                <Sparkles className="w-4 h-4 text-brand" />
+                Produtos em Destaque
+              </h2>
+              <p className="text-xs text-dark-muted mt-0.5">Selecionados pelo Radar Orangefy com IA, com imagens reais</p>
             </div>
-            <div className="space-y-3">
-              {missions.map((m) => (
-                <div
-                  key={m.id}
-                  className={`flex items-center gap-3 p-3 rounded-xl border transition-all ${
-                    m.completed ? "bg-green-50 border-green-200 opacity-70" :
-                    m.active ? "bg-orange-50 border-brand/30" :
-                    "bg-surface-50 border-surface-200"
-                  }`}
-                >
-                  <div className={`w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 ${
-                    m.completed ? "bg-success" : m.active ? "bg-gradient-brand" : "bg-surface-200"
-                  }`}>
-                    {m.completed ? <CheckCircle2 className="w-4 h-4 text-white" /> :
-                     m.active ? <Zap className="w-4 h-4 text-white" /> :
-                     <Clock className="w-4 h-4 text-dark-muted" />}
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <div className={`text-sm font-semibold ${m.completed ? "text-success line-through" : "text-dark"}`}>
-                      {m.title}
-                    </div>
-                    <div className="text-xs text-dark-muted">+{m.xp} XP</div>
-                  </div>
-                  {m.active && <span className="badge-brand text-xs">Atual</span>}
-                </div>
-              ))}
-            </div>
-          </motion.div>
+            <Link href="/dashboard/radar" className="text-brand text-sm font-semibold flex items-center gap-1 hover:gap-2 transition-all whitespace-nowrap">
+              Ver radar <ChevronRight className="w-4 h-4" />
+            </Link>
+          </div>
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+            {loadingProducts
+              ? [...Array(4)].map((_, i) => <FeaturedProductSkeleton key={i} />)
+              : products.map((p, i) => <FeaturedProductCard key={p.id} product={p} index={i} />)}
+          </div>
+        </motion.div>
 
-          {/* RECOMMENDED PRODUCTS */}
-          <motion.div className="card" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.5 }}>
-            <div className="flex items-center justify-between mb-5">
-              <div>
-                <h2 className="font-bold text-dark">Produtos Recomendados</h2>
-                <p className="text-xs text-dark-muted mt-0.5">Validados pelo Radar Orangefy</p>
-              </div>
-              <Link href="/dashboard/radar" className="text-brand text-sm font-semibold flex items-center gap-1 hover:gap-2 transition-all">
-                Ver radar <ChevronRight className="w-4 h-4" />
-              </Link>
-            </div>
-            <div className="space-y-4">
-              {recommendedProducts.map((p) => (
-                <div key={p.id} className="flex items-center gap-4 p-3 rounded-xl hover:bg-surface-50 transition-colors border border-surface-200">
-                  <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-orange-100 to-orange-200 flex items-center justify-center flex-shrink-0">
-                    <Package className="w-6 h-6 text-brand" />
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <div className="font-semibold text-dark text-sm truncate">{p.name}</div>
-                    <div className="flex flex-wrap gap-1 mt-1">
-                      {p.tags.map((tag) => (
-                        <span key={tag} className="text-xs text-dark-muted">{tag}</span>
-                      ))}
-                    </div>
-                  </div>
-                  <div className="text-right flex-shrink-0">
-                    <div className="text-lg font-black text-brand">{p.score}</div>
-                    <div className="text-xs text-dark-muted">score</div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </motion.div>
-        </div>
-
-        {/* STREAK / WELCOME BANNER */}
+        {/* WELCOME / CTA BANNER */}
         <motion.div
           className="bg-gradient-brand rounded-2xl p-5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 text-white relative overflow-hidden"
           initial={{ opacity: 0, y: 20 }}
@@ -312,14 +342,14 @@ export default function DashboardPage() {
             <p className="text-white/70 text-sm">
               {streak > 0
                 ? "Continue assim. Você está construindo um hábito vencedor!"
-                : "Sua jornada começa agora. Complete a primeira missão hoje!"}
+                : "Explore o Radar de Produtos e descubra seu próximo campeão de vendas agora."}
             </p>
           </div>
           <Link
-            href="/dashboard/missoes"
+            href="/dashboard/radar"
             className="relative z-10 bg-white text-brand font-bold text-sm px-5 py-2.5 rounded-xl hover:bg-surface-50 transition-colors flex items-center justify-center gap-2 w-full sm:w-auto flex-shrink-0"
           >
-            {streak > 0 ? "Ver missões" : "Começar agora"}
+            Explorar Radar
             <ArrowRight className="w-4 h-4" />
           </Link>
         </motion.div>
