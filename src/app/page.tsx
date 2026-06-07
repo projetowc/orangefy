@@ -83,6 +83,33 @@ const fadeUp = {
 };
 const stagger = { hidden: {}, show: { transition: { staggerChildren: 0.08 } } };
 
+function scoreColor(score: number) {
+  if (score >= 80) return "#10B981";
+  if (score >= 60) return "#FF7337";
+  return "#EE4D2D";
+}
+
+function ScoreBadge({ score }: { score: number }) {
+  const radius = 16;
+  const circumference = 2 * Math.PI * radius;
+  const dash = (Math.min(score, 100) / 100) * circumference;
+  return (
+    <div className="relative w-9 h-9 flex-shrink-0">
+      <svg viewBox="0 0 40 40" className="w-full h-full -rotate-90">
+        <circle cx="20" cy="20" r={radius} fill="none" stroke="#F0F0F0" strokeWidth="3" />
+        <circle
+          cx="20" cy="20" r={radius} fill="none"
+          stroke={scoreColor(score)} strokeWidth="3" strokeLinecap="round"
+          strokeDasharray={`${dash} ${circumference}`}
+        />
+      </svg>
+      <span className="absolute inset-0 flex items-center justify-center text-[10px] font-black text-dark">
+        {score}
+      </span>
+    </div>
+  );
+}
+
 const benefits = [
   { icon: Target, title: "Radar de Produtos com IA", description: "Descubra produtos virais com alta margem antes da concorrência. A IA analisa o mercado por você.", color: "bg-orange-50 text-brand" },
   { icon: Eye, title: "Spy de Concorrentes com IA", description: "Espione lojas e produtos da concorrência e descubra exatamente o que está vendendo no seu nicho.", color: "bg-amber-50 text-amber-600" },
@@ -274,9 +301,9 @@ export default function LandingPage() {
                     <Image src={p.img} alt={p.name} width={160} height={144} className="w-full h-full object-contain p-2" />
                   </div>
                   <p className="text-xs font-semibold text-dark leading-snug line-clamp-2 mb-2">{p.name}</p>
-                  <div className="flex items-center justify-between">
-                    <span className="text-xs text-dark-muted bg-surface-100 px-2 py-0.5 rounded-full">{p.tag}</span>
-                    <span className="text-xs font-black text-brand">{p.score}</span>
+                  <div className="flex items-center justify-between gap-2">
+                    <span className="text-xs text-dark-muted bg-surface-100 px-2 py-0.5 rounded-full truncate">{p.tag}</span>
+                    <ScoreBadge score={p.score} />
                   </div>
                 </div>
               ))}
