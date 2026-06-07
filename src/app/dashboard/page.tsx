@@ -3,13 +3,10 @@
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import {
-  ShoppingBag, TrendingUp, Star, Trophy, ArrowRight,
+  TrendingUp, ArrowRight,
   Package, Flame, ChevronRight, Sparkles, Store
 } from "lucide-react";
 import Link from "next/link";
-import {
-  BarChart, Bar, Cell, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer
-} from "recharts";
 import Header from "@/components/dashboard/Header";
 import { useUser, getFirstName } from "@/context/UserContext";
 
@@ -37,16 +34,12 @@ function scoreColor(score: number) {
   return "#EE4D2D";
 }
 
-function truncateName(name: string, max = 22) {
-  return name.length > max ? `${name.slice(0, max - 1)}…` : name;
-}
-
-const stagger = { hidden: {}, show: { transition: { staggerChildren: 0.08 } } };
-const fadeUp = { hidden: { opacity: 0, y: 16 }, show: { opacity: 1, y: 0, transition: { duration: 0.4 } } };
-
 function FeaturedProductCard({ product, index }: { product: FeaturedProduct; index: number }) {
   const [imgError, setImgError] = useState(false);
   const showImage = !!product.image && !imgError;
+  const radius = 16;
+  const circumference = 2 * Math.PI * radius;
+  const dash = (Math.min(product.score, 100) / 100) * circumference;
 
   return (
     <motion.div
@@ -69,9 +62,19 @@ function FeaturedProductCard({ product, index }: { product: FeaturedProduct; ind
             <Package className="w-8 h-8 text-surface-300" />
           </div>
         )}
-        <span className="absolute top-2 right-2 bg-white/90 backdrop-blur-sm text-brand text-xs font-black px-2 py-1 rounded-lg shadow-sm">
-          {product.score}
-        </span>
+        <div className="absolute top-2 right-2 w-10 h-10">
+          <svg viewBox="0 0 40 40" className="w-full h-full -rotate-90">
+            <circle cx="20" cy="20" r={radius} fill="rgba(0,0,0,0.35)" stroke="rgba(255,255,255,0.3)" strokeWidth="3" />
+            <circle
+              cx="20" cy="20" r={radius} fill="none"
+              stroke={scoreColor(product.score)} strokeWidth="3" strokeLinecap="round"
+              strokeDasharray={`${dash} ${circumference}`}
+            />
+          </svg>
+          <span className="absolute inset-0 flex items-center justify-center text-[11px] font-black text-white">
+            {product.score}
+          </span>
+        </div>
       </div>
       <div className="p-3">
         <h3 className="font-semibold text-dark text-sm leading-snug line-clamp-2 mb-1">{product.name}</h3>
@@ -101,11 +104,6 @@ export default function DashboardPage() {
 
   const name = profile?.name || user?.email?.split("@")[0] || "Vendedor";
   const firstName = getFirstName(name);
-  const sales = profile?.sales_count ?? 0;
-  const xp = profile?.xp ?? 0;
-  const level = profile?.level ?? 1;
-  const xpToNext = level * 1000;
-  const score = profile?.shopee_score ?? 0;
   const streak = profile?.streak_days ?? 0;
 
   const hour = new Date().getHours();
@@ -123,7 +121,7 @@ export default function DashboardPage() {
         if (cached) {
           const { products: cachedProducts } = JSON.parse(cached);
           if (Array.isArray(cachedProducts) && cachedProducts.length > 0 && !cancelled) {
-            setProducts(cachedProducts.slice(0, 6));
+            setProducts(cachedProducts.slice(0, 8));
             setLoadingProducts(false);
             return;
           }
@@ -137,7 +135,7 @@ export default function DashboardPage() {
         if (!res.ok) throw new Error("API error");
         const data = await res.json();
         if (!cancelled && data.products && Array.isArray(data.products)) {
-          setProducts(data.products.slice(0, 6));
+          setProducts(data.products.slice(0, 8));
         }
       } catch {
         // silently ignore — section just won't render
@@ -162,9 +160,6 @@ export default function DashboardPage() {
     }
   }, []);
 
-  const rankedProducts = [...products].sort((a, b) => b.score - a.score).slice(0, 5);
-  const chartData = rankedProducts.map((p) => ({ ...p, shortName: truncateName(p.name) }));
-
   return (
     <>
       <Header
@@ -173,163 +168,15 @@ export default function DashboardPage() {
       />
 
       <div className="p-4 lg:p-6 space-y-4 lg:space-y-6">
-        {/* STATS */}
-        <motion.div
-          className="grid grid-cols-2 lg:grid-cols-4 gap-4"
-          initial="hidden"
-          animate="show"
-          variants={stagger}
-        >
-          {[
-            {
-              label: "Total de Vendas",
-              value: String(sales),
-              sub: sales === 0 ? "Faça sua primeira venda!" : `${sales} venda${sales > 1 ? "s" : ""} realizadas`,
-              icon: ShoppingBag,
-              color: "text-brand",
-              bg: "bg-orange-50",
-            },
-            {
-              label: "Lucro Estimado",
-              value: sales === 0 ? "R$ 0" : `R$ ${(sales * 48).toFixed(0)}`,
-              sub: "Baseado nas suas vendas",
-              icon: TrendingUp,
-              color: "text-success",
-              bg: "bg-green-50",
-            },
-            {
-              label: "Score Shopee",
-              value: score === 0 ? "—" : String(score),
-              sub: score === 0 ? "Cadastre sua loja" : "de 100 pontos",
-              icon: Star,
-              color: "text-amber-500",
-              bg: "bg-amber-50",
-            },
-            {
-              label: "Nível Atual",
-              value: String(level),
-              sub: `${xp} / ${xpToNext} XP`,
-              icon: Trophy,
-              color: "text-purple-600",
-              bg: "bg-purple-50",
-            },
-          ].map((stat) => (
-            <motion.div key={stat.label} variants={fadeUp} className="card">
-              <div className="flex items-start justify-between mb-3">
-                <div className={`w-10 h-10 rounded-xl ${stat.bg} flex items-center justify-center`}>
-                  <stat.icon className={`w-5 h-5 ${stat.color}`} />
-                </div>
-              </div>
-              <div className="text-2xl font-black text-dark mb-0.5">{stat.value}</div>
-              <div className="text-xs text-dark-muted font-medium">{stat.label}</div>
-              <div className="text-xs text-dark-muted mt-1">{stat.sub}</div>
-            </motion.div>
-          ))}
-        </motion.div>
-
-        <div className="grid lg:grid-cols-3 gap-6">
-          {/* RANKING DE PRODUTOS */}
-          <motion.div
-            className="card lg:col-span-2"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.2 }}
-          >
-            <div className="flex items-center justify-between mb-6">
-              <div>
-                <h2 className="font-bold text-dark">Ranking de Produtos</h2>
-                <p className="text-xs text-dark-muted mt-0.5">Score de oportunidade dos produtos mais quentes do Radar agora</p>
-              </div>
-              <div className="badge-brand">Top 5</div>
-            </div>
-            {loadingProducts ? (
-              <div className="space-y-3 animate-pulse">
-                {[...Array(5)].map((_, i) => (
-                  <div key={i} className="h-8 bg-surface-100 rounded-lg" style={{ width: `${85 - i * 12}%` }} />
-                ))}
-              </div>
-            ) : chartData.length === 0 ? (
-              <div className="flex flex-col items-center justify-center h-40 text-center">
-                <Package className="w-10 h-10 text-surface-200 mb-3" />
-                <p className="text-dark-muted text-sm font-medium">Nenhum produto carregado ainda</p>
-                <p className="text-xs text-dark-muted mt-1">Explore o Radar de Produtos para ver as melhores oportunidades</p>
-              </div>
-            ) : (
-              <ResponsiveContainer width="100%" height={240}>
-                <BarChart data={chartData} layout="vertical" margin={{ top: 0, right: 24, left: 0, bottom: 0 }}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="#F0F0F0" horizontal={false} />
-                  <XAxis type="number" domain={[0, 100]} tick={{ fontSize: 12, fill: "#6B7280" }} axisLine={false} tickLine={false} />
-                  <YAxis type="category" dataKey="shortName" width={140} tick={{ fontSize: 12, fill: "#1F2937" }} axisLine={false} tickLine={false} />
-                  <Tooltip
-                    contentStyle={{ borderRadius: "12px", border: "1px solid #E5E7EB" }}
-                    formatter={(value: number) => [`${value} pontos`, "Score"]}
-                  />
-                  <Bar dataKey="score" radius={[0, 8, 8, 0]} barSize={18}>
-                    {chartData.map((entry) => (
-                      <Cell key={entry.id} fill={scoreColor(entry.score)} />
-                    ))}
-                  </Bar>
-                </BarChart>
-              </ResponsiveContainer>
-            )}
-          </motion.div>
-
-          {/* LOJAS EM ALTA */}
-          <motion.div
-            className="card"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.3 }}
-          >
-            <div className="flex items-center justify-between mb-4">
-              <h2 className="font-bold text-dark flex items-center gap-2">
-                <Store className="w-4 h-4 text-brand" />
-                Lojas em Alta
-              </h2>
-              <Link href="/dashboard/lojas-virais" className="text-brand text-xs font-semibold flex items-center gap-1 hover:gap-1.5 transition-all whitespace-nowrap">
-                Ver todas <ChevronRight className="w-3.5 h-3.5" />
-              </Link>
-            </div>
-            {shops.length === 0 ? (
-              <div className="text-center py-6">
-                <TrendingUp className="w-8 h-8 text-surface-200 mx-auto mb-3" />
-                <p className="text-dark-muted text-sm font-medium mb-1">Descubra lojas que mais vendem</p>
-                <p className="text-xs text-dark-muted mb-3">Veja produtos campeões e gráficos de vendas mensais de lojas em crescimento.</p>
-                <Link href="/dashboard/lojas-virais" className="btn-brand text-xs px-4 py-2 inline-flex items-center gap-1.5">
-                  Explorar lojas <ArrowRight className="w-3.5 h-3.5" />
-                </Link>
-              </div>
-            ) : (
-              <div className="space-y-3">
-                {shops.map((shop) => (
-                  <div key={shop.id} className="flex items-center gap-3 p-2.5 rounded-xl border border-surface-200 hover:border-brand/30 transition-colors">
-                    <div className="w-9 h-9 rounded-full bg-gradient-brand flex items-center justify-center text-white font-bold text-xs flex-shrink-0">
-                      {shop.nome.slice(0, 2).toUpperCase()}
-                    </div>
-                    <div className="min-w-0 flex-1">
-                      <div className="font-semibold text-dark text-sm truncate">{shop.nome}</div>
-                      <div className="text-xs text-dark-muted truncate">{shop.nicho}</div>
-                    </div>
-                    <span className={`flex items-center gap-1 text-xs font-bold flex-shrink-0 ${shop.tendencia === "alta" ? "text-success" : "text-dark-muted"}`}>
-                      <TrendingUp className="w-3.5 h-3.5" />
-                      +{shop.crescimentoPercentual}%
-                    </span>
-                  </div>
-                ))}
-              </div>
-            )}
-          </motion.div>
-        </div>
-
-        {/* FEATURED PRODUCTS */}
-        <motion.div className="card" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.4 }}>
+        {/* PRODUTOS EM DESTAQUE */}
+        <motion.div className="card" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}>
           <div className="flex items-center justify-between mb-5">
             <div>
               <h2 className="font-bold text-dark flex items-center gap-2">
                 <Sparkles className="w-4 h-4 text-brand" />
                 Produtos em Destaque
               </h2>
-              <p className="text-xs text-dark-muted mt-0.5">Selecionados pelo Radar Orangefy com IA, com imagens reais</p>
+              <p className="text-xs text-dark-muted mt-0.5">Selecionados pelo Radar Orangefy com IA — score de oportunidade e imagens reais</p>
             </div>
             <Link href="/dashboard/radar" className="text-brand text-sm font-semibold flex items-center gap-1 hover:gap-2 transition-all whitespace-nowrap">
               Ver radar <ChevronRight className="w-4 h-4" />
@@ -337,9 +184,61 @@ export default function DashboardPage() {
           </div>
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
             {loadingProducts
-              ? [...Array(4)].map((_, i) => <FeaturedProductSkeleton key={i} />)
+              ? [...Array(8)].map((_, i) => <FeaturedProductSkeleton key={i} />)
               : products.map((p, i) => <FeaturedProductCard key={p.id} product={p} index={i} />)}
           </div>
+        </motion.div>
+
+        {/* LOJAS EM ALTA */}
+        <motion.div className="card" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}>
+          <div className="flex items-center justify-between mb-5">
+            <div>
+              <h2 className="font-bold text-dark flex items-center gap-2">
+                <Store className="w-4 h-4 text-brand" />
+                Lojas em Alta
+              </h2>
+              <p className="text-xs text-dark-muted mt-0.5">Lojas que mais vendem agora, com seus produtos campeões</p>
+            </div>
+            <Link href="/dashboard/lojas-virais" className="text-brand text-sm font-semibold flex items-center gap-1 hover:gap-2 transition-all whitespace-nowrap">
+              Ver todas <ChevronRight className="w-4 h-4" />
+            </Link>
+          </div>
+          {shops.length === 0 ? (
+            <div className="flex flex-col items-center justify-center text-center py-8">
+              <TrendingUp className="w-9 h-9 text-surface-200 mb-3" />
+              <p className="text-dark-muted text-sm font-medium mb-1">Descubra as lojas que mais vendem na internet</p>
+              <p className="text-xs text-dark-muted mb-4 max-w-sm">Veja produtos campeões, faturamento estimado e gráficos de vendas mensais de lojas em crescimento acelerado.</p>
+              <Link href="/dashboard/lojas-virais" className="btn-brand text-sm px-4 py-2 inline-flex items-center gap-1.5">
+                Explorar lojas em alta <ArrowRight className="w-4 h-4" />
+              </Link>
+            </div>
+          ) : (
+            <div className="grid sm:grid-cols-3 gap-4">
+              {shops.map((shop, i) => (
+                <Link
+                  key={shop.id}
+                  href="/dashboard/lojas-virais"
+                  className="block p-4 rounded-2xl border border-surface-200 hover:border-brand/30 hover:shadow-card-hover transition-all duration-200"
+                >
+                  <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.06 }}>
+                    <div className="flex items-center gap-3 mb-3">
+                      <div className="w-10 h-10 rounded-full bg-gradient-brand flex items-center justify-center text-white font-bold text-sm flex-shrink-0">
+                        {shop.nome.slice(0, 2).toUpperCase()}
+                      </div>
+                      <div className="min-w-0 flex-1">
+                        <div className="font-semibold text-dark text-sm truncate">{shop.nome}</div>
+                        <div className="text-xs text-dark-muted truncate">{shop.nicho}</div>
+                      </div>
+                    </div>
+                    <span className={`inline-flex items-center gap-1 text-xs font-bold px-2 py-1 rounded-full ${shop.tendencia === "alta" ? "text-success bg-green-50" : "text-dark-muted bg-surface-100"}`}>
+                      <TrendingUp className="w-3.5 h-3.5" />
+                      +{shop.crescimentoPercentual}% no período
+                    </span>
+                  </motion.div>
+                </Link>
+              ))}
+            </div>
+          )}
         </motion.div>
 
         {/* WELCOME / CTA BANNER */}
