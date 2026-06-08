@@ -251,24 +251,6 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* BRAND LOGOS MARQUEE */}
-      <section className="py-7 bg-surface-50 border-y border-surface-200 overflow-hidden">
-        <p className="text-center text-xs font-semibold text-dark-muted uppercase tracking-wide mb-5">
-          Monitoramos os maiores marketplaces para você
-        </p>
-        <div className="relative">
-          <div className="pointer-events-none absolute inset-y-0 left-0 w-16 sm:w-28 bg-gradient-to-r from-surface-50 to-transparent z-10" />
-          <div className="pointer-events-none absolute inset-y-0 right-0 w-16 sm:w-28 bg-gradient-to-l from-surface-50 to-transparent z-10" />
-          <div className="flex gap-12 sm:gap-16 animate-marquee items-center" style={{ width: "max-content" }}>
-            {[...brandLogos, ...brandLogos].map((brand, i) => (
-              <div key={`${brand.file}-${i}`} className="relative h-7 sm:h-9 w-24 sm:w-32 flex-shrink-0 grayscale opacity-50 hover:grayscale-0 hover:opacity-100 transition-all duration-300">
-                <Image src={`/marcas/${brand.file}`} alt={brand.name} fill className="object-contain" sizes="160px" />
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
       {/* URGENCY BANNER */}
       <div className="bg-dark text-white py-3 px-4">
         <div className="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-center gap-2 sm:gap-6 text-sm text-center">
@@ -657,6 +639,24 @@ export default function LandingPage() {
           <p className="text-xs text-dark-muted">
             Resultados variam conforme dedicação, nicho e capital investido. Passe o mouse para pausar.
           </p>
+        </div>
+      </section>
+
+      {/* BRAND LOGOS MARQUEE */}
+      <section className="py-9 bg-white border-y border-surface-200 overflow-hidden">
+        <p className="text-center text-xs font-semibold text-dark-muted uppercase tracking-wide mb-6">
+          Funciona com os maiores marketplaces e plataformas do mercado
+        </p>
+        <div className="relative">
+          <div className="pointer-events-none absolute inset-y-0 left-0 w-16 sm:w-28 bg-gradient-to-r from-white to-transparent z-10" />
+          <div className="pointer-events-none absolute inset-y-0 right-0 w-16 sm:w-28 bg-gradient-to-l from-white to-transparent z-10" />
+          <div className="flex gap-12 sm:gap-16 animate-marquee items-center" style={{ width: "max-content" }}>
+            {[...brandLogos, ...brandLogos].map((brand, i) => (
+              <div key={`${brand.file}-${i}`} className="relative h-9 sm:h-11 w-28 sm:w-36 flex-shrink-0">
+                <Image src={`/marcas/${brand.file}`} alt={brand.name} fill className="object-contain" sizes="180px" />
+              </div>
+            ))}
+          </div>
         </div>
       </section>
 
