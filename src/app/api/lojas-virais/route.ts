@@ -30,7 +30,7 @@ async function fetchProductImage(keyword: string): Promise<string> {
     };
     params.sign = signAliExpressParams(params, appSecret);
     const url = "https://api-sg.aliexpress.com/sync?" + new URLSearchParams(params).toString();
-    const res = await fetch(url, { signal: AbortSignal.timeout(6000) });
+    const res = await fetch(url, { signal: AbortSignal.timeout(3000) });
     const data = await res.json();
     const resp = data?.aliexpress_affiliate_product_query_response?.resp_result;
     if (resp?.resp_code !== 200) {
@@ -78,7 +78,7 @@ export async function POST(request: NextRequest) {
 
     const message = await client.messages.create({
       model: "claude-haiku-4-5-20251001",
-      max_tokens: 6000,
+      max_tokens: 4000,
       system: [{ type: "text", text: SYSTEM_PROMPT, cache_control: { type: "ephemeral" } }],
       messages: [{
         role: "user",
@@ -141,11 +141,12 @@ REGRAS:
       parsed = JSON.parse(match[0]);
     }
 
-    const shopsWithImages = await Promise.all(
-      (parsed.shops as Array<{ produtos: Array<{ produtoTermo?: string; nome: string } & Record<string, unknown>> } & Record<string, unknown>>).map(async (shop) => {
+    const shops = parsed.shops as Array<{ produtos: Array<Record<string, unknown>> } & Record<string, unknown>>;
+    const imagePromise = Promise.all(
+      shops.map(async (shop) => {
         const produtosComImagem = await Promise.all(
           shop.produtos.map(async (produto) => {
-            const keyword = produto.produtoTermo || produto.nome;
+            const keyword = ((produto.produtoTermo || produto.nome) as string);
             const image = await fetchProductImage(keyword);
             return { ...produto, image };
           })
@@ -153,6 +154,10 @@ REGRAS:
         return { ...shop, produtos: produtosComImagem };
       })
     );
+    const shopsWithImages = await Promise.race([
+      imagePromise,
+      new Promise<typeof shops>((resolve) => setTimeout(() => resolve(shops), 4500)),
+    ]);
 
     return NextResponse.json({ shops: shopsWithImages });
   } catch (error) {

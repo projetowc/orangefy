@@ -30,7 +30,7 @@ async function fetchProductImage(keyword: string): Promise<string> {
     };
     params.sign = signAliExpressParams(params, appSecret);
     const url = "https://api-sg.aliexpress.com/sync?" + new URLSearchParams(params).toString();
-    const res = await fetch(url, { signal: AbortSignal.timeout(4000) });
+    const res = await fetch(url, { signal: AbortSignal.timeout(3000) });
     const data = await res.json();
     const resp = data?.aliexpress_affiliate_product_query_response?.resp_result;
     if (resp?.resp_code !== 200) return "";
@@ -112,13 +112,18 @@ REGRAS:
       parsed = JSON.parse(match[0]);
     }
 
-    const adsWithImages = await Promise.all(
-      (parsed.ads as Array<{ produtoTermo?: string; titulo: string } & Record<string, unknown>>).map(async (ad) => {
-        const keyword = ad.produtoTermo || ad.titulo;
-        const image = await fetchProductImage(keyword);
-        return { ...ad, image };
-      })
-    );
+    const ads = parsed.ads as Array<Record<string, unknown>>;
+    const imagePromise = Promise.all(ads.map(async (ad) => {
+      const keyword = ((ad.produtoTermo || ad.titulo) as string);
+      const image = await fetchProductImage(keyword);
+      return { ...ad, image };
+    }));
+    const adsWithImages = await Promise.race([
+      imagePromise,
+      new Promise<Array<Record<string, unknown>>>((resolve) =>
+        setTimeout(() => resolve(ads.map((ad) => ({ ...ad, image: "" }))), 4500)
+      ),
+    ]);
 
     return NextResponse.json({ ads: adsWithImages });
   } catch (error) {

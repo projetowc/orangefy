@@ -47,7 +47,7 @@ async function fetchProductImage(keyword: string): Promise<string> {
     };
     params.sign = signAliExpressParams(params, appSecret);
     const url = "https://api-sg.aliexpress.com/sync?" + new URLSearchParams(params).toString();
-    const res = await fetch(url, { signal: AbortSignal.timeout(6000) });
+    const res = await fetch(url, { signal: AbortSignal.timeout(3000) });
     const data = await res.json();
     const resp = data?.aliexpress_affiliate_product_query_response?.resp_result;
     if (resp?.resp_code !== 200) {
@@ -149,14 +149,19 @@ Retorne SOMENTE o JSON.`,
       parsed = JSON.parse(match[0]);
     }
 
-    const productsWithImages = await Promise.all(
-      (parsed.products as Array<{ imageKeyword?: string; aliexpressUrl?: string; name: string } & Record<string, unknown>>).map(async (p) => {
-        const urlMatch = p.aliexpressUrl?.match(/SearchText=([^&]+)/);
-        const keyword = p.imageKeyword || (urlMatch ? decodeURIComponent(urlMatch[1].replace(/\+/g, " ")) : p.name);
-        const image = await fetchProductImage(keyword);
-        return { ...p, image };
-      })
-    );
+    const products = parsed.products as Array<Record<string, unknown>>;
+    const imagePromise = Promise.all(products.map(async (p) => {
+      const urlMatch = (p.aliexpressUrl as string | undefined)?.match(/SearchText=([^&]+)/);
+      const keyword = (p.imageKeyword as string) || (urlMatch ? decodeURIComponent(urlMatch[1].replace(/\+/g, " ")) : p.name as string);
+      const image = await fetchProductImage(keyword);
+      return { ...p, image };
+    }));
+    const productsWithImages = await Promise.race([
+      imagePromise,
+      new Promise<Array<Record<string, unknown>>>((resolve) =>
+        setTimeout(() => resolve(products.map((p) => ({ ...p, image: "" }))), 4500)
+      ),
+    ]);
 
     return NextResponse.json({ products: productsWithImages, source: "ai" });
   } catch (error) {
