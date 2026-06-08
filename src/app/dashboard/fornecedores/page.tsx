@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Search, Truck, ExternalLink, Package, Globe, ShoppingBag, Sparkles, AlertCircle, CheckCircle2, X, ChevronRight } from "lucide-react";
 import Header from "@/components/dashboard/Header";
@@ -163,9 +163,6 @@ export default function FornecedoresPage() {
       setLoading(false);
     }
   }
-
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  useEffect(() => { search("eletrônicos e casa"); }, []);
 
   function handleKey(e: React.KeyboardEvent) {
     if (e.key === "Enter") search(query);

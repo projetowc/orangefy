@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Search, TrendingUp, Users, Star, Globe, Package,
@@ -403,8 +403,6 @@ export default function LojasViraisPage() {
       setLoading(false);
     }
   }, []);
-
-  useEffect(() => { fetchShops("", market); }, [fetchShops, market]);
 
   const handleMarketChange = (id: typeof MARKETS[number]["id"]) => {
     if (id === market) return;

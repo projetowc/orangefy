@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Search, Sparkles, RefreshCw, Play, Image as ImageIcon, LayoutGrid,
@@ -355,8 +355,6 @@ export default function AdsConcorrentesPage() {
       setLoading(false);
     }
   };
-
-  useEffect(() => { fetchAds("moda e beleza"); }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   const filtered = ads
     .filter((a) => platformFilter === "todos" || a.plataforma === platformFilter || a.plataforma === "ambos")

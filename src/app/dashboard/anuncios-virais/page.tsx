@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Search, Flame, TrendingUp, Minus, Play, Image as ImageIcon,
@@ -366,9 +366,6 @@ export default function AnunciosViraisPage() {
   }
 
   function search() { fetchAds(inputValue); }
-
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  useEffect(() => { fetchAds("produtos em alta"); }, []);
 
   const filteredAds = ads.filter((ad) => {
     if (platform !== "todos" && ad.platform !== platform) return false;
