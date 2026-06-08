@@ -228,10 +228,10 @@ export default function LandingPage() {
             >
               <div className="relative rounded-2xl overflow-hidden shadow-[0_24px_64px_-16px_rgba(238,77,45,0.25)]">
                 <Image
-                  src="/dashboard-preview.png"
-                  alt="Vendedor feliz usando a Orangefy no computador"
-                  width={640}
-                  height={480}
+                  src="/hero-banner.png"
+                  alt="Vendedores felizes usando a Orangefy Shop no computador"
+                  width={1536}
+                  height={1024}
                   className="w-full h-auto object-cover"
                   priority
                 />
