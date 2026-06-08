@@ -62,46 +62,59 @@ const SYSTEM_PROMPT = `Você é um analista de e-commerce e inteligência compet
 
 export async function POST(request: NextRequest) {
   try {
-    const { query } = await request.json();
+    const { query, mercado } = await request.json();
     const q = typeof query === "string" ? query.trim() : "";
+    const mercadoFiltro = typeof mercado === "string" ? mercado.trim().toLowerCase() : "todos";
 
     const nicheInstruction = q.length >= 2
       ? `Foque em lojas do nicho/segmento: "${q}".`
       : `Traga uma variedade de nichos populares e lucrativos (moda, casa, beleza, pets, eletrônicos, fitness, bebês).`;
 
+    const marketInstruction = mercadoFiltro === "brasil"
+      ? `Gere as 6 lojas do MERCADO BRASILEIRO (mercado: "brasil"), com faturamento em reais (R$) e canais como Shopee, Mercado Livre, Instagram e TikTok Shop Brasil.`
+      : mercadoFiltro === "eua"
+        ? `Gere as 6 lojas do MERCADO AMERICANO/EUA (mercado: "eua"), com faturamento em dólares (US$) e canais como Shopify, Amazon, TikTok Shop US, Etsy e Instagram Shopping.`
+        : `Gere 6 lojas no TOTAL, sendo EXATAMENTE 3 do mercado brasileiro (mercado: "brasil", faturamento em R$, canais como Shopee, Mercado Livre, Instagram, TikTok Shop Brasil) e EXATAMENTE 3 do mercado americano/EUA (mercado: "eua", faturamento em US$, canais como Shopify, Amazon, TikTok Shop US, Etsy). Intercale a ordem entre os dois mercados.`;
+
     const message = await client.messages.create({
       model: "claude-haiku-4-5-20251001",
-      max_tokens: 4000,
+      max_tokens: 6000,
       system: [{ type: "text", text: SYSTEM_PROMPT, cache_control: { type: "ephemeral" } }],
       messages: [{
         role: "user",
-        content: `Gere um relatório de 4 lojas de e-commerce fictícias, porém extremamente realistas, que estariam "bombando" agora — vendendo muito e em crescimento acelerado.
+        content: `Gere um relatório de lojas de e-commerce fictícias, porém extremamente realistas, que estariam "bombando" agora — vendendo muito e em crescimento acelerado.
 
 ${nicheInstruction}
+${marketInstruction}
 
-Para cada loja, invente um nome de marca plausível (não use marcas reais existentes) e construa um perfil completo com produtos campeões e histórico de vendas.
+Para cada loja, invente um nome de marca plausível (não use marcas reais existentes) e construa um perfil completo e detalhado com produtos campeões, histórico de vendas, canais de aquisição, público-alvo e diferencial competitivo.
 
 Retorne EXATAMENTE este JSON:
 {
   "shops": [
     {
-      "id": número de 1 a 4,
-      "nome": "nome de marca fictício e plausível",
+      "id": número sequencial,
+      "nome": "nome de marca fictício e plausível (condizente com o mercado: nomes brasileiros para lojas do Brasil, nomes em inglês para lojas dos EUA)",
       "nicho": "nicho específico em português",
       "categoria": "categoria geral (Moda, Casa & Decoração, Beleza, Pets, Eletrônicos, Fitness, Bebês, etc.)",
-      "pais": "país de origem (Brasil, Estados Unidos, China, Portugal, etc.)",
+      "mercado": "brasil" | "eua",
+      "pais": "Brasil" | "Estados Unidos",
+      "moeda": "BRL" | "USD",
       "visitasMensais": "estimativa de visitas mensais, ex: '1.2M' ou '480k'",
-      "faturamentoEstimado": "faixa de faturamento mensal estimado em reais, ex: 'R$ 450k – R$ 800k/mês'",
+      "faturamentoEstimado": "faixa de faturamento mensal estimado NA MOEDA DO MERCADO (R$ para brasil, US$ para eua), ex: 'R$ 450k – R$ 800k/mês' ou 'US$ 90k – US$ 160k/mês'",
       "seguidoresSociais": "estimativa de seguidores nas redes sociais, ex: '62.4k'",
       "avaliacaoMedia": número decimal entre 4.0 e 5.0,
       "crescimentoPercentual": número entre 8 e 90 representando crescimento no período,
       "tendencia": "alta" | "estavel",
       "grafico": [6 números entre 20 e 100 representando o volume relativo de vendas nos últimos 6 meses, em ordem crescente ou com pico recente — deve mostrar uma tendência de crescimento condizente com 'crescimentoPercentual'],
+      "principaisCanais": "2-3 canais de venda/aquisição reais e condizentes com o mercado da loja, separados por vírgula, ex: 'TikTok Shop, Instagram, Shopee' ou 'Shopify, Meta Ads, Amazon'",
+      "publicoAlvo": "descrição objetiva do público-alvo principal (idade, perfil, comportamento de compra) em 1 frase",
+      "diferencial": "o que torna essa loja diferente da concorrência e por que os clientes escolhem ela, em 1 frase",
       "produtos": [
         {
           "nome": "nome específico do produto mais vendido",
           "produtoTermo": "termo PRECISO e literal em inglês (3 a 5 palavras) descrevendo a aparência física e função do produto, para localizar uma FOTO REAL correspondente em catálogos como AliExpress — sem termos vagos ou criativos",
-          "precoFaixa": "faixa de preço em reais, ex: 'R$ 49 – R$ 89'",
+          "precoFaixa": "faixa de preço NA MOEDA DO MERCADO (R$ para brasil, US$ para eua), ex: 'R$ 49 – R$ 89' ou 'US$ 19 – US$ 35'",
           "vendasEstimadas": "estimativa de vendas mensais, ex: '8.400 vendas/mês'"
         }
       ],
@@ -112,7 +125,7 @@ Retorne EXATAMENTE este JSON:
 
 REGRAS:
 - Cada loja deve ter EXATAMENTE 3 produtos no array "produtos"
-- Os produtos devem ser coerentes com o nicho da loja
+- Os produtos e preços devem ser coerentes com o nicho, mercado e moeda da loja
 - Seja específico e evite generalidades — números, nomes e análises devem parecer reais
 - Retorne SOMENTE o JSON`
       }]
