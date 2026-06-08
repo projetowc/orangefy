@@ -235,16 +235,6 @@ export default function LandingPage() {
                   className="w-full h-auto object-cover"
                   priority
                 />
-                {/* Floating badge */}
-                <div className="absolute bottom-4 left-4 right-4 sm:left-auto sm:right-4 sm:w-56 bg-white rounded-xl shadow-xl p-3 flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-xl bg-gradient-brand flex items-center justify-center flex-shrink-0">
-                    <TrendingUp className="w-5 h-5 text-white" />
-                  </div>
-                  <div>
-                    <div className="text-xs text-dark-muted">Lucro esta semana</div>
-                    <div className="text-lg font-black text-success">+ R$ 340,00</div>
-                  </div>
-                </div>
               </div>
             </motion.div>
           </div>
