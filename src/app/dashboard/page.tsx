@@ -3,8 +3,8 @@
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import {
-  TrendingUp, ArrowRight, Target, Star, Percent, Tags,
-  Package, Flame, ChevronRight, Sparkles, Store
+  TrendingUp, ArrowRight, ArrowUpRight, Target, Star, Percent, Tags,
+  Package, Flame, ChevronRight, Sparkles, Store, Globe
 } from "lucide-react";
 import Link from "next/link";
 import {
@@ -29,6 +29,42 @@ interface ShopPreview {
   nicho: string;
   crescimentoPercentual: number;
   tendencia: "alta" | "estavel";
+}
+
+interface GlobalTrend {
+  categoria: string;
+  regiao: string;
+  crescimento: number;
+  dados: number[];
+}
+
+const globalTrends: GlobalTrend[] = [
+  { categoria: "Eletrônicos & Gadgets", regiao: "Global", crescimento: 34, dados: [40, 45, 52, 58, 65, 74] },
+  { categoria: "Casa & Decoração", regiao: "EUA & Europa", crescimento: 28, dados: [35, 38, 44, 50, 55, 62] },
+  { categoria: "Beleza & Cuidados Pessoais", regiao: "Ásia & Brasil", crescimento: 41, dados: [30, 36, 45, 53, 61, 70] },
+  { categoria: "Pet Tech", regiao: "Global", crescimento: 52, dados: [25, 32, 41, 50, 60, 72] },
+  { categoria: "Fitness & Wellness", regiao: "Global", crescimento: 22, dados: [45, 48, 52, 56, 60, 64] },
+  { categoria: "Moda Sustentável", regiao: "Europa & EUA", crescimento: 37, dados: [33, 38, 45, 52, 58, 66] },
+];
+
+function TrendSparkline({ data }: { data: number[] }) {
+  const chartData = data.map((v, i) => ({ i, v }));
+  const gradId = `trend-grad-${data.join("-")}`;
+  return (
+    <div className="h-12 w-full -mx-1">
+      <ResponsiveContainer width="100%" height="100%">
+        <AreaChart data={chartData} margin={{ top: 4, right: 0, left: 0, bottom: 0 }}>
+          <defs>
+            <linearGradient id={gradId} x1="0" y1="0" x2="0" y2="1">
+              <stop offset="5%" stopColor="#10B981" stopOpacity={0.3} />
+              <stop offset="95%" stopColor="#10B981" stopOpacity={0} />
+            </linearGradient>
+          </defs>
+          <Area type="monotone" dataKey="v" stroke="#10B981" strokeWidth={2} fill={`url(#${gradId})`} />
+        </AreaChart>
+      </ResponsiveContainer>
+    </div>
+  );
 }
 
 function scoreColor(score: number) {
@@ -359,6 +395,47 @@ export default function DashboardPage() {
               ? [...Array(8)].map((_, i) => <FeaturedProductSkeleton key={i} />)
               : products.map((p, i) => <FeaturedProductCard key={p.id} product={p} index={i} />)}
           </div>
+        </motion.div>
+
+        {/* TENDÊNCIAS DE MERCADO GLOBAL */}
+        <motion.div className="card" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.18 }}>
+          <div className="flex items-center justify-between mb-5">
+            <div>
+              <h2 className="font-bold text-dark flex items-center gap-2">
+                <Globe className="w-4 h-4 text-success" />
+                Tendências de Mercado Global
+              </h2>
+              <p className="text-xs text-dark-muted mt-0.5">Categorias de produtos em crescimento acelerado no e-commerce mundial nos últimos 6 meses</p>
+            </div>
+            <span className="badge-success text-xs flex items-center gap-1 flex-shrink-0">
+              <TrendingUp className="w-3.5 h-3.5" />
+              Em alta
+            </span>
+          </div>
+          <motion.div
+            className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4"
+            initial="hidden" animate="show" variants={stagger}
+          >
+            {globalTrends.map((t) => (
+              <motion.div
+                key={t.categoria}
+                variants={fadeUp}
+                className="bg-surface-50 border border-surface-200 rounded-xl p-4 hover:border-success/30 hover:shadow-sm transition-all"
+              >
+                <div className="flex items-start justify-between gap-2 mb-1">
+                  <div className="min-w-0">
+                    <h3 className="font-bold text-dark text-sm truncate">{t.categoria}</h3>
+                    <p className="text-xs text-dark-muted">{t.regiao}</p>
+                  </div>
+                  <div className="flex items-center gap-0.5 text-success font-bold text-sm flex-shrink-0">
+                    <ArrowUpRight className="w-3.5 h-3.5" />
+                    {t.crescimento}%
+                  </div>
+                </div>
+                <TrendSparkline data={t.dados} />
+              </motion.div>
+            ))}
+          </motion.div>
         </motion.div>
 
         {/* WELCOME / CTA BANNER */}
