@@ -431,20 +431,11 @@ export default function LandingPage() {
               <div className="rounded-3xl overflow-hidden border border-surface-200 shadow-card">
                 <Image
                   src="/carlos.png"
-                  alt="Carlos, fundador da Orangefy"
+                  alt="Time da Orangefy"
                   width={500}
                   height={620}
                   className="w-full h-auto object-cover"
                 />
-              </div>
-              <div className="absolute -bottom-5 -right-3 sm:right-4 bg-white rounded-2xl shadow-card border border-surface-200 px-4 py-3 flex items-center gap-3">
-                <div className="w-10 h-10 rounded-xl bg-gradient-brand flex items-center justify-center text-white font-black flex-shrink-0">
-                  C
-                </div>
-                <div>
-                  <div className="text-sm font-bold text-dark leading-tight">Carlos</div>
-                  <div className="text-xs text-dark-muted">Fundador da Orangefy</div>
-                </div>
               </div>
             </motion.div>
 
