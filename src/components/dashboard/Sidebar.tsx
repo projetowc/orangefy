@@ -16,7 +16,6 @@ import { useUser, getInitials, getFirstName } from "@/context/UserContext";
 const navItems = [
   { href: "/dashboard", icon: LayoutDashboard, label: "Dashboard" },
   { href: "/dashboard/radar", icon: Target, label: "Radar de Produtos" },
-  { href: "/dashboard/assistente", icon: Bot, label: "Assistente IA" },
   { href: "/dashboard/fornecedores", icon: Truck, label: "Radar de Fornecedores" },
   { href: "/dashboard/spy", icon: Eye, label: "Spy de Concorrentes", badge: "novo" },
   { href: "/dashboard/anuncios-virais", icon: Flame, label: "Anúncios Virais", badge: "novo" },
@@ -24,6 +23,7 @@ const navItems = [
   { href: "/dashboard/calculadora", icon: Calculator, label: "Calculadora" },
   { href: "/dashboard/gerador", icon: Megaphone, label: "Gerador de Anúncios" },
   { href: "/dashboard/minha-loja", icon: Store, label: "Minha Loja" },
+  { href: "/dashboard/assistente", icon: Bot, label: "Assistente IA" },
   { href: "/dashboard/configuracoes", icon: Settings, label: "Configurações" },
 ];
 
