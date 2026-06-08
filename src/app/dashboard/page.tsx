@@ -7,6 +7,7 @@ import {
   Package, Flame, ChevronRight, Sparkles, Store, Globe
 } from "lucide-react";
 import Link from "next/link";
+import Image from "next/image";
 import {
   AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer
 } from "recharts";
@@ -259,6 +260,18 @@ export default function DashboardPage() {
       />
 
       <div className="p-4 lg:p-6 space-y-4 lg:space-y-6">
+        {/* BANNER */}
+        <div className="w-full rounded-2xl overflow-hidden">
+          <Image
+            src="/banner-dashboard.png"
+            alt="Banner Orangefy"
+            width={1200}
+            height={300}
+            className="w-full h-auto object-cover"
+            priority
+          />
+        </div>
+
         {/* STATS */}
         <motion.div
           className="grid grid-cols-2 lg:grid-cols-4 gap-4"
