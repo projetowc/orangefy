@@ -9,20 +9,24 @@ function signAliExpressParams(params: Record<string, string>, secret: string): s
   return crypto.createHmac("sha256", secret).update(sorted).digest("hex").toUpperCase();
 }
 
+function normalizeWords(text: string): string[] {
+  return text.toLowerCase().replace(/[^a-z0-9\s]/g, " ").split(/\s+/).filter((w) => w.length > 2);
+}
+
 async function fetchProductImage(keyword: string): Promise<string> {
   const appSecret = process.env.ALIEXPRESS_APP_SECRET;
-  if (!appSecret) return "";
-  const shortKeyword = keyword.split(" ").slice(0, 3).join(" ");
+  if (!appSecret || !keyword.trim()) return "";
+  const cleanKeyword = keyword.trim().slice(0, 80);
   try {
     const params: Record<string, string> = {
       app_key: "534762",
       timestamp: Date.now().toString(),
       sign_method: "sha256",
       method: "aliexpress.affiliate.product.query",
-      keywords: shortKeyword,
+      keywords: cleanKeyword,
       page_no: "1",
-      page_size: "1",
-      fields: "product_main_image_url",
+      page_size: "5",
+      fields: "product_main_image_url,product_title",
     };
     params.sign = signAliExpressParams(params, appSecret);
     const url = "https://api-sg.aliexpress.com/sync?" + new URLSearchParams(params).toString();
@@ -30,11 +34,26 @@ async function fetchProductImage(keyword: string): Promise<string> {
     const data = await res.json();
     const resp = data?.aliexpress_affiliate_product_query_response?.resp_result;
     if (resp?.resp_code !== 200) {
-      console.error(`AliExpress error for "${shortKeyword}":`, resp?.resp_msg, resp?.resp_code);
+      console.error(`AliExpress error for "${cleanKeyword}":`, resp?.resp_msg, resp?.resp_code);
+      return "";
     }
-    return resp?.result?.products?.product?.[0]?.product_main_image_url ?? "";
+    const candidates: Array<{ product_main_image_url?: string; product_title?: string }> = resp?.result?.products?.product ?? [];
+    if (!candidates.length) return "";
+
+    const keywordWords = normalizeWords(cleanKeyword);
+    let best = candidates[0];
+    let bestScore = -1;
+    for (const candidate of candidates) {
+      const titleWords = normalizeWords(candidate.product_title ?? "");
+      const score = keywordWords.filter((w) => titleWords.includes(w)).length;
+      if (score > bestScore) {
+        bestScore = score;
+        best = candidate;
+      }
+    }
+    return best?.product_main_image_url ?? "";
   } catch (err) {
-    console.error(`AliExpress fetch error for "${shortKeyword}":`, err);
+    console.error(`AliExpress fetch error for "${cleanKeyword}":`, err);
     return "";
   }
 }
@@ -78,6 +97,7 @@ Retorne EXATAMENTE este JSON:
       "category": "categoria em português",
       "analysis": "análise de 2-3 frases sobre potencial, margem e dica prática",
       "image": "",
+      "imageKeyword": "termo PRECISO em inglês (3 a 5 palavras) descrevendo a aparência física e função do produto, ideal para localizar uma FOTO REAL correspondente em catálogos como AliExpress",
       "aliexpressUrl": "https://www.aliexpress.com/wholesale?SearchText=TERMO_DE_BUSCA_EM_INGLES"
     }
   ]
@@ -85,8 +105,9 @@ Retorne EXATAMENTE este JSON:
 
 REGRAS IMPORTANTES:
 - Todos os produtos devem ser do nicho "${q}" — nada fora do tema
-- aliexpressUrl: gere uma URL de busca no AliExpress em inglês para cada produto (substitua espaços por +)
-- Exemplo: para "coleira para cachorro" → "https://www.aliexpress.com/wholesale?SearchText=dog+collar"
+- imageKeyword: descreva o objeto físico de forma literal e visual (substantivo principal + características distintivas), sem termos vagos ou criativos — precisa casar com o título de um produto real catalogado
+- aliexpressUrl: gere uma URL de busca no AliExpress em inglês usando o mesmo termo de imageKeyword (substitua espaços por +)
+- Exemplo: para "coleira para cachorro" → imageKeyword "dog collar adjustable nylon" e aliexpressUrl "https://www.aliexpress.com/wholesale?SearchText=dog+collar+adjustable+nylon"
 - Seja criativo e específico com os produtos, evite genéricos
 - Inclua variações e complementos do nicho pesquisado
 - Retorne SOMENTE o JSON`,
@@ -109,9 +130,9 @@ REGRAS IMPORTANTES:
     }
 
     const productsWithImages = await Promise.all(
-      (parsed.products as Array<{ aliexpressUrl?: string; name: string } & Record<string, unknown>>).map(async (p) => {
+      (parsed.products as Array<{ imageKeyword?: string; aliexpressUrl?: string; name: string } & Record<string, unknown>>).map(async (p) => {
         const urlMatch = p.aliexpressUrl?.match(/SearchText=([^&]+)/);
-        const keyword = urlMatch ? decodeURIComponent(urlMatch[1].replace(/\+/g, " ")) : p.name;
+        const keyword = p.imageKeyword || (urlMatch ? decodeURIComponent(urlMatch[1].replace(/\+/g, " ")) : p.name);
         const image = await fetchProductImage(keyword);
         return { ...p, image };
       })

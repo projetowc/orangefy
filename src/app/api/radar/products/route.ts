@@ -26,21 +26,24 @@ function signAliExpressParams(params: Record<string, string>, secret: string): s
   return crypto.createHmac("sha256", secret).update(sorted).digest("hex").toUpperCase();
 }
 
+function normalizeWords(text: string): string[] {
+  return text.toLowerCase().replace(/[^a-z0-9\s]/g, " ").split(/\s+/).filter((w) => w.length > 2);
+}
+
 async function fetchProductImage(keyword: string): Promise<string> {
   const appSecret = process.env.ALIEXPRESS_APP_SECRET;
-  if (!appSecret) return "";
-  // Use first 3 words to get broader, more reliable image results
-  const shortKeyword = keyword.split(" ").slice(0, 3).join(" ");
+  if (!appSecret || !keyword.trim()) return "";
+  const cleanKeyword = keyword.trim().slice(0, 80);
   try {
     const params: Record<string, string> = {
       app_key: "534762",
       timestamp: Date.now().toString(),
       sign_method: "sha256",
       method: "aliexpress.affiliate.product.query",
-      keywords: shortKeyword,
+      keywords: cleanKeyword,
       page_no: "1",
-      page_size: "1",
-      fields: "product_main_image_url",
+      page_size: "5",
+      fields: "product_main_image_url,product_title",
     };
     params.sign = signAliExpressParams(params, appSecret);
     const url = "https://api-sg.aliexpress.com/sync?" + new URLSearchParams(params).toString();
@@ -48,11 +51,27 @@ async function fetchProductImage(keyword: string): Promise<string> {
     const data = await res.json();
     const resp = data?.aliexpress_affiliate_product_query_response?.resp_result;
     if (resp?.resp_code !== 200) {
-      console.error(`AliExpress error for "${shortKeyword}":`, resp?.resp_msg, resp?.resp_code);
+      console.error(`AliExpress error for "${cleanKeyword}":`, resp?.resp_msg, resp?.resp_code);
+      return "";
     }
-    return resp?.result?.products?.product?.[0]?.product_main_image_url ?? "";
+    const candidates: Array<{ product_main_image_url?: string; product_title?: string }> = resp?.result?.products?.product ?? [];
+    if (!candidates.length) return "";
+
+    // Pick the candidate whose title best overlaps with the search keyword, instead of blindly trusting the first result
+    const keywordWords = normalizeWords(cleanKeyword);
+    let best = candidates[0];
+    let bestScore = -1;
+    for (const candidate of candidates) {
+      const titleWords = normalizeWords(candidate.product_title ?? "");
+      const score = keywordWords.filter((w) => titleWords.includes(w)).length;
+      if (score > bestScore) {
+        bestScore = score;
+        best = candidate;
+      }
+    }
+    return best?.product_main_image_url ?? "";
   } catch (err) {
-    console.error(`AliExpress fetch error for "${shortKeyword}":`, err);
+    console.error(`AliExpress fetch error for "${cleanKeyword}":`, err);
     return "";
   }
 }
@@ -99,13 +118,17 @@ Retorne EXATAMENTE este JSON:
       "category": "categoria em português",
       "analysis": "análise prática de 2-3 frases: por que vende, margem real, dica de diferenciação",
       "image": "",
+      "imageKeyword": "termo PRECISO em inglês (3 a 5 palavras) descrevendo a aparência física e função do produto, ideal para localizar uma FOTO REAL correspondente em catálogos como AliExpress",
       "aliexpressUrl": "https://www.aliexpress.com/wholesale?SearchText=TERMO_EM_INGLES"
     }
   ]
 }
 
-Para aliexpressUrl: gere a URL de busca no AliExpress em inglês para cada produto.
-Exemplo: para "organizador de gaveta modular" → "https://www.aliexpress.com/wholesale?SearchText=modular+drawer+organizer"
+Para imageKeyword: descreva o objeto físico de forma literal e visual, com substantivo principal + características distintivas — não use termos vagos, criativos ou metafóricos. O termo precisa casar com o título de um produto real catalogado.
+Exemplo: para "Suporte Vertical para Prato e Panela Magnético" → "magnetic pot lid stand holder"
+Exemplo: para "Cinto de Segurança de Carro com Almofada de Memória" → "car seatbelt shoulder pad cushion"
+
+Para aliexpressUrl: gere a URL de busca no AliExpress em inglês para cada produto, usando o mesmo termo de imageKeyword (substitua espaços por +).
 
 Retorne SOMENTE o JSON.`,
         },
@@ -127,9 +150,9 @@ Retorne SOMENTE o JSON.`,
     }
 
     const productsWithImages = await Promise.all(
-      (parsed.products as Array<{ aliexpressUrl?: string; name: string } & Record<string, unknown>>).map(async (p) => {
+      (parsed.products as Array<{ imageKeyword?: string; aliexpressUrl?: string; name: string } & Record<string, unknown>>).map(async (p) => {
         const urlMatch = p.aliexpressUrl?.match(/SearchText=([^&]+)/);
-        const keyword = urlMatch ? decodeURIComponent(urlMatch[1].replace(/\+/g, " ")) : p.name;
+        const keyword = p.imageKeyword || (urlMatch ? decodeURIComponent(urlMatch[1].replace(/\+/g, " ")) : p.name);
         const image = await fetchProductImage(keyword);
         return { ...p, image };
       })
