@@ -132,6 +132,21 @@ const testimonials = [
   { name: "Juliana R.", role: "Empreendedora digital", text: "A calculadora de lucro mudou tudo. Antes eu vendia sem saber se estava ganhando dinheiro de verdade.", avatar: "JR", sales: 15 },
 ];
 
+const brandLogos = [
+  { name: "Walmart", file: "1.png" },
+  { name: "Shopee", file: "2.png" },
+  { name: "Magalu", file: "3.png" },
+  { name: "Shein", file: "4.png" },
+  { name: "Mercado Livre", file: "5.png" },
+  { name: "Etsy", file: "6.png" },
+  { name: "Shopify", file: "7.png" },
+  { name: "eBay", file: "8.png" },
+  { name: "Americanas", file: "9.png" },
+  { name: "Amazon", file: "10.png" },
+  { name: "AliExpress", file: "11.png" },
+  { name: "TikTok Shop", file: "12.png" },
+];
+
 const planFeatures = ["Radar de Produtos com IA", "Spy de Concorrentes com IA", "Calculadora de Lucro", "Gerador de Anúncios com IA", "Anúncios Virais (inteligência de concorrência)", "Score de Oportunidade", "Dashboard Completo"];
 
 export default function LandingPage() {
@@ -224,6 +239,24 @@ export default function LandingPage() {
                 </div>
               </div>
             </motion.div>
+          </div>
+        </div>
+      </section>
+
+      {/* BRAND LOGOS MARQUEE */}
+      <section className="py-7 bg-surface-50 border-y border-surface-200 overflow-hidden">
+        <p className="text-center text-xs font-semibold text-dark-muted uppercase tracking-wide mb-5">
+          Monitoramos os maiores marketplaces para você
+        </p>
+        <div className="relative">
+          <div className="pointer-events-none absolute inset-y-0 left-0 w-16 sm:w-28 bg-gradient-to-r from-surface-50 to-transparent z-10" />
+          <div className="pointer-events-none absolute inset-y-0 right-0 w-16 sm:w-28 bg-gradient-to-l from-surface-50 to-transparent z-10" />
+          <div className="flex gap-12 sm:gap-16 animate-marquee items-center" style={{ width: "max-content" }}>
+            {[...brandLogos, ...brandLogos].map((brand, i) => (
+              <div key={`${brand.file}-${i}`} className="relative h-7 sm:h-9 w-24 sm:w-32 flex-shrink-0 grayscale opacity-50 hover:grayscale-0 hover:opacity-100 transition-all duration-300">
+                <Image src={`/marcas/${brand.file}`} alt={brand.name} fill className="object-contain" sizes="160px" />
+              </div>
+            ))}
           </div>
         </div>
       </section>
