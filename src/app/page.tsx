@@ -7,7 +7,8 @@ import Image from "next/image";
 import {
   Target, Calculator, Megaphone, BarChart3, TrendingUp,
   Star, CheckCircle2, ArrowRight, ShoppingBag, Shield,
-  ChevronRight, Clock, Users, Award, AlertCircle, Sparkles, Flame, Eye
+  ChevronRight, Clock, Users, Award, AlertCircle, Sparkles, Flame, Eye,
+  Heart, MessageCircle
 } from "lucide-react";
 
 async function goToCheckout(plan: "monthly" | "quarterly" | "annual") {
@@ -130,6 +131,13 @@ const testimonials = [
   { name: "Ana Paula S.", role: "Vendedora online", text: "Em 3 semanas usando as ferramentas da Orangefy fiz minhas primeiras 8 vendas. O radar me mostrou exatamente o produto certo.", avatar: "AP", sales: 8 },
   { name: "Carlos M.", role: "Revendedor", text: "Achei um nicho com 60% de margem em 20 minutos usando o radar com IA. Nunca teria achado sozinho.", avatar: "CM", sales: 24 },
   { name: "Juliana R.", role: "Empreendedora digital", text: "A calculadora de lucro mudou tudo. Antes eu vendia sem saber se estava ganhando dinheiro de verdade.", avatar: "JR", sales: 15 },
+];
+
+const whyUs = [
+  { icon: Heart, title: "Feita por quem vende de verdade", desc: "Cada ferramenta nasceu de testes reais em marketplaces — não é teoria, é o que funciona na prática." },
+  { icon: Sparkles, title: "IA treinada para o mercado brasileiro", desc: "Análises e sugestões pensadas para a realidade da Shopee, Mercado Livre e do consumidor brasileiro." },
+  { icon: TrendingUp, title: "Sempre atualizada com as tendências", desc: "Os dados e produtos em alta são renovados constantemente, então você nunca trabalha com informação velha." },
+  { icon: MessageCircle, title: "Suporte que entende seu negócio", desc: "Você não está sozinho: tem gente acompanhando sua jornada e pronta para ajudar quando precisar." },
 ];
 
 const brandLogos = [
@@ -424,6 +432,64 @@ export default function LandingPage() {
               </motion.div>
             ))}
           </motion.div>
+        </div>
+      </section>
+
+      {/* WHY ORANGEFY */}
+      <section className="py-12 px-4 bg-white">
+        <div className="max-w-6xl mx-auto">
+          <div className="grid lg:grid-cols-2 gap-10 lg:gap-16 items-center">
+            {/* Image */}
+            <motion.div
+              className="relative max-w-sm mx-auto lg:mx-0"
+              initial={{ opacity: 0, x: -20 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true }}
+            >
+              <div className="rounded-3xl overflow-hidden border border-surface-200 shadow-card">
+                <Image
+                  src="/carlos.png"
+                  alt="Carlos, fundador da Orangefy"
+                  width={500}
+                  height={620}
+                  className="w-full h-auto object-cover"
+                />
+              </div>
+              <div className="absolute -bottom-5 -right-3 sm:right-4 bg-white rounded-2xl shadow-card border border-surface-200 px-4 py-3 flex items-center gap-3">
+                <div className="w-10 h-10 rounded-xl bg-gradient-brand flex items-center justify-center text-white font-black flex-shrink-0">
+                  C
+                </div>
+                <div>
+                  <div className="text-sm font-bold text-dark leading-tight">Carlos</div>
+                  <div className="text-xs text-dark-muted">Fundador da Orangefy</div>
+                </div>
+              </div>
+            </motion.div>
+
+            {/* Copy */}
+            <motion.div initial="hidden" whileInView="show" viewport={{ once: true }} variants={stagger}>
+              <motion.div variants={fadeUp} className="badge-brand inline-flex mb-3">Por que a Orangefy</motion.div>
+              <motion.h2 variants={fadeUp} className="text-3xl sm:text-4xl font-black text-dark mb-4">
+                Feita por quem <span className="text-gradient">vende de verdade</span>
+              </motion.h2>
+              <motion.p variants={fadeUp} className="text-dark-muted text-base leading-relaxed mb-7">
+                A Orangefy nasceu da experiência real de vender em marketplaces — testando produtos, errando anúncios e aprendendo, na prática, o que realmente gera resultado. Hoje, essas descobertas viraram ferramentas de IA para você não cometer os mesmos erros e chegar mais rápido às suas primeiras vendas.
+              </motion.p>
+              <motion.div variants={fadeUp} className="space-y-4">
+                {whyUs.map((item) => (
+                  <div key={item.title} className="flex items-start gap-3">
+                    <div className="w-9 h-9 rounded-xl bg-orange-50 text-brand flex items-center justify-center flex-shrink-0">
+                      <item.icon className="w-4.5 h-4.5" />
+                    </div>
+                    <div>
+                      <div className="font-bold text-dark text-sm">{item.title}</div>
+                      <div className="text-dark-muted text-sm leading-relaxed">{item.desc}</div>
+                    </div>
+                  </div>
+                ))}
+              </motion.div>
+            </motion.div>
+          </div>
         </div>
       </section>
 
