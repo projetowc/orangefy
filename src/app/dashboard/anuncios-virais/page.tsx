@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Search, Flame, TrendingUp, Minus, Play, Image as ImageIcon,
@@ -338,21 +338,18 @@ export default function AnunciosViraisPage() {
   const [selected, setSelected] = useState<Ad | null>(null);
   const [searched, setSearched] = useState(false);
 
-  async function search() {
-    const q = inputValue.trim();
-    if (q.length < 2) return;
-
+  async function fetchAds(q: string) {
+    if (q.trim().length < 2) return;
     setLoading(true);
     setError(false);
     setAds([]);
-    setQuery(q);
+    setQuery(q.trim());
     setSearched(true);
-
     try {
       const res = await fetch("/api/anuncios-virais", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ query: q, platform, format }),
+        body: JSON.stringify({ query: q.trim(), platform, format }),
       });
       if (!res.ok) throw new Error("API error");
       const data = await res.json();
@@ -367,6 +364,11 @@ export default function AnunciosViraisPage() {
       setLoading(false);
     }
   }
+
+  function search() { fetchAds(inputValue); }
+
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  useEffect(() => { fetchAds("produtos em alta"); }, []);
 
   const filteredAds = ads.filter((ad) => {
     if (platform !== "todos" && ad.platform !== platform) return false;

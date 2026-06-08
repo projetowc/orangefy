@@ -30,7 +30,7 @@ async function fetchProductImage(keyword: string): Promise<string> {
     };
     params.sign = signAliExpressParams(params, appSecret);
     const url = "https://api-sg.aliexpress.com/sync?" + new URLSearchParams(params).toString();
-    const res = await fetch(url, { signal: AbortSignal.timeout(6000) });
+    const res = await fetch(url, { signal: AbortSignal.timeout(4000) });
     const data = await res.json();
     const resp = data?.aliexpress_affiliate_product_query_response?.resp_result;
     if (resp?.resp_code !== 200) return "";
@@ -61,11 +61,11 @@ export async function POST(request: NextRequest) {
 
     const message = await client.messages.create({
       model: "claude-haiku-4-5-20251001",
-      max_tokens: 4000,
+      max_tokens: 3500,
       system: [{ type: "text", text: SYSTEM_PROMPT, cache_control: { type: "ephemeral" } }],
       messages: [{
         role: "user",
-        content: `Gere 8 anúncios de CONCORRENTES que estariam rodando no Meta Ads (Facebook/Instagram) para o nicho: "${q}".
+        content: `Gere 6 anúncios de CONCORRENTES que estariam rodando no Meta Ads (Facebook/Instagram) para o nicho: "${q}".
 
 Simule como se fossem anúncios reais da Meta Ads Library — cada um de um anunciante diferente, com dados realistas e específicos para esse nicho.
 
@@ -73,7 +73,7 @@ Retorne EXATAMENTE este JSON:
 {
   "ads": [
     {
-      "id": número de 1 a 8,
+      "id": número de 1 a 6,
       "anunciante": "nome de marca fictício mas plausível para esse nicho (ex: 'PetAmor Brasil', 'FitZone Store')",
       "avatarLetra": "primeira letra do nome do anunciante",
       "avatarCor": "cor hex vibrante para o avatar, ex: '#E91E63'",
