@@ -704,9 +704,6 @@ export default function LandingPage() {
                 <p className="text-dark-muted text-sm">3 meses de acesso completo.</p>
               </div>
               <div className="mb-5">
-                <div className="flex items-center gap-2 mb-1">
-                  <span className="text-sm text-dark-muted line-through">R$49,90/mês</span>
-                </div>
                 <div className="flex items-end gap-1 leading-none">
                   <span className="text-4xl font-black text-dark">R$43</span>
                   <span className="text-xl font-bold text-dark mb-0.5">,30</span>
@@ -744,9 +741,6 @@ export default function LandingPage() {
                 <p className="text-dark-muted text-sm">12 meses de acesso completo.</p>
               </div>
               <div className="mb-5">
-                <div className="flex items-center gap-2 mb-1">
-                  <span className="text-sm text-dark-muted line-through">R$49,90/mês</span>
-                </div>
                 <div className="flex items-end gap-1 leading-none">
                   <span className="text-4xl font-black text-dark">R$20</span>
                   <span className="text-xl font-bold text-dark mb-0.5">,83</span>
