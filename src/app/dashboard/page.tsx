@@ -43,6 +43,12 @@ interface ShopPreview {
   tendencia: "alta" | "estavel";
 }
 
+const STATIC_SHOPS: ShopPreview[] = [
+  { id: 1, nome: "TrendShop Brasil", nicho: "Moda & Acessórios", crescimentoPercentual: 47, tendencia: "alta" },
+  { id: 2, nome: "GadgetZone", nicho: "Eletrônicos & Gadgets", crescimentoPercentual: 62, tendencia: "alta" },
+  { id: 3, nome: "PetLover Store", nicho: "Pets & Animais", crescimentoPercentual: 38, tendencia: "alta" },
+];
+
 interface GlobalTrend {
   categoria: string;
   regiao: string;
@@ -169,7 +175,7 @@ export default function DashboardPage() {
 
   const [products, setProducts] = useState<FeaturedProduct[]>(STATIC_FEATURED);
   const [loadingProducts, setLoadingProducts] = useState(false);
-  const [shops, setShops] = useState<ShopPreview[]>([]);
+  const [shops, setShops] = useState<ShopPreview[]>(STATIC_SHOPS);
 
   useEffect(() => {
     let cancelled = false;
@@ -206,11 +212,14 @@ export default function DashboardPage() {
 
   useEffect(() => {
     try {
-      const cached = sessionStorage.getItem("lojas_virais_v1");
-      if (cached) {
-        const { shops: cachedShops } = JSON.parse(cached);
-        if (Array.isArray(cachedShops) && cachedShops.length > 0) {
-          setShops(cachedShops.slice(0, 3));
+      for (const key of ["lojas_virais_v2_todos", "lojas_virais_v2_brasil", "lojas_virais_v2_eua"]) {
+        const cached = sessionStorage.getItem(key);
+        if (cached) {
+          const { shops: cachedShops } = JSON.parse(cached);
+          if (Array.isArray(cachedShops) && cachedShops.length > 0) {
+            setShops(cachedShops.slice(0, 3));
+            break;
+          }
         }
       }
     } catch {
