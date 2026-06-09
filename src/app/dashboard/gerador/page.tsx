@@ -2,7 +2,11 @@
 
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Megaphone, Sparkles, Copy, Check, ChevronDown, Tag, FileText, Lightbulb, AlertCircle, ShoppingCart } from "lucide-react";
+import {
+  Megaphone, Sparkles, Copy, Check, ChevronDown, Tag, FileText,
+  Lightbulb, AlertCircle, ShoppingCart, Video, Camera, Music,
+  Scissors, Eye, Mic, Clock
+} from "lucide-react";
 import Header from "@/components/dashboard/Header";
 
 const MARKETPLACES = [
@@ -21,6 +25,23 @@ const CATEGORIES = [
   "Bebês e Maternidade", "Saúde e Bem-estar", "Automotivo", "Informática",
 ];
 
+const VIDEO_PLATFORMS = [
+  { id: "tiktok",  label: "TikTok",          color: "bg-black text-white border-black",           dot: "bg-white" },
+  { id: "reels",   label: "Instagram Reels", color: "bg-pink-100 text-pink-700 border-pink-300",  dot: "bg-pink-500" },
+  { id: "shorts",  label: "YouTube Shorts",  color: "bg-red-100 text-red-700 border-red-200",     dot: "bg-red-500" },
+];
+
+const SCENE_TYPE_CONFIG: Record<string, { color: string; bg: string }> = {
+  GANCHO:      { color: "text-red-600",    bg: "bg-red-50 border-red-200" },
+  PROBLEMA:    { color: "text-orange-600", bg: "bg-orange-50 border-orange-200" },
+  SOLUÇÃO:     { color: "text-brand",      bg: "bg-orange-50 border-brand/30" },
+  APRESENTAÇÃO:{ color: "text-brand",      bg: "bg-orange-50 border-brand/30" },
+  BENEFÍCIOS:  { color: "text-green-600",  bg: "bg-green-50 border-green-200" },
+  "PROVA SOCIAL":{ color: "text-purple-600", bg: "bg-purple-50 border-purple-200" },
+  OFERTA:      { color: "text-amber-600",  bg: "bg-amber-50 border-amber-200" },
+  CTA:         { color: "text-blue-600",   bg: "bg-blue-50 border-blue-200" },
+};
+
 interface Generated {
   titulo: string;
   descricao: string;
@@ -29,6 +50,29 @@ interface Generated {
   precoSugerido: string;
   dicaVendedor: string;
   callToAction: string;
+}
+
+interface VideoScene {
+  numero: number;
+  tipo: string;
+  tempoInicio: string;
+  tempoFim: string;
+  visual: string;
+  legenda: string;
+  narracao: string;
+  dica: string;
+}
+
+interface VideoScript {
+  plataforma: string;
+  duracaoTotal: string;
+  formato: string;
+  musicaSugerida: string;
+  gancho: string;
+  cenas: VideoScene[];
+  dicaGravacao: string;
+  dicaEdicao: string;
+  cta: string;
 }
 
 function CopyButton({ text }: { text: string }) {
@@ -44,9 +88,7 @@ function CopyButton({ text }: { text: string }) {
   );
 }
 
-function ResultCard({ label, icon: Icon, content }: {
-  label: string; icon: React.ElementType; content: string;
-}) {
+function ResultCard({ label, icon: Icon, content }: { label: string; icon: React.ElementType; content: string }) {
   return (
     <div className="card border border-surface-200">
       <div className="flex items-center justify-between mb-3">
@@ -61,17 +103,88 @@ function ResultCard({ label, icon: Icon, content }: {
   );
 }
 
+function SceneCard({ scene, index }: { scene: VideoScene; index: number }) {
+  const config = SCENE_TYPE_CONFIG[scene.tipo] ?? { color: "text-dark-muted", bg: "bg-surface-50 border-surface-200" };
+  const sceneText = `CENA ${scene.numero} — ${scene.tipo} (${scene.tempoInicio}–${scene.tempoFim})\nVisual: ${scene.visual}\nLegenda: ${scene.legenda}\nNarração: ${scene.narracao}`;
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 8 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ delay: index * 0.05 }}
+      className={`border rounded-2xl p-4 ${config.bg}`}
+    >
+      <div className="flex items-center justify-between mb-3">
+        <div className="flex items-center gap-2">
+          <span className="w-6 h-6 rounded-full bg-white border border-current flex items-center justify-center text-xs font-black" style={{ color: "inherit" }}>
+            {scene.numero}
+          </span>
+          <span className={`text-xs font-bold uppercase tracking-wider ${config.color}`}>{scene.tipo}</span>
+          <span className="flex items-center gap-1 text-xs text-dark-muted">
+            <Clock className="w-3 h-3" />
+            {scene.tempoInicio}–{scene.tempoFim}
+          </span>
+        </div>
+        <CopyButton text={sceneText} />
+      </div>
+
+      <div className="space-y-2">
+        <div className="flex items-start gap-2">
+          <Eye className="w-3.5 h-3.5 text-dark-muted flex-shrink-0 mt-0.5" />
+          <div>
+            <span className="text-xs font-semibold text-dark-muted uppercase tracking-wide">Visual </span>
+            <span className="text-sm text-dark">{scene.visual}</span>
+          </div>
+        </div>
+        <div className="flex items-start gap-2">
+          <span className="text-xs font-black text-dark-muted flex-shrink-0 mt-0.5">T</span>
+          <div>
+            <span className="text-xs font-semibold text-dark-muted uppercase tracking-wide">Legenda </span>
+            <span className="text-sm font-bold text-dark">&ldquo;{scene.legenda}&rdquo;</span>
+          </div>
+        </div>
+        {scene.narracao && scene.narracao.toLowerCase() !== "sem narração" && (
+          <div className="flex items-start gap-2">
+            <Mic className="w-3.5 h-3.5 text-dark-muted flex-shrink-0 mt-0.5" />
+            <div>
+              <span className="text-xs font-semibold text-dark-muted uppercase tracking-wide">Narração </span>
+              <span className="text-sm text-dark italic">&ldquo;{scene.narracao}&rdquo;</span>
+            </div>
+          </div>
+        )}
+        {scene.dica && (
+          <div className="mt-2 pt-2 border-t border-black/10 flex items-start gap-2">
+            <Lightbulb className="w-3.5 h-3.5 text-amber-500 flex-shrink-0 mt-0.5" />
+            <span className="text-xs text-dark-muted">{scene.dica}</span>
+          </div>
+        )}
+      </div>
+    </motion.div>
+  );
+}
+
 export default function GeradorPage() {
-  const [marketplace, setMarketplace] = useState("shopee");
+  const [activeTab, setActiveTab] = useState<"anuncio" | "video">("anuncio");
+
+  // form state (shared)
   const [product, setProduct] = useState("");
   const [category, setCategory] = useState("");
   const [benefits, setBenefits] = useState("");
   const [price, setPrice] = useState("");
   const [details, setDetails] = useState("");
+  const [showCat, setShowCat] = useState(false);
+
+  // anuncio state
+  const [marketplace, setMarketplace] = useState("shopee");
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<Generated | null>(null);
   const [error, setError] = useState("");
-  const [showCat, setShowCat] = useState(false);
+
+  // video state
+  const [videoPlatform, setVideoPlatform] = useState("tiktok");
+  const [videoLoading, setVideoLoading] = useState(false);
+  const [videoResult, setVideoResult] = useState<VideoScript | null>(null);
+  const [videoError, setVideoError] = useState("");
 
   async function generate() {
     if (!product.trim()) return;
@@ -94,49 +207,114 @@ export default function GeradorPage() {
     }
   }
 
+  async function generateVideo() {
+    if (!product.trim()) return;
+    setVideoLoading(true);
+    setVideoError("");
+    setVideoResult(null);
+    try {
+      const res = await fetch("/api/gerador/video", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ product: product.trim(), category, benefits, price, details, platform: videoPlatform }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error);
+      setVideoResult(data);
+    } catch {
+      setVideoError("Erro ao gerar roteiro. Tente novamente.");
+    } finally {
+      setVideoLoading(false);
+    }
+  }
+
   const selectedMP = MARKETPLACES.find(m => m.id === marketplace)!;
+  const selectedVP = VIDEO_PLATFORMS.find(p => p.id === videoPlatform)!;
+
   const fullAd = result
     ? `TÍTULO:\n${result.titulo}\n\nDESCRIÇÃO:\n${result.descricao}\n\nPALAVRAS-CHAVE:\n${result.palavrasChave.join(", ")}\n\nHASHTAGS:\n${result.hashtags.join(" ")}\n\nCALL TO ACTION:\n${result.callToAction}`
     : "";
 
+  const fullScript = videoResult
+    ? `ROTEIRO DE VÍDEO — ${videoResult.plataforma}\nDuração: ${videoResult.duracaoTotal}\nMúsica: ${videoResult.musicaSugerida}\nGancho: ${videoResult.gancho}\n\n${videoResult.cenas.map(c => `CENA ${c.numero} — ${c.tipo} (${c.tempoInicio}–${c.tempoFim})\nVisual: ${c.visual}\nLegenda: "${c.legenda}"\nNarração: "${c.narracao}"`).join("\n\n")}\n\nCTA: ${videoResult.cta}\n\nDica de Gravação: ${videoResult.dicaGravacao}\nDica de Edição: ${videoResult.dicaEdicao}`
+    : "";
+
   return (
     <>
-      <Header title="Gerador de Anúncios" subtitle="Crie anúncios otimizados com IA para qualquer marketplace" />
+      <Header title="Gerador de Anúncios" subtitle="Crie anúncios e roteiros de vídeo com IA para qualquer plataforma" />
 
       <div className="p-4 lg:p-6 space-y-5">
-        {/* Marketplace */}
-        <div className="card">
-          <div className="flex items-center gap-2 mb-4">
-            <ShoppingCart className="w-4 h-4 text-brand" />
-            <span className="text-sm font-semibold text-dark">Escolha o marketplace</span>
-          </div>
-          <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
-            {MARKETPLACES.map((m) => (
-              <button
-                key={m.id}
-                onClick={() => setMarketplace(m.id)}
-                className={`flex items-center gap-2 px-3 py-2.5 rounded-xl border text-sm font-medium transition-all ${
-                  marketplace === m.id ? `${m.color} border-current` : "bg-white border-surface-200 text-dark-muted hover:border-surface-300"
-                }`}
-              >
-                <span className={`w-2 h-2 rounded-full flex-shrink-0 ${marketplace === m.id ? m.dot : "bg-surface-200"}`} />
-                {m.label}
-              </button>
-            ))}
-          </div>
+        {/* Tab switcher */}
+        <div className="flex gap-1 p-1 bg-surface-100 rounded-2xl">
+          <button
+            onClick={() => setActiveTab("anuncio")}
+            className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl text-sm font-semibold transition-all ${
+              activeTab === "anuncio" ? "bg-white text-dark shadow-sm" : "text-dark-muted hover:text-dark"
+            }`}
+          >
+            <Megaphone className="w-4 h-4" />
+            Anúncio de Texto
+          </button>
+          <button
+            onClick={() => setActiveTab("video")}
+            className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl text-sm font-semibold transition-all ${
+              activeTab === "video" ? "bg-white text-dark shadow-sm" : "text-dark-muted hover:text-dark"
+            }`}
+          >
+            <Video className="w-4 h-4" />
+            Roteiro de Vídeo
+            <span className="text-xs bg-brand text-white px-1.5 py-0.5 rounded-full">novo</span>
+          </button>
         </div>
 
-        {/* Form */}
+        {/* Platform selector */}
+        <AnimatePresence mode="wait">
+          {activeTab === "anuncio" ? (
+            <motion.div key="mp" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="card">
+              <div className="flex items-center gap-2 mb-4">
+                <ShoppingCart className="w-4 h-4 text-brand" />
+                <span className="text-sm font-semibold text-dark">Escolha o marketplace</span>
+              </div>
+              <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+                {MARKETPLACES.map((m) => (
+                  <button key={m.id} onClick={() => setMarketplace(m.id)}
+                    className={`flex items-center gap-2 px-3 py-2.5 rounded-xl border text-sm font-medium transition-all ${
+                      marketplace === m.id ? `${m.color} border-current` : "bg-white border-surface-200 text-dark-muted hover:border-surface-300"
+                    }`}>
+                    <span className={`w-2 h-2 rounded-full flex-shrink-0 ${marketplace === m.id ? m.dot : "bg-surface-200"}`} />
+                    {m.label}
+                  </button>
+                ))}
+              </div>
+            </motion.div>
+          ) : (
+            <motion.div key="vp" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="card">
+              <div className="flex items-center gap-2 mb-4">
+                <Video className="w-4 h-4 text-brand" />
+                <span className="text-sm font-semibold text-dark">Plataforma do vídeo</span>
+              </div>
+              <div className="grid grid-cols-3 gap-2">
+                {VIDEO_PLATFORMS.map((p) => (
+                  <button key={p.id} onClick={() => setVideoPlatform(p.id)}
+                    className={`flex items-center gap-2 px-3 py-2.5 rounded-xl border text-sm font-medium transition-all ${
+                      videoPlatform === p.id ? `${p.color} border-current` : "bg-white border-surface-200 text-dark-muted hover:border-surface-300"
+                    }`}>
+                    <span className={`w-2 h-2 rounded-full flex-shrink-0 ${videoPlatform === p.id ? p.dot : "bg-surface-200"}`} />
+                    {p.label}
+                  </button>
+                ))}
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+        {/* Form (shared) */}
         <div className="card space-y-4">
           <div>
             <label className="text-xs font-semibold text-dark-muted uppercase tracking-wide mb-1.5 block">Nome do produto *</label>
-            <input
-              className="input-field"
-              placeholder="Ex: Fone Bluetooth TWS sem fio"
-              value={product}
-              onChange={(e) => setProduct(e.target.value)}
-              onKeyDown={(e) => e.key === "Enter" && generate()}
-            />
+            <input className="input-field" placeholder="Ex: Fone Bluetooth TWS sem fio"
+              value={product} onChange={(e) => setProduct(e.target.value)}
+              onKeyDown={(e) => e.key === "Enter" && (activeTab === "anuncio" ? generate() : generateVideo())} />
           </div>
 
           <div className="grid sm:grid-cols-2 gap-4">
@@ -177,25 +355,42 @@ export default function GeradorPage() {
               value={details} onChange={(e) => setDetails(e.target.value)} />
           </div>
 
-          <button onClick={generate} disabled={loading || !product.trim()}
-            className="btn-brand w-full flex items-center justify-center gap-2 py-3 disabled:opacity-50 disabled:cursor-not-allowed">
-            {loading
-              ? <><div className="w-4 h-4 border-2 border-white/40 border-t-white rounded-full animate-spin" />Gerando anúncio...</>
-              : <><Sparkles className="w-4 h-4" />Gerar Anúncio para {selectedMP.label}</>}
-          </button>
+          {activeTab === "anuncio" ? (
+            <button onClick={generate} disabled={loading || !product.trim()}
+              className="btn-brand w-full flex items-center justify-center gap-2 py-3 disabled:opacity-50 disabled:cursor-not-allowed">
+              {loading
+                ? <><div className="w-4 h-4 border-2 border-white/40 border-t-white rounded-full animate-spin" />Gerando anúncio...</>
+                : <><Sparkles className="w-4 h-4" />Gerar Anúncio para {selectedMP.label}</>}
+            </button>
+          ) : (
+            <button onClick={generateVideo} disabled={videoLoading || !product.trim()}
+              className="btn-brand w-full flex items-center justify-center gap-2 py-3 disabled:opacity-50 disabled:cursor-not-allowed">
+              {videoLoading
+                ? <><div className="w-4 h-4 border-2 border-white/40 border-t-white rounded-full animate-spin" />Gerando roteiro...</>
+                : <><Video className="w-4 h-4" />Gerar Roteiro para {selectedVP.label}</>}
+            </button>
+          )}
         </div>
 
-        {/* Error */}
-        {error && (
+        {/* Anuncio errors */}
+        {activeTab === "anuncio" && error && (
           <div className="card border-red-100 bg-red-50 flex items-center gap-3 py-4">
             <AlertCircle className="w-5 h-5 text-danger flex-shrink-0" />
             <p className="text-sm text-danger">{error}</p>
           </div>
         )}
 
-        {/* Results */}
+        {/* Video errors */}
+        {activeTab === "video" && videoError && (
+          <div className="card border-red-100 bg-red-50 flex items-center gap-3 py-4">
+            <AlertCircle className="w-5 h-5 text-danger flex-shrink-0" />
+            <p className="text-sm text-danger">{videoError}</p>
+          </div>
+        )}
+
+        {/* Anuncio results */}
         <AnimatePresence>
-          {result && !loading && (
+          {activeTab === "anuncio" && result && !loading && (
             <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} className="space-y-4">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
@@ -268,6 +463,105 @@ export default function GeradorPage() {
                 className="btn-brand w-full flex items-center justify-center gap-2 py-3">
                 <Copy className="w-4 h-4" />
                 Copiar anúncio completo
+              </button>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+        {/* Video results */}
+        <AnimatePresence>
+          {activeTab === "video" && videoResult && !videoLoading && (
+            <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} className="space-y-4">
+              {/* Header */}
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <Video className="w-4 h-4 text-brand" />
+                  <span className="text-sm font-semibold text-dark">Roteiro para {videoResult.plataforma}</span>
+                </div>
+                <CopyButton text={fullScript} />
+              </div>
+
+              {/* Meta info */}
+              <div className="grid grid-cols-3 gap-3">
+                <div className="card py-3 text-center">
+                  <Clock className="w-4 h-4 text-brand mx-auto mb-1" />
+                  <div className="text-xs font-bold text-dark">{videoResult.duracaoTotal}</div>
+                  <div className="text-xs text-dark-muted">Duração</div>
+                </div>
+                <div className="card py-3 text-center">
+                  <Camera className="w-4 h-4 text-brand mx-auto mb-1" />
+                  <div className="text-xs font-bold text-dark">{videoResult.formato?.split("—")[0]?.trim() || "9:16"}</div>
+                  <div className="text-xs text-dark-muted">Formato</div>
+                </div>
+                <div className="card py-3 text-center">
+                  <FileText className="w-4 h-4 text-brand mx-auto mb-1" />
+                  <div className="text-xs font-bold text-dark">{videoResult.cenas?.length || 0} cenas</div>
+                  <div className="text-xs text-dark-muted">Roteiro</div>
+                </div>
+              </div>
+
+              {/* Gancho */}
+              <div className="card bg-red-50 border-red-200">
+                <div className="flex items-center gap-2 mb-2">
+                  <span className="text-xs font-bold text-red-600 uppercase tracking-wider">🎯 Gancho Principal</span>
+                </div>
+                <p className="text-base font-black text-dark">&ldquo;{videoResult.gancho}&rdquo;</p>
+                <p className="text-xs text-dark-muted mt-1">Use nos primeiros 3 segundos para parar o scroll</p>
+              </div>
+
+              {/* Music */}
+              <div className="card bg-purple-50 border-purple-200">
+                <div className="flex items-center gap-2">
+                  <Music className="w-4 h-4 text-purple-600" />
+                  <span className="text-xs font-bold text-purple-700 uppercase tracking-wider">Música Sugerida</span>
+                </div>
+                <p className="text-sm text-dark mt-1">{videoResult.musicaSugerida}</p>
+              </div>
+
+              {/* Scenes */}
+              <div>
+                <div className="flex items-center gap-2 mb-3">
+                  <Video className="w-4 h-4 text-brand" />
+                  <span className="text-sm font-semibold text-dark">Cenas do Roteiro</span>
+                </div>
+                <div className="space-y-3">
+                  {videoResult.cenas?.map((scene, i) => (
+                    <SceneCard key={i} scene={scene} index={i} />
+                  ))}
+                </div>
+              </div>
+
+              {/* CTA */}
+              <div className="card bg-blue-50 border-blue-200">
+                <div className="flex items-center gap-2 mb-2">
+                  <Megaphone className="w-4 h-4 text-blue-600" />
+                  <span className="text-xs font-bold text-blue-700 uppercase tracking-wider">Call to Action Final</span>
+                </div>
+                <p className="text-sm font-bold text-dark">&ldquo;{videoResult.cta}&rdquo;</p>
+              </div>
+
+              {/* Tips */}
+              <div className="grid sm:grid-cols-2 gap-4">
+                <div className="card bg-amber-50 border-amber-200">
+                  <div className="flex items-center gap-2 mb-2">
+                    <Camera className="w-4 h-4 text-amber-600" />
+                    <span className="text-xs font-bold text-amber-700 uppercase tracking-wider">Dicas de Gravação</span>
+                  </div>
+                  <p className="text-sm text-dark leading-relaxed whitespace-pre-wrap">{videoResult.dicaGravacao}</p>
+                </div>
+                <div className="card bg-green-50 border-green-200">
+                  <div className="flex items-center gap-2 mb-2">
+                    <Scissors className="w-4 h-4 text-green-600" />
+                    <span className="text-xs font-bold text-green-700 uppercase tracking-wider">Dicas de Edição</span>
+                  </div>
+                  <p className="text-sm text-dark leading-relaxed whitespace-pre-wrap">{videoResult.dicaEdicao}</p>
+                </div>
+              </div>
+
+              <button onClick={() => navigator.clipboard.writeText(fullScript)}
+                className="btn-brand w-full flex items-center justify-center gap-2 py-3">
+                <Copy className="w-4 h-4" />
+                Copiar roteiro completo
               </button>
             </motion.div>
           )}
