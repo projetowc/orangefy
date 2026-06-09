@@ -706,7 +706,6 @@ export default function LandingPage() {
               <div className="mb-5">
                 <div className="flex items-center gap-2 mb-1">
                   <span className="text-sm text-dark-muted line-through">R$49,90/mês</span>
-                  <span className="bg-green-100 text-success text-xs font-bold px-2 py-0.5 rounded-full">-13%</span>
                 </div>
                 <div className="flex items-end gap-1 leading-none">
                   <span className="text-4xl font-black text-dark">R$43</span>
@@ -747,7 +746,6 @@ export default function LandingPage() {
               <div className="mb-5">
                 <div className="flex items-center gap-2 mb-1">
                   <span className="text-sm text-dark-muted line-through">R$49,90/mês</span>
-                  <span className="bg-green-100 text-success text-xs font-bold px-2 py-0.5 rounded-full">-58%</span>
                 </div>
                 <div className="flex items-end gap-1 leading-none">
                   <span className="text-4xl font-black text-dark">R$20</span>
