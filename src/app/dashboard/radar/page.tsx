@@ -36,6 +36,17 @@ const tagLabels: Record<Tag, string> = {
 const CACHE_KEY = "radar_products_v3";
 const CACHE_TTL = 30 * 60 * 1000; // 30 min
 
+const STATIC_PRODUCTS: Product[] = [
+  { id: 1, name: "Secador de Cabelo Profissional 2200W", score: 83, margin: 55, competition: "Média", difficulty: "Fácil", trend: "up", tags: ["viral", "high-margin"], avgPrice: "R$59–R$99", category: "Beleza", analysis: "Alta demanda feminina, fácil de diferenciar com kit de acessórios. Margem acima de 50% no dropshipping.", image: "/produtos/p25.png" },
+  { id: 2, name: "Fone de Ouvido Bluetooth Over-Ear", score: 86, margin: 58, competition: "Média", difficulty: "Fácil", trend: "up", tags: ["trending", "easy-shipping"], avgPrice: "R$49–R$89", category: "Eletrônicos", analysis: "Produto viral em alta, boa margem e fácil envio. Demanda constante por qualidade de som acessível.", image: "/produtos/p21.png" },
+  { id: 3, name: "Máquina de Cortar Cabelo Profissional", score: 88, margin: 62, competition: "Baixa", difficulty: "Fácil", trend: "up", tags: ["high-margin", "easy-shipping", "viral"], avgPrice: "R$49–R$79", category: "Beleza", analysis: "Produto viral no TikTok, público masculino fiel. Margem excelente com demonstrações em vídeo.", image: "/produtos/p26.png" },
+  { id: 4, name: "Controle Gamer Wireless", score: 81, margin: 50, competition: "Alta", difficulty: "Médio", trend: "up", tags: ["trending", "viral"], avgPrice: "R$69–R$119", category: "Games", analysis: "Nicho de games em crescimento no Brasil. Consumidores buscam alternativas mais baratas às marcas.", image: "/produtos/p28.png" },
+  { id: 5, name: "Mouse Sem Fio RGB LED", score: 79, margin: 53, competition: "Média", difficulty: "Fácil", trend: "stable", tags: ["easy-shipping", "trending"], avgPrice: "R$39–R$69", category: "Eletrônicos", analysis: "Alta busca por periféricos com iluminação RGB. Diferencial visual vende muito no feed.", image: "/produtos/p08.png" },
+  { id: 6, name: "Shorts Esportivo Dry Fit Masculino", score: 74, margin: 60, competition: "Alta", difficulty: "Fácil", trend: "stable", tags: ["easy", "easy-shipping"], avgPrice: "R$25–R$45", category: "Fitness", analysis: "Evergreen com alta rotatividade, vende bem o ano todo. Ticket baixo mas volume alto compensa.", image: "/produtos/p06.png" },
+  { id: 7, name: "Afiador de Facas 3 Estágios", score: 72, margin: 65, competition: "Baixa", difficulty: "Fácil", trend: "up", tags: ["high-margin", "easy-shipping", "easy"], avgPrice: "R$29–R$49", category: "Casa e Cozinha", analysis: "Nicho pouco explorado com margem altíssima. Produto prático que resolve dor real na cozinha.", image: "/produtos/p33.png" },
+  { id: 8, name: "Casaco Pet com Capuz", score: 77, margin: 58, competition: "Baixa", difficulty: "Fácil", trend: "up", tags: ["viral", "high-margin"], avgPrice: "R$35–R$65", category: "Pets", analysis: "Mercado pet em explosão no Brasil. Roupas para animais têm margem excelente e público muito fiel.", image: "/produtos/p38.png" },
+];
+
 function ScoreRing({ score }: { score: number }) {
   const radius = 22;
   const circ = 2 * Math.PI * radius;
@@ -187,8 +198,8 @@ function ProductCard({ product, index, onClick, aiGenerated }: {
 }
 
 export default function RadarPage() {
-  const [baseProducts, setBaseProducts] = useState<Product[]>([]);
-  const [loadingBase, setLoadingBase] = useState(true);
+  const [baseProducts, setBaseProducts] = useState<Product[]>(STATIC_PRODUCTS);
+  const [loadingBase, setLoadingBase] = useState(false);
   const [baseError, setBaseError] = useState(false);
 
   const [search, setSearch] = useState("");
@@ -200,7 +211,7 @@ export default function RadarPage() {
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const fetchBaseProducts = useCallback(async (force = false) => {
-    setLoadingBase(true);
+    if (force) setLoadingBase(true);
     setBaseError(false);
 
     if (!force) {
@@ -232,7 +243,7 @@ export default function RadarPage() {
         throw new Error("Invalid response");
       }
     } catch {
-      setBaseError(true);
+      if (force) setBaseError(true);
     } finally {
       setLoadingBase(false);
     }

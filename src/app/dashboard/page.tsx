@@ -24,6 +24,17 @@ interface FeaturedProduct {
   image?: string;
 }
 
+const STATIC_FEATURED: FeaturedProduct[] = [
+  { id: 1, name: "Smartwatch Fitness Colorido", score: 87, margin: 52, category: "Eletrônicos", avgPrice: "R$49–R$89", image: "/produtos/p11.png" },
+  { id: 2, name: "Fone TWS Sem Fio Bluetooth", score: 84, margin: 58, category: "Eletrônicos", avgPrice: "R$29–R$59", image: "/produtos/p17.png" },
+  { id: 3, name: "Boné Bordado Unissex", score: 79, margin: 62, category: "Moda", avgPrice: "R$25–R$45", image: "/produtos/p16.png" },
+  { id: 4, name: "Umidificador Portátil LED", score: 82, margin: 55, category: "Casa & Decoração", avgPrice: "R$35–R$65", image: "/produtos/p05.png" },
+  { id: 5, name: "Óculos de Sol Retrô Polarizado", score: 76, margin: 65, category: "Moda", avgPrice: "R$30–R$55", image: "/produtos/p19.png" },
+  { id: 6, name: "Power Bank 10000mAh Display LED", score: 81, margin: 48, category: "Eletrônicos", avgPrice: "R$39–R$69", image: "/produtos/p20.png" },
+  { id: 7, name: "Tapete de Yoga Antiderrapante", score: 78, margin: 57, category: "Fitness", avgPrice: "R$45–R$79", image: "/produtos/p37.png" },
+  { id: 8, name: "Mochila Executiva Expansível USB", score: 85, margin: 50, category: "Acessórios", avgPrice: "R$79–R$129", image: "/produtos/p15.png" },
+];
+
 interface ShopPreview {
   id: number;
   nome: string;
@@ -156,8 +167,8 @@ export default function DashboardPage() {
   const hour = new Date().getHours();
   const greeting = hour < 12 ? "Bom dia" : hour < 18 ? "Boa tarde" : "Boa noite";
 
-  const [products, setProducts] = useState<FeaturedProduct[]>([]);
-  const [loadingProducts, setLoadingProducts] = useState(true);
+  const [products, setProducts] = useState<FeaturedProduct[]>(STATIC_FEATURED);
+  const [loadingProducts, setLoadingProducts] = useState(false);
   const [shops, setShops] = useState<ShopPreview[]>([]);
 
   useEffect(() => {
@@ -185,7 +196,7 @@ export default function DashboardPage() {
           setProducts(data.products.slice(0, 8));
         }
       } catch {
-        // silently ignore — section just won't render
+        // silently ignore — static products already shown
       } finally {
         if (!cancelled) setLoadingProducts(false);
       }
