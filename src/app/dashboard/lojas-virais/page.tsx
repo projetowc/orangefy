@@ -354,7 +354,7 @@ function ShopModal({ shop, onClose }: { shop: Shop; onClose: () => void }) {
 
 export default function LojasViraisPage() {
   const [shops, setShops] = useState<Shop[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [error, setError] = useState(false);
   const [search, setSearch] = useState("");
   const [market, setMarket] = useState<typeof MARKETS[number]["id"]>("todos");
