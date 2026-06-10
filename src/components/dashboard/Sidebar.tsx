@@ -17,10 +17,10 @@ const navItems = [
   { href: "/dashboard", icon: LayoutDashboard, label: "Dashboard" },
   { href: "/dashboard/radar", icon: Target, label: "Radar de Produtos" },
   { href: "/dashboard/fornecedores", icon: Truck, label: "Radar de Fornecedores" },
-  { href: "/dashboard/spy", icon: Eye, label: "Spy de Concorrentes", badge: "novo" },
-  { href: "/dashboard/anuncios-virais", icon: Flame, label: "Anúncios Virais", badge: "novo" },
-  { href: "/dashboard/ads", icon: MonitorPlay, label: "Ads Concorrentes", badge: "novo" },
-  { href: "/dashboard/lojas-virais", icon: TrendingUp, label: "Lojas em Alta", badge: "novo" },
+  { href: "/dashboard/spy", icon: Eye, label: "Spy de Concorrentes" },
+  { href: "/dashboard/anuncios-virais", icon: Flame, label: "Anúncios Virais" },
+  { href: "/dashboard/ads", icon: MonitorPlay, label: "Ads Concorrentes" },
+  { href: "/dashboard/lojas-virais", icon: TrendingUp, label: "Lojas em Alta" },
   { href: "/dashboard/calculadora", icon: Calculator, label: "Calculadora" },
   { href: "/dashboard/gerador", icon: Megaphone, label: "Gerador de Anúncios" },
   { href: "/dashboard/minha-loja", icon: Store, label: "Minha Loja" },
@@ -91,11 +91,6 @@ function SidebarContent({ onClose }: { onClose?: () => void }) {
             >
               <item.icon className="w-5 h-5 flex-shrink-0" />
               <span className="flex-1">{item.label}</span>
-              {item.badge && !isActive && (
-                <span className="bg-brand text-white text-xs font-bold px-2 py-0.5 rounded-full">
-                  {item.badge}
-                </span>
-              )}
               {isActive && <ChevronRight className="w-4 h-4" />}
             </Link>
           );
