@@ -641,6 +641,42 @@ export default function LandingPage() {
         </div>
       </section>
 
+      {/* VIDEO TESTIMONIALS */}
+      <section className="py-12 px-4 bg-white">
+        <div className="max-w-6xl mx-auto">
+          <motion.div className="text-center mb-10" initial="hidden" whileInView="show" viewport={{ once: true }} variants={stagger}>
+            <motion.div variants={fadeUp} className="badge-brand inline-flex mb-3">Depoimentos em vídeo</motion.div>
+            <motion.h2 variants={fadeUp} className="text-3xl sm:text-4xl font-black text-dark mb-2">
+              Quem usa, <span className="text-gradient">recomenda</span>
+            </motion.h2>
+            <motion.p variants={fadeUp} className="text-base text-dark-muted max-w-xl mx-auto">
+              Veja na prática a experiência de quem já está usando a Orangefy para vender mais.
+            </motion.p>
+          </motion.div>
+
+          <div className="grid sm:grid-cols-2 gap-5 max-w-2xl mx-auto">
+            {["oY6ZzsLksC4", "rGLiHesEmtk"].map((videoId, i) => (
+              <motion.div
+                key={videoId}
+                className="relative rounded-2xl overflow-hidden shadow-card border border-surface-200 aspect-[9/16]"
+                initial={{ opacity: 0, y: 16 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: i * 0.08 }}
+              >
+                <iframe
+                  src={`https://www.youtube.com/embed/${videoId}`}
+                  title="Depoimento Orangefy"
+                  className="absolute inset-0 w-full h-full"
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                  allowFullScreen
+                />
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </section>
+
       {/* PRICING */}
       <section id="planos" className="py-12 px-4 bg-surface-50">
         <div className="max-w-6xl mx-auto">
