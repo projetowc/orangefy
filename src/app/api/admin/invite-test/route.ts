@@ -15,7 +15,7 @@ export async function POST(req: NextRequest) {
   }
 
   const supabase = getServiceSupabase();
-  const appUrl = process.env.NEXT_PUBLIC_APP_URL || "https://orangefy-rlhr.vercel.app";
+  const appUrl = process.env.NEXT_PUBLIC_APP_URL || "https://orange-fy.com";
 
   // Tenta convidar — se já existe, gera link de redefinição de senha
   const { error: inviteError } = await supabase.auth.admin.inviteUserByEmail(email, {

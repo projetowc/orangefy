@@ -16,7 +16,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Plano inválido" }, { status: 400 });
     }
 
-    const appUrl = process.env.NEXT_PUBLIC_APP_URL || "https://orangefy-shop.vercel.app";
+    const appUrl = process.env.NEXT_PUBLIC_APP_URL || "https://orange-fy.com";
 
     const session = await stripe.checkout.sessions.create({
       mode: "subscription",
