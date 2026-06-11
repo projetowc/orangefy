@@ -654,7 +654,7 @@ export default function LandingPage() {
             </motion.p>
           </motion.div>
 
-          <div className="grid sm:grid-cols-2 gap-5 max-w-2xl mx-auto">
+          <div className="grid grid-cols-2 gap-3 sm:gap-5 max-w-xs sm:max-w-md mx-auto">
             {["oY6ZzsLksC4", "rGLiHesEmtk"].map((videoId, i) => (
               <motion.div
                 key={videoId}
