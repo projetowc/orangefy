@@ -16,9 +16,10 @@ export async function POST(req: NextRequest) {
     }
 
     const appUrl = process.env.NEXT_PUBLIC_APP_URL || "https://orange-fy.com";
+    const isPremium = plan === "premium";
 
     const session = await stripe.checkout.sessions.create({
-      mode: "subscription",
+      mode: isPremium ? "payment" : "subscription",
       line_items: [{ price: PRICES[plan as keyof typeof PRICES], quantity: 1 }],
       success_url: `${appUrl}/checkout/sucesso?session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${appUrl}/#planos`,

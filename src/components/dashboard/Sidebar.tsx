@@ -37,7 +37,7 @@ function SidebarContent({ onClose }: { onClose?: () => void }) {
 
   const name = profile?.name || user?.email?.split("@")[0] || "Usuário";
   const initials = getInitials(name);
-  const planLabel = profile?.plan === "premium" ? "Premium"
+  const planLabel = profile?.plan === "premium" ? "Premium Vitalício"
     : profile?.plan === "lifetime" ? "Vitalício"
     : "Básico";
 

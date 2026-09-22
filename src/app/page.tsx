@@ -246,7 +246,7 @@ export default function LandingPage() {
         <div className="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-center gap-2 sm:gap-6 text-sm text-center">
           <span className="flex items-center gap-2 font-semibold">
             <Clock className="w-4 h-4 text-brand" />
-            Plano Premium por R$297,00 — Acesso completo a todas as ferramentas
+            Plano Premium Vitalício por R$297,00 — Pague uma vez, acesse para sempre
           </span>
           <span className="text-white/50 hidden sm:block">|</span>
           <span className="text-white/70">Uma única venda já cobre meses de assinatura</span>
@@ -735,15 +735,14 @@ export default function LandingPage() {
                 </div>
               </div>
               <div className="mb-4">
-                <h3 className="text-lg font-bold text-dark mb-0.5">Premium</h3>
-                <p className="text-dark-muted text-sm">Acesso completo a todas as ferramentas.</p>
+                <h3 className="text-lg font-bold text-dark mb-0.5">Premium Vitalício</h3>
+                <p className="text-dark-muted text-sm">Acesso completo para sempre, pague uma vez.</p>
               </div>
               <div className="mb-5">
                 <div className="flex items-end gap-1 leading-none">
                   <span className="text-4xl font-black text-dark">R$297</span>
-                  <span className="text-dark-muted text-sm mb-1">/mês</span>
                 </div>
-                <div className="text-xs text-dark-muted mt-1.5">Cobrado mensalmente</div>
+                <div className="text-xs text-dark-muted mt-1.5">Pagamento único — acesso vitalício</div>
               </div>
               <ul className="space-y-2 mb-6 flex-1">
                 {[...planFeatures, "Suporte prioritário", "Acesso antecipado a novidades"].map((f) => (
@@ -782,7 +781,7 @@ export default function LandingPage() {
             </motion.p>
             <motion.div variants={fadeUp} className="flex flex-col sm:flex-row gap-3 justify-center">
               <CheckoutButton plan="premium" className="bg-white text-brand font-bold rounded-xl px-7 py-3.5 hover:bg-surface-50 transition-colors flex items-center justify-center gap-2">
-                Garantir Plano Premium — R$297,00
+                Garantir Acesso Vitalício — R$297,00
                 <ChevronRight className="w-4 h-4" />
               </CheckoutButton>
               <Link href="/login" className="border-2 border-white/40 text-white font-bold rounded-xl px-7 py-3.5 hover:bg-white/10 transition-colors flex items-center justify-center gap-2">
