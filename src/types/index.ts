@@ -3,7 +3,7 @@ export interface User {
   email: string;
   name: string;
   avatar_url?: string;
-  plan: "monthly" | "annual";
+  plan: "basico" | "premium";
   status: "active" | "inactive" | "pending";
   xp: number;
   level: number;

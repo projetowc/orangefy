@@ -8,7 +8,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import {
   LayoutDashboard, Target, Calculator, Megaphone,
   Store, Settings, LogOut,
-  ChevronRight, X, Menu, Bot, Truck, Eye, Flame, TrendingUp, MonitorPlay, Bookmark
+  ChevronRight, X, Menu, Bot, Truck, Eye, Flame, TrendingUp, MonitorPlay, Bookmark, PlugZap
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useUser, getInitials, getFirstName } from "@/context/UserContext";
@@ -23,6 +23,7 @@ const navItems = [
   { href: "/dashboard/lojas-virais", icon: TrendingUp, label: "Lojas em Alta" },
   { href: "/dashboard/calculadora", icon: Calculator, label: "Calculadora" },
   { href: "/dashboard/gerador", icon: Megaphone, label: "Gerador de Anúncios" },
+  { href: "/dashboard/integracoes", icon: PlugZap, label: "Integrações" },
   { href: "/dashboard/minha-loja", icon: Store, label: "Minha Loja" },
   { href: "/dashboard/produtos-salvos", icon: Bookmark, label: "Produtos Salvos" },
   { href: "/dashboard/assistente", icon: Bot, label: "Assistente IA" },
@@ -36,10 +37,9 @@ function SidebarContent({ onClose }: { onClose?: () => void }) {
 
   const name = profile?.name || user?.email?.split("@")[0] || "Usuário";
   const initials = getInitials(name);
-  const planLabel = profile?.plan === "quarterly" ? "Trimestral"
-    : profile?.plan === "annual" ? "Anual"
+  const planLabel = profile?.plan === "premium" ? "Premium"
     : profile?.plan === "lifetime" ? "Vitalício"
-    : "Mensal";
+    : "Básico";
 
   return (
     <div className="flex flex-col h-full">

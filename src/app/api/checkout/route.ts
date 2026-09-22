@@ -2,9 +2,8 @@ import { NextRequest, NextResponse } from "next/server";
 import Stripe from "stripe";
 
 const PRICES = {
-  monthly:   process.env.STRIPE_PRICE_MONTHLY!,
-  quarterly: process.env.STRIPE_PRICE_QUARTERLY!,
-  annual:    process.env.STRIPE_PRICE_ANNUAL!,
+  basico:   process.env.STRIPE_PRICE_BASICO!,
+  premium:  process.env.STRIPE_PRICE_PREMIUM!,
 };
 
 export async function POST(req: NextRequest) {
